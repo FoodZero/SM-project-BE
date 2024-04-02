@@ -37,3 +37,6 @@ coolsms:
     key: ${API_KEY}
     secret: ${API_SECRET}
   senderNumber: ${SENDER_NUMBER}
+
+chatgpt:
+  key: ${GPT_KEY}

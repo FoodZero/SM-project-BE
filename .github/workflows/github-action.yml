@@ -44,6 +44,7 @@ jobs:
           coolsms.api.key: ${{ secrets.COOLSMS_API_KEY }}
           coolsms.api.secret: ${{ secrets.COOLSMS_API_SECRET }}
           coolsms.senderNumber: ${{ secrets.COOLSMS_SENDER_NUMBER }}
+          chatgpt.key: ${{ secrets.GPT_KEY }}
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
