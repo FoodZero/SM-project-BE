@@ -26,7 +26,7 @@ public class ChatGPTController {
     private final ChatGPTService chatGPTService;
 
     @PostMapping("/prompt")
-    @Operation(summary = "ChatGPT 대화 api", description = "ChatGPT에게 레시피를 물어보는 api입니다. prompt에 입력해주세요." )
+    @Operation(summary = "ChatGPT 질문 api", description = "ChatGPT에게 레시피를 물어보는 api입니다. prompt에 입력해주세요." )
     public ResponseDTO<?> prompt(@RequestBody @Valid ChatGPTRequestDTO.PromptDTO request) {
         return ResponseDTO.of(SuccessStatus._OK, chatGPTService.prompt(request));
     }

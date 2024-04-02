@@ -16,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ChatGPTService {
     private OpenAiService openAiService;
-    @Value("${GPT_KEY}")
+    @Value("${chatgpt.key}")
     private String gptKey;
     private static final String MODEL = "gpt-3.5-turbo";
 
