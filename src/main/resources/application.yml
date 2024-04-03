@@ -50,6 +50,7 @@ logging:
   level:
     org.hibernate.SQL: info
     org.hibernate.type: trace
+    com.sm.project.feignClient.naver.NaverOCRFeignClient: DEBUG
     com.sm.project.feignClient.lambda.LambdaFeignClient: DEBUG
 servlet:
   multipart:
@@ -86,7 +87,10 @@ feign:
       default:
         connectTimeout: 5000
         readTimeout: 5000
-        loggerLevel: basic
+        loggerLevel: FULL
+
+
+
 
 coolsms:
   api:

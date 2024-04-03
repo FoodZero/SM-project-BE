@@ -41,6 +41,7 @@ public class FoodConverter {
 
 
 
+
     public static NaverOCRRequest toNaverOCRRequestDTO(String receiptUrl){
 
         List<Long> template = new ArrayList<>();

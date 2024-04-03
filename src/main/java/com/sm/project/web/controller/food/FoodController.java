@@ -88,6 +88,7 @@ public class FoodController {
     public ResponseDTO<?> uploadReceipt(@RequestParam("receipt") MultipartFile receipt, Authentication authentication) throws Exception{
 
         Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        
         //S3에 영수증 사진 업로드
         String receiptUrl = foodService.uploadReceipt(member,receipt);
 
@@ -104,4 +105,6 @@ public class FoodController {
 
 
     }
+
+
 }
