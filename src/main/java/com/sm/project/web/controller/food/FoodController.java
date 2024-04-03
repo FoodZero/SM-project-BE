@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -79,5 +80,14 @@ public class FoodController {
         foodService.deleteFood(member,refrigeratorId,foodId);
 
         return ResponseDTO.of(SuccessStatus.FOOD_DELETE_SUCCESS,null);
+    }
+
+    @PostMapping(value = "/food/receipt", consumes = "multipart/form-data")
+    @Operation(summary = "영수증 사진 등록 api", description = "영수증 사진을 담아서 호출하면 사진이 저장됩니다.")
+    public ResponseDTO<?> uploadReceipt(@RequestParam("receipt") MultipartFile receipt, Authentication authentication){
+
+        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        foodService.uploadReceipt(member,receipt);
+        return ResponseDTO.of(SuccessStatus.RECEIPT_UPLOAD_SUCCESS, null);
     }
 }

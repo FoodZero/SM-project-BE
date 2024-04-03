@@ -87,5 +87,19 @@ coolsms:
     secret: ${API_SECRET}
   senderNumber: ${SENDER_NUMBER}
 
+cloud:
+  aws:
+    s3:
+      bucket: sm-project-refrigerator
+      path:
+        receipt: receipt
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+    credentials:
+      accessKey: ${CLOUD_AWS_CREDENTIALS_ACCESSKEY}
+      secretKey: ${CLOUD_AWS_CREDENTIALS_SECRETKEY}
+
 chatgpt:
   key: ${GPT_KEY}

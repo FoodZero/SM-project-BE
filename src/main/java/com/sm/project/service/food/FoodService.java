@@ -2,13 +2,17 @@ package com.sm.project.service.food;
 
 import com.sm.project.converter.food.FoodConverter;
 import com.sm.project.domain.food.Food;
+import com.sm.project.domain.image.ReceiptImage;
 import com.sm.project.domain.member.Member;
 import com.sm.project.repository.food.FoodRepository;
+import com.sm.project.repository.food.ReceiptImageRepository;
+import com.sm.project.service.UtilService;
 import com.sm.project.web.dto.food.FoodRequestDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -19,6 +23,8 @@ import java.util.List;
 public class FoodService {
 
     private final FoodRepository foodRepository;
+    private final ReceiptImageRepository receiptImageRepository;
+    private final UtilService utilService;
 
     public void uploadFood(FoodRequestDTO.UploadFoodDTO request, Member member, Integer refrigeratorId){
 
@@ -46,6 +52,16 @@ public class FoodService {
         Food deleteFood = foodRepository.findByMemberAndIdAndRefrigeratorId(member, foodId, refrigeratorId);
         foodRepository.delete(deleteFood);
         return;
+    }
+
+    public void uploadReceipt(Member member, MultipartFile receipt){
+
+        String receiptUrl = utilService.uploadS3Img("receipt", receipt);
+        ReceiptImage receiptImage = ReceiptImage.builder()
+                .url(receiptUrl)
+                .member(member)
+                .build();
+        receiptImageRepository.save(receiptImage);
     }
 
 }
