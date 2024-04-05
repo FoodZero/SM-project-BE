@@ -50,6 +50,8 @@ logging:
   level:
     org.hibernate.SQL: info
     org.hibernate.type: trace
+    com.sm.project.feignClient.naver.NaverOCRFeignClient: DEBUG
+    com.sm.project.feignClient.lambda.LambdaFeignClient: DEBUG
 servlet:
   multipart:
     enabled: true
@@ -73,19 +75,44 @@ oauth2:
     client-id: ${KAKAO_CLIENT_ID}
     redirect-uri: ${KAKAO_REDIRECT_URI}
 
+naver:
+  ocr:
+    secret: ${NAVER_OCR_SECRET}
+    url: ${NAVER_OCR_URL}
+    template: ${NAVER_OCR_TEMPLATE}
+
 feign:
   client:
     config:
       default:
         connectTimeout: 5000
         readTimeout: 5000
-        loggerLevel: basic
+        loggerLevel: FULL
+
+
+
 
 coolsms:
   api:
     key: ${API_KEY}
     secret: ${API_SECRET}
   senderNumber: ${SENDER_NUMBER}
+
+cloud:
+  aws:
+    s3:
+      bucket: sm-project-refrigerator
+      path:
+        receipt: receipt
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+    credentials:
+      accessKey: ${CLOUD_AWS_CREDENTIALS_ACCESSKEY}
+      secretKey: ${CLOUD_AWS_CREDENTIALS_SECRETKEY}
+    lambda:
+      url: ${LAMBDA_URL}
 
 chatgpt:
   key: ${GPT_KEY}

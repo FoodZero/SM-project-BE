@@ -7,6 +7,7 @@ import com.sm.project.apiPayload.exception.handler.MemberHandler;
 import com.sm.project.converter.food.FoodConverter;
 import com.sm.project.domain.food.Food;
 import com.sm.project.domain.member.Member;
+import com.sm.project.feignClient.dto.NaverOCRResponse;
 import com.sm.project.service.food.FoodService;
 import com.sm.project.service.member.MemberQueryService;
 import com.sm.project.web.dto.food.FoodRequestDTO;
@@ -18,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -80,4 +82,29 @@ public class FoodController {
 
         return ResponseDTO.of(SuccessStatus.FOOD_DELETE_SUCCESS,null);
     }
+
+    @PostMapping(value = "/food/receipt", consumes = "multipart/form-data")
+    @Operation(summary = "영수증 사진 등록 api", description = "영수증 사진을 담아서 호출하면 사진이 저장됩니다.")
+    public ResponseDTO<?> uploadReceipt(@RequestParam("receipt") MultipartFile receipt, Authentication authentication) throws Exception{
+
+        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        
+        //S3에 영수증 사진 업로드
+        String receiptUrl = foodService.uploadReceipt(member,receipt);
+
+        //저장된 사진 가져와서 OCR로 텍스트 데이터 가져오기
+        NaverOCRResponse naverOCRResponse = foodService.uploadReceiptData(receiptUrl);
+
+        // 영수증에서 가져온 json 형태 데이터 식품 이름 아닌 것 필터링해서 List로 저장
+        List<String> foodList = foodService.filterReceipt(naverOCRResponse);
+
+        //식품 분류해주는 모델을 이용해서 식품인지 아닌지 구분해서 식품만 가져오기
+        List<String> classifyFoodList = foodService.classifyFood(foodList);
+
+        return ResponseDTO.of(SuccessStatus.RECEIPT_UPLOAD_SUCCESS, FoodConverter.toOCRResponseDTO(classifyFoodList));
+
+
+    }
+
+
 }

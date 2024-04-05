@@ -29,5 +29,12 @@ public class FoodResponseDTO {
         List<FoodDTO> foodList;
     }
 
+    @Builder
+    @Getter
+    @AllArgsConstructor(access = AccessLevel.PROTECTED)
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class OCRResponseDTO{
+        List<String> foodList;
+    }
 
 }
