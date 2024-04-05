@@ -1,8 +1,12 @@
 package com.sm.project.web.controller.member;
 
 import com.sm.project.apiPayload.ResponseDTO;
+import com.sm.project.apiPayload.code.ErrorReasonDTO;
 import com.sm.project.apiPayload.code.status.ErrorStatus;
+import com.sm.project.apiPayload.code.status.SuccessStatus;
 import com.sm.project.apiPayload.exception.handler.MemberHandler;
+import com.sm.project.converter.member.MemberConverter;
+import com.sm.project.domain.member.Member;
 import com.sm.project.service.mail.MailService;
 import com.sm.project.service.member.MemberService;
 import com.sm.project.web.dto.member.MemberRequestDTO;
@@ -145,4 +149,8 @@ public class MemberController {
         memberService.resetPassword(request);
         return ResponseDTO.of(SuccessStatus._OK, "비밀번호 재설정 성공");
     }
+
+
+
+
 }

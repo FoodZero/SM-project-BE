@@ -13,7 +13,10 @@ import java.util.List;
 
 public interface FoodRepository extends JpaRepository<Food, Long> {
 
+
     List<Food> findAllByMemberAndRefrigeratorId(Member member, Integer refrigeratorId);
+
+    List<Food> findTop5ByMemberOrderByExpireDesc(Member member);
 
     Food findByMemberAndIdAndRefrigeratorId(Member member, Long foodId, Integer refrigeratorId);
     @Transactional

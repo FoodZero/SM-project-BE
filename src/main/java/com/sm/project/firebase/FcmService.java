@@ -23,7 +23,6 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class FcmService{
 
-    private String fcmUrl = "https://fcm.googleapis.com/v1/projects/zipdabang-android/messages:send";
 
     private final ObjectMapper objectMapper;
 
@@ -33,7 +32,7 @@ public class FcmService{
 
 
     @Transactional
-    public void sendMessage(String targetToken, String title, String body, String targetView, String targetPK, String targetNotification) throws IOException {
+    public void sendMessage(String targetToken, String title, String body) throws IOException {
         String aosMessage = makeMessage(targetToken, title, body);
 
         FcmResponseDTO fcmResponse = fcmFeignClient.getFCMResponse("Bearer " + getAccessToken(),aosMessage);
