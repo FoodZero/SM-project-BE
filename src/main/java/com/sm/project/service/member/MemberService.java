@@ -117,7 +117,7 @@ public class MemberService {
 
     @Transactional
     public Member joinMember(MemberRequestDTO.JoinDTO request) {
-        //verifySms(request.getPhone(), request.getCertificationCode()); //인증코드 검사
+        verifySms(request.getPhone(), request.getCertificationCode()); //인증코드 검사
 
         if (memberRepository.findByEmail(request.getEmail()).isPresent()) { //이메일 중복 검사
             throw new MemberHandler(ErrorStatus.MEMBER_ALREADY_JOIN);
