@@ -18,7 +18,9 @@ public enum SuccessStatus implements BaseCode {
     FOOD_GET_SUCCESS(HttpStatus.OK, "FOOD2002", "음식 조회 성공"),
     FOOD_DELETE_SUCCESS(HttpStatus.OK, "FOOD2003", "음식 삭제 성공"),
     //RECEIPT
-    RECEIPT_UPLOAD_SUCCESS(HttpStatus.OK, "RECEIPT200", "영수증 저장 성공");
+    RECEIPT_UPLOAD_SUCCESS(HttpStatus.OK, "RECEIPT200", "영수증 저장 성공"),
+    //MEMBER
+    MEMBER_PUSH_SUCCESS(HttpStatus.OK, "MEMBER200", "앱 푸쉬 성공");
 
     private final HttpStatus httpStatus;
     private final String code;

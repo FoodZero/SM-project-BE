@@ -1,9 +1,11 @@
 package com.sm.project.web.dto.member;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.constraints.*;
-import java.time.LocalDate;
 
 public class MemberRequestDTO {
 
@@ -40,6 +42,12 @@ public class MemberRequestDTO {
 
         Boolean infoAgree;
         Boolean messageAgree;
+
+        @NotBlank
+        private String fcmToken;
+
+        @NotBlank
+        private String serialNumber;
 
         //인증번호
         @NotBlank(message = "인증번호는 필수 입력값입니다.")

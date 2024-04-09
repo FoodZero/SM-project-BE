@@ -7,13 +7,17 @@ import com.sm.project.config.springSecurity.TokenProvider;
 import com.sm.project.converter.member.MemberConverter;
 import com.sm.project.coolsms.RedisUtil;
 import com.sm.project.coolsms.SmsUtil;
+import com.sm.project.domain.member.FcmRepository;
+import com.sm.project.domain.member.FcmToken;
 import com.sm.project.domain.member.Member;
 import com.sm.project.domain.member.MemberPassword;
 import com.sm.project.feignClient.dto.KakaoProfile;
 import com.sm.project.feignClient.dto.KakaoTokenResponse;
 import com.sm.project.feignClient.kakao.KakaoTokenFeignClient;
 import com.sm.project.feignClient.service.KakaoOauthService;
+import com.sm.project.firebase.FcmService;
 import com.sm.project.redis.service.RedisService;
+import com.sm.project.repository.food.FoodRepository;
 import com.sm.project.repository.member.MemberPasswordRepository;
 import com.sm.project.repository.member.MemberRepository;
 import com.sm.project.service.mail.MailService;
@@ -22,21 +26,23 @@ import com.sm.project.web.dto.member.MemberResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.MessagingException;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 @Transactional
+@EnableScheduling
 public class MemberService {
 
     private final RedisService redisService;
@@ -46,10 +52,13 @@ public class MemberService {
     private final MemberPasswordRepository memberPasswordRepository;
     private final KakaoOauthService kakaoOauthService;
     private final KakaoTokenFeignClient tokenClient;
+    private final FoodRepository foodRepository;
+    private final FcmService fcmService;
     private final SmsUtil smsUtil;
     private final RedisUtil redisUtil;
     private final MemberQueryService memberQueryService;
     private final MailService mailService;
+    private final FcmRepository fcmRepository;
 
 
     @Value("${oauth2.kakao.client-id}")
@@ -108,13 +117,23 @@ public class MemberService {
 
     @Transactional
     public Member joinMember(MemberRequestDTO.JoinDTO request) {
-        verifySms(request.getPhone(), request.getCertificationCode()); //인증코드 검사
+        //verifySms(request.getPhone(), request.getCertificationCode()); //인증코드 검사
 
         if (memberRepository.findByEmail(request.getEmail()).isPresent()) { //이메일 중복 검사
             throw new MemberHandler(ErrorStatus.MEMBER_ALREADY_JOIN);
         }
+
         Member newMember = MemberConverter.toMember(request);
         memberRepository.save(newMember);
+
+        FcmToken fcmToken = FcmToken.builder()
+                .token(request.getFcmToken())
+                .serialNumber(request.getSerialNumber())
+                .build();
+
+        fcmToken.setMember(newMember);
+
+        fcmRepository.save(fcmToken);
 
         //패스워드 해시처리.
         String password = encoder.encode(request.getPassword());
@@ -126,6 +145,34 @@ public class MemberService {
         Member member = memberRepository.findByNickname(request.getNickname());
         return (member!=null);
     }
+    //@Scheduled(cron = "0 0 17 * * ?")
+    //
+    //@Scheduled(cron = "0 0/1 * * * ?")
+    public void sendPushAlarm() throws IOException {
+        List<Member> memberList = memberRepository.findAll();
+        Map<String,Integer> map = new HashMap<>();
+        Date currentTime = new Date();
+
+        memberList.stream().forEach(member -> {
+            foodRepository.findTop5ByMemberOrderByExpireDesc(member).stream().forEach(food -> {
+                map.put(food.getName(), (int) (currentTime.getTime() - food.getExpire().getTime()));
+            });
+            try {
+                String result = map.entrySet().stream()
+                        .map(entry -> entry.getKey() + "의 유통기한: " + entry.getValue() + "일 남음")
+                        .collect(Collectors.joining("\n"));
+                fcmService.sendMessage(member.getFcmTokenList().get(0).getToken(),"유통기한이 곧 지나는 식품들입니다.",result);
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+
+
+    }
+
+
 
     public void sendSms(MemberRequestDTO.SmsDTO smsDTO) {
         String to = smsDTO.getPhone();
@@ -181,5 +228,7 @@ public class MemberService {
             throw new MemberHandler(ErrorStatus.MEMBER_PASSWORD_MISMATCH);
         }
     }
+
+
 
 }

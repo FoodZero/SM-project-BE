@@ -63,6 +63,9 @@ public class Member extends BaseDateTimeEntity {
 
     private String resetToken;
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<FcmToken> fcmTokenList;
+
     public void setResetToken(String resetToken) {
         this.resetToken = resetToken;
     }

@@ -35,6 +35,9 @@ public enum ErrorStatus implements BaseErrorCode {
 
     //FeignClient
     FEIGN_CLIENT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "5001", "Inter server Error in feign client"),
+
+    //Fcm
+    FCM_REQUEST_TOKEN_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "FCM4001", "구글 request 토큰 오류"),
     ;
 
 
