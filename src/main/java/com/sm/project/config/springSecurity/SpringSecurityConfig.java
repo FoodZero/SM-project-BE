@@ -50,7 +50,8 @@ public class SpringSecurityConfig {
                         "/api/members/password/send",
                         "/api/members/password",
                         "/api/members/nickname",
-                        "/api/members/password/reset"
+                        "/api/members/password/reset",
+                        "/api/food/**"
                 );
     }
     @Bean

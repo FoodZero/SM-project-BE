@@ -24,7 +24,7 @@ public class FcmToken {
     private String serialNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "member_id")
     private Member member;
 
     public void setMember(Member member){

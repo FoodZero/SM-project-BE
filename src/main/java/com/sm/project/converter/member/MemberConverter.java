@@ -1,12 +1,12 @@
 package com.sm.project.converter.member;
 
 import com.sm.project.domain.enums.JoinType;
-import com.sm.project.web.dto.member.MemberResponseDTO;
 import com.sm.project.domain.member.Member;
 import com.sm.project.domain.member.MemberPassword;
 import com.sm.project.web.dto.member.MemberRequestDTO;
+import com.sm.project.web.dto.member.MemberResponseDTO;
 
-import javax.validation.constraints.Email;
+import java.util.ArrayList;
 
 
 public class MemberConverter {
@@ -26,6 +26,7 @@ public class MemberConverter {
                 .phone(request.getPhone())
                 .infoAgree(request.getInfoAgree())
                 .messageAgree(request.getMessageAgree())
+                .fcmTokenList(new ArrayList<>())
                 .joinType(JoinType.GENERAL)
                 .build();
     }

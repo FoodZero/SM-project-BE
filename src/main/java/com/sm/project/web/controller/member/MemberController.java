@@ -8,15 +8,11 @@ import com.sm.project.apiPayload.exception.handler.MemberHandler;
 import com.sm.project.converter.member.MemberConverter;
 import com.sm.project.domain.member.Member;
 import com.sm.project.service.mail.MailService;
+import com.sm.project.service.member.MemberQueryService;
 import com.sm.project.service.member.MemberService;
 import com.sm.project.web.dto.member.MemberRequestDTO;
 import com.sm.project.web.dto.member.MemberResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
-import com.sm.project.apiPayload.code.ErrorReasonDTO;
-import com.sm.project.apiPayload.code.status.SuccessStatus;
-import com.sm.project.converter.member.MemberConverter;
-import com.sm.project.domain.member.Member;
-import com.sm.project.service.member.MemberQueryService;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -29,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 @RestController
@@ -151,6 +148,15 @@ public class MemberController {
     }
 
 
+    @PostMapping("/fcm/send")
+    @Operation(summary = "앱 푸쉬 전송 api", description = "")
+    public ResponseDTO<?> pushMessage() throws IOException {
+
+        //Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        memberService.sendPushAlarm();
+
+        return ResponseDTO.of(SuccessStatus.MEMBER_PUSH_SUCCESS,null);
+    }
 
 
 }
