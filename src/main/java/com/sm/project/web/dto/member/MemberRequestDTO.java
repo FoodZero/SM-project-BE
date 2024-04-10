@@ -46,9 +46,6 @@ public class MemberRequestDTO {
         @NotBlank
         private String fcmToken;
 
-        @NotBlank
-        private String serialNumber;
-
         //인증번호
         @NotBlank(message = "인증번호는 필수 입력값입니다.")
         String certificationCode;

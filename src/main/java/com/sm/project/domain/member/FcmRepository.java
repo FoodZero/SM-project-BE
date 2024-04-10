@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface FcmRepository extends JpaRepository<FcmToken, Long> {
 
-    Optional<FcmToken> findByTokenAndSerialNumber(String token, String serialNumber);
+    Optional<FcmToken> findByToken(String token);
 
     List<FcmToken> findAllByMember(Member member);
 }

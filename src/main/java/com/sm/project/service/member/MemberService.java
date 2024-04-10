@@ -128,7 +128,6 @@ public class MemberService {
 
         FcmToken fcmToken = FcmToken.builder()
                 .token(request.getFcmToken())
-                .serialNumber(request.getSerialNumber())
                 .build();
 
         fcmToken.setMember(newMember);

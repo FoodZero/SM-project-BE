@@ -20,8 +20,6 @@ public class FcmToken {
 
     private String token;
 
-    @Column(unique = true)
-    private String serialNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
