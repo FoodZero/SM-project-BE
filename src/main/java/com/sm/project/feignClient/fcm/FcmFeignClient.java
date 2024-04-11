@@ -14,6 +14,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 public interface FcmFeignClient {
 
 
-    @PostMapping("/v1/projects/sm-project/messages:send")
+    @PostMapping("/v1/projects/sm-project-ea2a9/messages:send")
     FcmResponseDTO getFCMResponse(@RequestHeader("Authorization") String token, @RequestBody String fcmMessage);
 }

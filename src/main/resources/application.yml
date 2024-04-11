@@ -50,8 +50,6 @@ logging:
   level:
     org.hibernate.SQL: info
     org.hibernate.type: trace
-    com.sm.project.feignClient.naver.NaverOCRFeignClient: DEBUG
-    com.sm.project.feignClient.lambda.LambdaFeignClient: DEBUG
 servlet:
   multipart:
     enabled: true
