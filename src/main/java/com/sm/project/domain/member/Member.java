@@ -2,6 +2,7 @@ package com.sm.project.domain.member;
 
 
 import com.sm.project.domain.Common.BaseDateTimeEntity;
+import com.sm.project.domain.community.Post;
 import com.sm.project.domain.enums.JoinType;
 import com.sm.project.domain.enums.StatusType;
 import com.sm.project.domain.food.Food;
@@ -65,6 +66,9 @@ public class Member extends BaseDateTimeEntity {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<FcmToken> fcmTokenList;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<Post> postList;
 
     public void setResetToken(String resetToken) {
         this.resetToken = resetToken;

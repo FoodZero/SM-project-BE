@@ -1,8 +1,6 @@
 package com.sm.project.service.community;
 
-import com.sm.project.domain.community.Post;
 import com.sm.project.repository.community.PostRepository;
-import com.sm.project.web.dto.community.PostRequestDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -12,16 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @RequiredArgsConstructor
 @Transactional
-public class PostService {
+public class PostQueryService {
 
     private final PostRepository postRepository;
-    private final PostQueryService postQueryService;
-
-    public void createPost(Post post) {
-        postRepository.save(post);
-    }
-
-    public void updatePost() {
-
-    }
 }
