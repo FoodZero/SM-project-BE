@@ -21,7 +21,8 @@ public class PostService {
         postRepository.save(post);
     }
 
-    public void updatePost() {
-
+    public void updatePost(Long postId, PostRequestDTO.UpdateDTO request) {
+        Post post = postQueryService.findPostById(postId);
+        post.changePost(request.getContent(), request.getLatitude(), request.getLongitude()); //변경감지
     }
 }

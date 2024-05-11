@@ -15,4 +15,5 @@ public class PostConverter {
                 .longitude(request.getLongitude())
                 .build();
     }
+
 }

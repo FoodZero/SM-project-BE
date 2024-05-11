@@ -35,4 +35,11 @@ public class Post extends BaseDateTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
+    public void changePost(String content, double latitude, double longitude) {
+        this.content = content;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+
 }

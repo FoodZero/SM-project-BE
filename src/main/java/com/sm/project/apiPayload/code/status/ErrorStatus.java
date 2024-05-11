@@ -38,6 +38,9 @@ public enum ErrorStatus implements BaseErrorCode {
 
     //Fcm
     FCM_REQUEST_TOKEN_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "FCM4001", "구글 request 토큰 오류"),
+
+    //Post
+    POST_NOT_FOUND(HttpStatus.NOT_FOUND, "POST4001", "해당 포스트를 찾을 수 없습니다.")
     ;
 
 

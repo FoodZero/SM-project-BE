@@ -5,7 +5,9 @@ import com.sm.project.apiPayload.code.status.ErrorStatus;
 import com.sm.project.apiPayload.code.status.SuccessStatus;
 import com.sm.project.apiPayload.exception.handler.MemberHandler;
 import com.sm.project.converter.community.PostConverter;
+import com.sm.project.domain.community.Post;
 import com.sm.project.domain.member.Member;
+import com.sm.project.service.community.PostQueryService;
 import com.sm.project.service.community.PostService;
 import com.sm.project.service.member.MemberQueryService;
 import com.sm.project.web.dto.community.PostRequestDTO;
@@ -37,11 +39,10 @@ public class PostController {
         return ResponseDTO.of(SuccessStatus.POST_CREATE_SUCCESS, null);
     }
 
-    @PatchMapping("/update")
+    @PatchMapping("/update/{postId}")
     @Operation(summary = "커뮤니티 글 수정 API", description = "커뮤니티에서 게시글을 수정하는 api입니다.")
-    public ResponseDTO<?> updatePost(Authentication auth, @RequestBody PostRequestDTO.UpdateDTO request) {
-        Member member = memberQueryService.findMemberById(Long.valueOf(auth.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
-        postService.updatePost();
+    public ResponseDTO<?> updatePost(@PathVariable Long postId, @RequestBody PostRequestDTO.UpdateDTO request) {
+        postService.updatePost(postId, request);
         return ResponseDTO.of(SuccessStatus.POST_UPDATE_SUCCESS, null);
     }
 
