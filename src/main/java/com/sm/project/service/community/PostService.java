@@ -25,4 +25,9 @@ public class PostService {
         Post post = postQueryService.findPostById(postId);
         post.changePost(request.getContent(), request.getLatitude(), request.getLongitude()); //변경감지
     }
+
+    public void deletePost(Long postId) {
+        Post post = postQueryService.findPostById(postId);
+        postRepository.delete(post);
+    }
 }

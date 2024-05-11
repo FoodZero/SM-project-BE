@@ -23,7 +23,8 @@ public enum SuccessStatus implements BaseCode {
     MEMBER_PUSH_SUCCESS(HttpStatus.OK, "MEMBER200", "앱 푸쉬 성공"),
     //POST
     POST_CREATE_SUCCESS(HttpStatus.OK, "POST200", "글 등록 성공"),
-    POST_UPDATE_SUCCESS(HttpStatus.OK, "POST200", "글 수정 성공");
+    POST_UPDATE_SUCCESS(HttpStatus.OK, "POST2001", "글 수정 성공"),
+    POST_DELETE_SUCCESS(HttpStatus.OK, "POST2002", "글 삭제 성공");
 
     private final HttpStatus httpStatus;
     private final String code;
