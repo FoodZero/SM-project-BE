@@ -110,14 +110,15 @@ public class PostController {
 
     @PatchMapping("/update/{postId}")
     @Operation(summary = "커뮤니티 글 수정 API", description = "커뮤니티에서 게시글을 수정하는 api입니다.")
-    public ResponseDTO<?> updatePost(@PathVariable Long postId, @RequestBody PostRequestDTO.UpdateDTO request) {
+    public ResponseDTO<?> updatePost(@PathVariable(name = "postId") Long postId, @RequestBody PostRequestDTO.UpdateDTO request) {
         postService.updatePost(postId, request);
         return ResponseDTO.of(SuccessStatus.POST_UPDATE_SUCCESS, null);
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/delete/{postId}")
     @Operation(summary = "커뮤니티 글 삭제 API", description = "커뮤니티에서 게시글을 삭제하는 api입니다.")
-    public ResponseDTO<?> deletePost() {
-        return null;
+    public ResponseDTO<?> deletePost(@PathVariable(name = "postId") Long postId) {
+        postService.deletePost(postId);
+        return ResponseDTO.of(SuccessStatus.POST_DELETE_SUCCESS, null);
     }
 }
