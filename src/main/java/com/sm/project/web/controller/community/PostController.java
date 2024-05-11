@@ -96,4 +96,28 @@ public class PostController {
         postService.deletePost(postId);
         return ResponseDTO.of(SuccessStatus.POST_DELETE_SUCCESS, null);
     }
+
+    private final MemberQueryService memberQueryService;
+    private final PostService postService;
+
+    @PostMapping("/create")
+    @Operation(summary = "커뮤니티 글 등록 API", description = "커뮤니티에서 게시글을 등록하는 api입니다.")
+    public ResponseDTO<?> createPost(Authentication auth, @RequestBody PostRequestDTO.CreateDTO request) {
+        Member member = memberQueryService.findMemberById(Long.valueOf(auth.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        postService.createPost(PostConverter.toPost(member, request));
+        return ResponseDTO.of(SuccessStatus.POST_CREATE_SUCCESS, null);
+    }
+
+    @PatchMapping("/update/{postId}")
+    @Operation(summary = "커뮤니티 글 수정 API", description = "커뮤니티에서 게시글을 수정하는 api입니다.")
+    public ResponseDTO<?> updatePost(@PathVariable Long postId, @RequestBody PostRequestDTO.UpdateDTO request) {
+        postService.updatePost(postId, request);
+        return ResponseDTO.of(SuccessStatus.POST_UPDATE_SUCCESS, null);
+    }
+
+    @DeleteMapping("/delete")
+    @Operation(summary = "커뮤니티 글 삭제 API", description = "커뮤니티에서 게시글을 삭제하는 api입니다.")
+    public ResponseDTO<?> deletePost() {
+        return null;
+    }
 }

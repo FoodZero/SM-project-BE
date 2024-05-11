@@ -8,6 +8,7 @@ import com.sm.project.domain.member.Member;
 import lombok.*;
 
 import javax.persistence.*;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +23,9 @@ public class Post extends BaseDateTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "post_id")
     private Long id;
+
+    @Column(nullable = false, columnDefinition = "GEOMETRY")
+    private Point2D.Double geography;
 
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;

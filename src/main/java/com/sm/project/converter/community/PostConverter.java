@@ -1,6 +1,8 @@
 package com.sm.project.converter.community;
 
 import com.sm.project.domain.community.Post;
+import com.sm.project.domain.member.Member;
+import com.sm.project.web.dto.community.PostRequestDTO;
 import com.sm.project.domain.enums.PostStatusType;
 import com.sm.project.domain.enums.PostTopicType;
 import com.sm.project.domain.member.Location;
