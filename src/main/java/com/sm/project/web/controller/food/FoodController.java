@@ -49,6 +49,16 @@ public class FoodController {
 
     }
 
+    @GetMapping("/refrigerator")
+    @Operation(summary = "냉장고 조회 API", description = "냉장고 조회 api")
+    public ResponseDTO<FoodResponseDTO.RefrigeratorListDTO> getRefrigerator(Authentication authentication){
+        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        List<Refrigerator> refrigeratorList = foodService.getRefrigeratorList(member);
+
+        return ResponseDTO.onSuccess(FoodConverter.toGetRefrigeratorListResultDTO(refrigeratorList));
+    }
+
     @PostMapping("/refrigerator")
     @Operation(summary = "냉장고 생성 API", description = "name에 냉장고 이름 적고 냉장고 추가할 때 사용하면 됩니다.")
     public ResponseDTO<?> postRefrigerator(Authentication authentication,
