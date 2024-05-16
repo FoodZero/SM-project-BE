@@ -1,6 +1,7 @@
 package com.sm.project.converter.food;
 
 import com.sm.project.domain.food.Food;
+import com.sm.project.domain.food.Refrigerator;
 import com.sm.project.domain.member.Member;
 import com.sm.project.feignClient.dto.Image;
 import com.sm.project.feignClient.dto.NaverOCRRequest;
@@ -18,15 +19,25 @@ public class FoodConverter {
 
         return Food.builder()
                 .name(request.getName())
-                .refrigeratorId(refrigeratorId)
                 .count(request.getCount())
                 .expire(request.getExpire())
                 .foodType(request.getFoodType())
-                .member(member)
                 .build();
     }
 
+    public static FoodResponseDTO.RefrigeratorListDTO toGetRefrigeratorListResultDTO(List<Refrigerator> refrigeratorList){
 
+        List<FoodResponseDTO.RefrigeratorDTO> refrigeratorDTOList = refrigeratorList.stream()
+                                                                    .map(refrigerator -> FoodResponseDTO.RefrigeratorDTO
+                                                                            .builder()
+                                                                            .id(refrigerator.getId())
+                                                                            .name(refrigerator.getName())
+                                                                            .build()).collect(Collectors.toList());
+
+        return FoodResponseDTO.RefrigeratorListDTO.builder()
+                .refrigeratorList(refrigeratorDTOList)
+                .build();
+    }
     public static FoodResponseDTO.FoodListDTO toGetFoodListResultDTO(List<Food> foodList){
         List<FoodResponseDTO.FoodDTO> foodListDTO = foodList.stream().map(food -> FoodResponseDTO.FoodDTO.builder()
                                                                                                     .name(food.getName())

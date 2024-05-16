@@ -6,6 +6,7 @@ import com.sm.project.apiPayload.code.status.SuccessStatus;
 import com.sm.project.apiPayload.exception.handler.MemberHandler;
 import com.sm.project.converter.food.FoodConverter;
 import com.sm.project.domain.food.Food;
+import com.sm.project.domain.food.Refrigerator;
 import com.sm.project.domain.member.Member;
 import com.sm.project.feignClient.dto.NaverOCRResponse;
 import com.sm.project.service.food.FoodService;
@@ -48,9 +49,19 @@ public class FoodController {
 
     }
 
+    @GetMapping("/refrigerator")
+    @Operation(summary = "냉장고 조회 API", description = "냉장고 조회 api")
+    public ResponseDTO<FoodResponseDTO.RefrigeratorListDTO> getRefrigerator(Authentication authentication){
+        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        List<Refrigerator> refrigeratorList = foodService.getRefrigeratorList(member);
+
+        return ResponseDTO.onSuccess(FoodConverter.toGetRefrigeratorListResultDTO(refrigeratorList));
+    }
+
     @GetMapping("/food/{refrigeratorId}")
     @Operation(summary = "음식 조회 API", description = "request parmeter에 냉장고 번호 입력하면 해당 냉장고 음식 조회 가능")
-    public ResponseDTO<FoodResponseDTO.FoodListDTO> getFood(@PathVariable(name = "refrigeratorId") Integer refrigeratorId,
+    public ResponseDTO<FoodResponseDTO.FoodListDTO> getFood(@PathVariable(name = "refrigeratorId") Long refrigeratorId,
                                                             Authentication authentication){
 
         Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
@@ -59,26 +70,26 @@ public class FoodController {
         return ResponseDTO.of(SuccessStatus.FOOD_GET_SUCCESS,FoodConverter.toGetFoodListResultDTO(foodList));
     }
 
-    @PutMapping("/food/{refrigeratorId}/{foodId}")
-    @Operation(summary = "음식 수정 api", description = "냉장고 번호와 음식 번호 request param으로 담고 request body에 수정해서 사용하면 수정됩니다.")
+    @PutMapping("/food/{foodId}/{refrigeratorId}")
+    @Operation(summary = "음식 수정 api", description = "음식 번호와 냉장고 번호를 request param으로 담고 request body에 수정해서 사용하면 수정됩니다.")
     public ResponseDTO<?> updateFood(@RequestBody FoodRequestDTO.UpdateFoodDTO request,
-                                                                        @PathVariable(name = "refrigeratorId") Integer refrigeratorId,
+                                     @PathVariable(name = "refrigeratorId") Long refrigeratorId,
                                                                        @PathVariable(name = "foodId") Long foodId,
                                                                        Authentication authentication){
 
         Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
-        foodService.updateFood(request,member,refrigeratorId,foodId);
+        foodService.updateFood(request,foodId,refrigeratorId);
         return ResponseDTO.of(SuccessStatus.FOOD_UPDATE_SUCCESS, null);
     }
 
-    @DeleteMapping("/food/{refrigeratorId}/{foodId}")
-    @Operation(summary = "음식 삭제 api", description = "냉장고 번호와 음식 번호 request param으로 담아서 사용하면 삭제됩니다.")
-    public ResponseDTO<?> deleteFood(@PathVariable(name = "refrigeratorId") Integer refrigeratorId,
-                                                                       @PathVariable(name = "foodId") Long foodId,
+    @DeleteMapping("/food/{foodId}/{refrigeratorId}")
+    @Operation(summary = "음식 삭제 api", description = "음식 번호와 냉장고 번호를  request param으로 담아서 사용하면 삭제됩니다.")
+    public ResponseDTO<?> deleteFood(@PathVariable(name = "foodId") Long foodId,
+                                     @PathVariable(name = "refrigeratorId") Long refrigeratorId,
                                                                        Authentication authentication){
 
         Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
-        foodService.deleteFood(member,refrigeratorId,foodId);
+        foodService.deleteFood(foodId,refrigeratorId);
 
         return ResponseDTO.of(SuccessStatus.FOOD_DELETE_SUCCESS,null);
     }
