@@ -1,16 +1,14 @@
 name: CI/CD
 
 on:
-  push:
-    branches: ["dev"] # dev 브랜치에 push 했을경우
+
   pull_request:
     types: [closed] # pull_request closed 됐을 경우
-  workflow_dispatch: # 수동 실행 가능
 
 jobs:
   build:
     runs-on: ubuntu-latest # OS 환경
-    #if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'dev'
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'dev'
     # pull_request가 dev 브랜치에 merge 됐을 경우
 
     steps:
