@@ -15,6 +15,7 @@ public class FoodResponseDTO {
     @AllArgsConstructor(access = AccessLevel.PROTECTED)
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class FoodDTO {
+        Long id;
         String name;
         Date expire;
         Integer count;
@@ -27,6 +28,24 @@ public class FoodResponseDTO {
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class FoodListDTO {
         List<FoodDTO> foodList;
+    }
+
+    @Builder
+    @Getter
+    @AllArgsConstructor(access = AccessLevel.PROTECTED)
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class RefrigeratorListDTO {
+        List<RefrigeratorDTO> refrigeratorList;
+    }
+
+    @Builder
+    @Getter
+    @AllArgsConstructor(access = AccessLevel.PROTECTED)
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class RefrigeratorDTO {
+        Long id;
+        String name;
+
     }
 
     @Builder

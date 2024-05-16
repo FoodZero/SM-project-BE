@@ -7,6 +7,7 @@ import com.sm.project.config.springSecurity.TokenProvider;
 import com.sm.project.converter.member.MemberConverter;
 import com.sm.project.coolsms.RedisUtil;
 import com.sm.project.coolsms.SmsUtil;
+import com.sm.project.domain.food.Refrigerator;
 import com.sm.project.domain.member.FcmRepository;
 import com.sm.project.domain.member.FcmToken;
 import com.sm.project.domain.member.Member;
@@ -18,6 +19,7 @@ import com.sm.project.feignClient.service.KakaoOauthService;
 import com.sm.project.firebase.FcmService;
 import com.sm.project.redis.service.RedisService;
 import com.sm.project.repository.food.FoodRepository;
+import com.sm.project.repository.food.RefrigeratorRepository;
 import com.sm.project.repository.member.MemberPasswordRepository;
 import com.sm.project.repository.member.MemberRepository;
 import com.sm.project.service.mail.MailService;
@@ -59,6 +61,7 @@ public class MemberService {
     private final MemberQueryService memberQueryService;
     private final MailService mailService;
     private final FcmRepository fcmRepository;
+    private final RefrigeratorRepository refrigeratorRepository;
 
 
     @Value("${oauth2.kakao.client-id}")
@@ -148,18 +151,19 @@ public class MemberService {
     //
     //@Scheduled(cron = "0 0/1 * * * ?")
     public void sendPushAlarm() throws IOException {
-        List<Member> memberList = memberRepository.findAll();
+        List<Refrigerator> refrigeratorList = refrigeratorRepository.findAll();
         Map<String,Integer> map = new HashMap<>();
         Date currentTime = new Date();
 
-        memberList.stream().forEach(member -> {
-            foodRepository.findTop5ByMemberOrderByExpireDesc(member).stream().forEach(food -> {
+        refrigeratorList.stream().forEach(refrigerator -> {
+            foodRepository.findTop5ByRefrigeratorOrderByExpireDesc(refrigerator).stream().forEach(food -> {
                 map.put(food.getName(), (int) (currentTime.getTime() - food.getExpire().getTime()));
             });
             try {
                 String result = map.entrySet().stream()
                         .map(entry -> entry.getKey() + "의 유통기한: " + entry.getValue() + "일 남음")
                         .collect(Collectors.joining("\n"));
+                Member member = memberRepository.findByMemberRefrigeratorListContaining(refrigerator);
                 fcmService.sendMessage(member.getFcmTokenList().get(0).getToken(),"유통기한이 곧 지나는 식품들입니다.",result);
 
             } catch (IOException e) {
