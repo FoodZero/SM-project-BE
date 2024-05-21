@@ -28,4 +28,11 @@ public class FoodRequestDTO {
         Integer count;
         FoodType foodType;
     }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UploadRefrigeratorDTO{
+        String name;
+    }
 }
