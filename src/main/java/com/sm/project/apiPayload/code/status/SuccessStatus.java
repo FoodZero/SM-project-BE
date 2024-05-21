@@ -33,6 +33,8 @@ public enum SuccessStatus implements BaseCode {
     //REFRIGERATOR
     REFRIGERATOR_UPLOAD_SUCCESS(HttpStatus.OK, "REF200", "냉장고 등록 성공");
 
+
+
     private final HttpStatus httpStatus;
     private final String code;
     private final String message;

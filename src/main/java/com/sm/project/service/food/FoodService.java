@@ -49,6 +49,14 @@ public class FoodService {
         return;
     }
 
+    public void uploadRefrigerator(FoodRequestDTO.UploadRefrigeratorDTO request, Member member){
+        Refrigerator refrigerator = Refrigerator.builder()
+                .member(member)
+                .name(request.getName())
+                .build();
+        refrigeratorRepository.save(refrigerator);
+    }
+
     public List<Refrigerator> getRefrigeratorList(Member member){
 
         return refrigeratorRepository.findAllByMember(member);
