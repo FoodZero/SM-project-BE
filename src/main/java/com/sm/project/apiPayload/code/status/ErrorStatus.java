@@ -25,6 +25,12 @@ public enum ErrorStatus implements BaseErrorCode {
     MEMBER_WRONG_RESET_TOKEN(HttpStatus.BAD_REQUEST, "MEMBER4007", "재설정 토큰이 올바르지 않습니다."),
     MEMBER_NICKNAME_DUPLICATE(HttpStatus.BAD_REQUEST, "MEMBER4008", "이미 존재하는 닉네임입니다."),
 
+    //Refrigerator
+    RERFIGERATOR_NOT_FOUND(HttpStatus.NOT_FOUND, "REF4001", "냉장고를 찾을 수 없습니다."),
+
+    //Food
+    FOOD_NOT_FOUND(HttpStatus.NOT_FOUND, "FOOD4001","음식을 찾을 수 없습니다."),
+
     //JWT
 
     JWT_BAD_REQUEST(HttpStatus.UNAUTHORIZED, "JWT4001","잘못된 JWT 서명입니다."),

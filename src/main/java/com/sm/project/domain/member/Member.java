@@ -4,7 +4,7 @@ package com.sm.project.domain.member;
 import com.sm.project.domain.Common.BaseDateTimeEntity;
 import com.sm.project.domain.enums.JoinType;
 import com.sm.project.domain.enums.StatusType;
-import com.sm.project.domain.food.Food;
+import com.sm.project.domain.food.Refrigerator;
 import com.sm.project.domain.image.ReceiptImage;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -51,8 +51,7 @@ public class Member extends BaseDateTimeEntity {
     private StatusType status = StatusType.ACTIVE;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<Food> memberTermList = new ArrayList<>();
-
+    private List<Refrigerator> memberRefrigeratorList = new ArrayList<>();
 
     @OneToOne(mappedBy = "member")
     private MemberPassword memberPassword;
