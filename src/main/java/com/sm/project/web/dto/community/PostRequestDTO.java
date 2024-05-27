@@ -4,9 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.awt.*;
-import java.awt.geom.Point2D;
-
 public class PostRequestDTO {
 
     @Getter

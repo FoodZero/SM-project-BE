@@ -34,6 +34,9 @@ public class AmazonConfig {
     @Value("${cloud.aws.s3.path.receipt}")
     private String receiptPath;
 
+    @Value("post")
+    private String postPath;
+
     @PostConstruct
     public void init() {
         this.awsCredentials = new BasicAWSCredentials(accessKey, secretKey);

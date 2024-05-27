@@ -29,6 +29,15 @@ public class Post extends BaseDateTimeEntity {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
+    private String title;
+    private String topic; //enum으로 고치기(나눔, 레시피, 잡담)
+    private String address;
+    private String status; //enum(진행 중, 마감)
+    private String imageUrl; //url 여러 이미지면 어쩌지
+
+    @OneToMany(mappedBy = "post")
+    private List<PostImg> postImgs = new ArrayList<>();
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<Comment> commentList = new ArrayList<>();
 
