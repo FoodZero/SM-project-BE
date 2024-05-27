@@ -42,7 +42,6 @@ public class PostConverter {
 
         return Post.builder()
                 .member(member)
-                .title(request.getTitle())
                 .content(request.getContent())
                 .topic(topic)
                 .status(status)

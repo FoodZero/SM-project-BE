@@ -100,6 +100,41 @@ public class PostController {
     private final MemberQueryService memberQueryService;
     private final PostService postService;
 
+
+    @PostMapping("/location")
+    @Operation(summary = "위치 저장 API", description = "사용자의 위치를 저장하는 api입니다.")
+    public ResponseDTO<?> postLocation(Authentication auth,
+                                       @RequestBody PostRequestDTO.LocationDTO request){
+
+        Member member = memberQueryService.findMemberById(Long.valueOf(auth.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        postService.createLocation(member,request);
+
+        return ResponseDTO.of(SuccessStatus.LOCATION_POST_SUCCESS, null);
+    }
+
+    @GetMapping("/location")
+    @Operation(summary = "위치 조회 API", description = "사용자의 저장된 위치 조회 api입니다.")
+    public ResponseDTO<?> getLocation(){
+        return null;
+    }
+
+    @GetMapping("/")
+    @Operation(summary = "커뮤니티 글 조회 API", description = "커뮤니티에서 글 조회하는 api입니다.")
+    public ResponseDTO<?> getPostList(Authentication authentication,
+                                      @RequestParam(value = "lastIndex", required = false) Long lastIndex){
+
+        return null;
+    }
+
+
+    @GetMapping("/{postId}")
+    @Operation(summary = "커뮤니티 글 상세 조회 API", description = "커뮤니티에서 글 상세 조회하는 api입니다.")
+    public ResponseDTO<?> getPost(Authentication authentication,
+                                  @PathVariable(name = "postId") Long postId){
+
+        return null;
+    }
+
     @PostMapping("/create")
     @Operation(summary = "커뮤니티 글 등록 API", description = "커뮤니티에서 게시글을 등록하는 api입니다.")
     public ResponseDTO<?> createPost(Authentication auth, @RequestBody PostRequestDTO.CreateDTO request) {
