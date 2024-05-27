@@ -1,7 +1,10 @@
 package com.sm.project.service.food;
 
+import com.sm.project.apiPayload.code.status.ErrorStatus;
+import com.sm.project.apiPayload.exception.handler.FoodHandler;
 import com.sm.project.converter.food.FoodConverter;
 import com.sm.project.domain.food.Food;
+import com.sm.project.domain.food.Refrigerator;
 import com.sm.project.domain.image.ReceiptImage;
 import com.sm.project.domain.member.Member;
 import com.sm.project.feignClient.dto.LambdaRequest;
@@ -11,6 +14,7 @@ import com.sm.project.feignClient.lambda.LambdaFeignClient;
 import com.sm.project.feignClient.naver.NaverOCRFeignClient;
 import com.sm.project.repository.food.FoodRepository;
 import com.sm.project.repository.food.ReceiptImageRepository;
+import com.sm.project.repository.food.RefrigeratorRepository;
 import com.sm.project.service.UtilService;
 import com.sm.project.web.dto.food.FoodRequestDTO;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +40,7 @@ public class FoodService {
     private final UtilService utilService;
     private final NaverOCRFeignClient naverOCRFeignClient;
     private final LambdaFeignClient lambdaFeignClient;
+    private final RefrigeratorRepository refrigeratorRepository;
 
     public void uploadFood(FoodRequestDTO.UploadFoodDTO request, Member member, Integer refrigeratorId){
 
@@ -45,24 +50,43 @@ public class FoodService {
         return;
     }
 
-    public List<Food> getFoodList(Member member, Integer refigeratorId){
-
-        List<Food> foodList = foodRepository.findAllByMemberAndRefrigeratorId(member,refigeratorId);
-
-        return foodList;
+    public void uploadRefrigerator(FoodRequestDTO.UploadRefrigeratorDTO request, Member member){
+        Refrigerator refrigerator = Refrigerator.builder()
+                .member(member)
+                .name(request.getName())
+                .build();
+        refrigeratorRepository.save(refrigerator);
     }
 
-    public void updateFood(FoodRequestDTO.UpdateFoodDTO request, Member member, Integer refrigeratorId, Long foodId){
+    public List<Refrigerator> getRefrigeratorList(Member member){
 
-        foodRepository.changeFood(request.getName(),request.getCount(),request.getExpire(),request.getFoodType(),member,refrigeratorId,foodId);
-        return;
+        return refrigeratorRepository.findAllByMember(member);
+
     }
 
-    public void deleteFood(Member member, Integer refrigeratorId, Long foodId){
+    public List<Food> getFoodList(Member member, Long refigeratorId){
 
-        Food deleteFood = foodRepository.findByMemberAndIdAndRefrigeratorId(member, foodId, refrigeratorId);
+        Refrigerator refrigerator = refrigeratorRepository.findByIdAndMember(refigeratorId,member).orElseThrow(() -> new FoodHandler(ErrorStatus.RERFIGERATOR_NOT_FOUND));
+
+
+
+        return foodRepository.findAllByRefrigerator(refrigerator);
+
+    }
+
+    public void updateFood(FoodRequestDTO.UpdateFoodDTO request, Long foodId, Long refrigeratorId){
+
+        Refrigerator refrigerator = refrigeratorRepository.findById(refrigeratorId).orElseThrow(() -> new FoodHandler(ErrorStatus.RERFIGERATOR_NOT_FOUND));
+        foodRepository.changeFood(request.getName(),request.getCount(),request.getExpire(),request.getFoodType(),foodId, refrigerator);
+
+    }
+
+    public void deleteFood(Long foodId, Long refrigeratorId){
+
+        Refrigerator refrigerator = refrigeratorRepository.findById(refrigeratorId).orElseThrow(() -> new FoodHandler(ErrorStatus.RERFIGERATOR_NOT_FOUND));
+        Food deleteFood = foodRepository.findByRefrigeratorAndId(refrigerator, foodId).orElseThrow(() -> new FoodHandler(ErrorStatus.FOOD_NOT_FOUND));
         foodRepository.delete(deleteFood);
-        return;
+
     }
 
     public String uploadReceipt(Member member, MultipartFile receipt){

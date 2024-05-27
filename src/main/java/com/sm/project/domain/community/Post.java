@@ -1,6 +1,7 @@
 package com.sm.project.domain.community;
 
 import com.sm.project.domain.Common.BaseDateTimeEntity;
+import com.sm.project.domain.member.Location;
 import com.sm.project.domain.member.Member;
 import lombok.*;
 
@@ -44,6 +45,10 @@ public class Post extends BaseDateTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "location_id")
+    private Location location;
 
     public void changePost(String content, double latitude, double longitude) {
         this.content = content;

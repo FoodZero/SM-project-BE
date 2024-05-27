@@ -2,7 +2,6 @@ package com.sm.project.domain.food;
 
 import com.sm.project.domain.Common.BaseDateTimeEntity;
 import com.sm.project.domain.enums.FoodType;
-import com.sm.project.domain.member.Member;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -15,12 +14,11 @@ import java.util.Date;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class Food extends BaseDateTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "food_id")
     private Long id;
-
-    private Integer refrigeratorId;
 
     @Column(nullable = false, columnDefinition = "VARCHAR(20)")
     private String name;
@@ -35,10 +33,9 @@ public class Food extends BaseDateTimeEntity {
     @Enumerated(EnumType.STRING)
     private FoodType foodType;
 
-    
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
+    @JoinColumn(name = "refrigerator_id")
+    private Refrigerator refrigerator;
 
 
 }

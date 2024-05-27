@@ -24,7 +24,14 @@ public enum SuccessStatus implements BaseCode {
     //POST
     POST_CREATE_SUCCESS(HttpStatus.OK, "POST200", "글 등록 성공"),
     POST_UPDATE_SUCCESS(HttpStatus.OK, "POST2001", "글 수정 성공"),
-    POST_DELETE_SUCCESS(HttpStatus.OK, "POST2002", "글 삭제 성공");
+    POST_DELETE_SUCCESS(HttpStatus.OK, "POST2002", "글 삭제 성공"),
+
+
+    //LOCATION
+    LOCATION_POST_SUCCESS(HttpStatus.OK, "LOCATION200", "위치 저장 성공입니다."),
+
+    //REFRIGERATOR
+    REFRIGERATOR_UPLOAD_SUCCESS(HttpStatus.OK, "REF200", "냉장고 등록 성공");
 
     private final HttpStatus httpStatus;
     private final String code;

@@ -23,4 +23,12 @@ public class PostRequestDTO {
         private double longitude;
         private String content; //글 내용
     }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class LocationDTO {
+        private double latitude; //사용자의 위도, 경도
+        private double longitude;
+    }
 }

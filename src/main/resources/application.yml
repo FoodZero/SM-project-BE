@@ -50,6 +50,7 @@ logging:
   level:
     org.hibernate.SQL: info
     org.hibernate.type: trace
+
 servlet:
   multipart:
     enabled: true
@@ -78,6 +79,11 @@ naver:
     secret: ${NAVER_OCR_SECRET}
     url: ${NAVER_OCR_URL}
     template: ${NAVER_OCR_TEMPLATE}
+  geo:
+    url: ${NAVER_GEO_URL}
+    client : ${NAVER_GEO_CLIENT}
+    key : ${NAVER_GEO_KEY}
+    
 
 feign:
   client:
