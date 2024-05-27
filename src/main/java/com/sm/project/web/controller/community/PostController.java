@@ -114,8 +114,12 @@ public class PostController {
 
     @GetMapping("/location")
     @Operation(summary = "위치 조회 API", description = "사용자의 저장된 위치 조회 api입니다.")
-    public ResponseDTO<?> getLocation(){
-        return null;
+    public ResponseDTO<PostResponseDTO.LocationListDTO> getLocation(Authentication auth){
+
+        Member member = memberQueryService.findMemberById(Long.valueOf(auth.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        List<Location> locationList = postService.getLocationList(member);
+
+        return ResponseDTO.onSuccess(PostConverter.toLocationList(locationList));
     }
 
     @GetMapping("/")
