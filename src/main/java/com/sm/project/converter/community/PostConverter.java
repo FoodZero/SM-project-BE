@@ -1,8 +1,15 @@
 package com.sm.project.converter.community;
 
 import com.sm.project.domain.community.Post;
+import com.sm.project.domain.member.Location;
 import com.sm.project.domain.member.Member;
 import com.sm.project.web.dto.community.PostRequestDTO;
+import com.sm.project.web.dto.community.PostResponseDTO;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+
 
 public class PostConverter {
 
@@ -16,6 +23,17 @@ public class PostConverter {
                 .build();
     }
 
+    public static PostResponseDTO.LocationListDTO toLocationList(List<Location> locationList){
+        List<PostResponseDTO.LocationDTO> locationListDTO= locationList.stream().map(location ->
+            PostResponseDTO.LocationDTO.builder()
+                    .id(location.getId())
+                    .address(location.getAddress())
+                    .build()).collect(Collectors.toList());
+
+        return PostResponseDTO.LocationListDTO.builder()
+                .LocationList(locationListDTO)
+                .build();
+    }
 
 
 }

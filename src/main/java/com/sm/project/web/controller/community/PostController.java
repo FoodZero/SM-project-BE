@@ -5,10 +5,12 @@ import com.sm.project.apiPayload.code.status.ErrorStatus;
 import com.sm.project.apiPayload.code.status.SuccessStatus;
 import com.sm.project.apiPayload.exception.handler.MemberHandler;
 import com.sm.project.converter.community.PostConverter;
+import com.sm.project.domain.member.Location;
 import com.sm.project.domain.member.Member;
 import com.sm.project.service.community.PostService;
 import com.sm.project.service.member.MemberQueryService;
 import com.sm.project.web.dto.community.PostRequestDTO;
+import com.sm.project.web.dto.community.PostResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -42,8 +46,12 @@ public class PostController {
 
     @GetMapping("/location")
     @Operation(summary = "위치 조회 API", description = "사용자의 저장된 위치 조회 api입니다.")
-    public ResponseDTO<?> getLocation(){
-        return null;
+    public ResponseDTO<PostResponseDTO.LocationListDTO> getLocation(Authentication auth){
+
+        Member member = memberQueryService.findMemberById(Long.valueOf(auth.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        List<Location> locationList = postService.getLocationList(member);
+
+        return ResponseDTO.onSuccess(PostConverter.toLocationList(locationList));
     }
 
     @GetMapping("/")
