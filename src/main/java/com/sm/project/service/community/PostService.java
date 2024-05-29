@@ -41,16 +41,16 @@ public class PostService {
             PostImg newPostImg = PostImg.builder()
                     .url(imgUrl)
                     .name(multipartFile.getOriginalFilename())
-                    .post(post)
                     .build();
 
+            newPostImg.changePost(post);
             postImgRepository.save(newPostImg);
         }
     }
 
     public void updatePost(Long postId, PostRequestDTO.UpdateDTO request) {
         Post post = postQueryService.findPostById(postId);
-        post.changePost(request.getContent(), request.getLatitude(), request.getLongitude()); //변경감지
+        post.changePost(request.getContent()); //변경감지
     }
 
     public void deletePost(Long postId) {

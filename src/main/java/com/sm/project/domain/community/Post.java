@@ -1,6 +1,8 @@
 package com.sm.project.domain.community;
 
 import com.sm.project.domain.Common.BaseDateTimeEntity;
+import com.sm.project.domain.enums.PostStatusType;
+import com.sm.project.domain.enums.PostTopicType;
 import com.sm.project.domain.member.Location;
 import com.sm.project.domain.member.Member;
 import lombok.*;
@@ -21,20 +23,17 @@ public class Post extends BaseDateTimeEntity {
     @Column(name = "post_id")
     private Long id;
 
-    @Column(nullable = false)
-    private double latitude;
-
-    @Column(nullable = false)
-    private double longitude;
-
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
+    @Column(columnDefinition = "VARCHAR(20)", nullable = false)
     private String title;
-    private String topic; //enum으로 고치기(나눔, 레시피, 잡담)
-    private String address;
-    private String status; //enum(진행 중, 마감)
-    private String imageUrl; //url 여러 이미지면 어쩌지
+
+    @Enumerated(EnumType.STRING)
+    private PostTopicType topic;
+
+    @Enumerated(EnumType.STRING)
+    private PostStatusType status;
 
     @OneToMany(mappedBy = "post")
     private List<PostImg> postImgs = new ArrayList<>();
@@ -50,10 +49,8 @@ public class Post extends BaseDateTimeEntity {
     @JoinColumn(name = "location_id")
     private Location location;
 
-    public void changePost(String content, double latitude, double longitude) {
+    public void changePost(String content) {
         this.content = content;
-        this.latitude = latitude;
-        this.longitude = longitude;
     }
 
 }

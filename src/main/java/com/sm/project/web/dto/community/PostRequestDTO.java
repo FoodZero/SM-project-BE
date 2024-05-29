@@ -10,9 +10,10 @@ public class PostRequestDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CreateDTO {
-        private double latitude; //사용자의 위도, 경도
-        private double longitude;
-        private String content; //글 내용
+        private String title;
+        private String content;
+        private String topic;
+        private String status;
     }
 
     @Getter
