@@ -44,6 +44,23 @@ public class PostResponseDTO {
 
     @Builder
     @Getter
+    @AllArgsConstructor(access = AccessLevel.PROTECTED)
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class PostDetailDTO{
+        Long id;
+        String nickname;
+        String address;
+        String title;
+        String content;
+        PostStatusType status;
+        LocalDateTime createdAt;
+        List<PostImgResponseDTO> itemImgUrlList;
+
+
+    }
+
+    @Builder
+    @Getter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class PostImgResponseDTO {

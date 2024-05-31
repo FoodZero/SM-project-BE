@@ -106,4 +106,8 @@ public class PostService {
         return postRepository.findPostList(lastIndex, postTopicType);
     }
 
+    public Post getPost(Long postId){
+        return postRepository.findById(postId).orElseThrow(()-> new PostHandler(ErrorStatus.POST_NOT_FOUND));
+    }
+
 }

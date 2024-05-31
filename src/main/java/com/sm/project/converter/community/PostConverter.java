@@ -83,6 +83,27 @@ public class PostConverter {
                 .postDTOList(postDTOS)
                 .build();
     }
+
+    public static PostResponseDTO.PostDetailDTO toPostDTO(Post post, Member member){
+
+        List<PostResponseDTO.PostImgResponseDTO> imgs = post.getPostImgs().stream().map(img ->
+                        PostResponseDTO.PostImgResponseDTO.builder()
+                                .itemImgUrl(img.getUrl())
+                                .build())
+                .collect(Collectors.toList());
+
+        return PostResponseDTO.PostDetailDTO.builder()
+                .id(post.getId())
+                .address(post.getLocation().getAddress())
+                .title(post.getTitle())
+                .status(post.getStatus())
+                .content(post.getContent())
+                .nickname(member.getNickname())
+                .createdAt(post.getCreatedAt())
+                .itemImgUrlList(imgs)
+                .build();
+    }
+
 }
 
 

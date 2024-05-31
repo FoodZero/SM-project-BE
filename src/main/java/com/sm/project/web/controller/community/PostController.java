@@ -81,10 +81,13 @@ public class PostController {
 
     @GetMapping("/{postId}")
     @Operation(summary = "커뮤니티 글 상세 조회 API", description = "커뮤니티에서 글 상세 조회하는 api입니다.")
-    public ResponseDTO<?> getPost(Authentication authentication,
+    public ResponseDTO<?> getPost(Authentication auth,
                                   @PathVariable(name = "postId") Long postId){
 
-        return null;
+        Post post = postService.getPost(postId);
+        Member member = memberQueryService.findMemberById(Long.valueOf(auth.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        return ResponseDTO.onSuccess(PostConverter.toPostDTO(post,member));
     }
 
     @PostMapping(value = "/create", consumes = "multipart/form-data")
