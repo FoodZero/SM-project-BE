@@ -42,10 +42,10 @@ public class FoodService {
     private final LambdaFeignClient lambdaFeignClient;
     private final RefrigeratorRepository refrigeratorRepository;
 
-    public void uploadFood(FoodRequestDTO.UploadFoodDTO request, Member member, Integer refrigeratorId){
+    public void uploadFood(FoodRequestDTO.UploadFoodDTO request, Member member, Long refrigeratorId){
 
-
-        Food newFood = FoodConverter.toFoodDTO(request, member, refrigeratorId);
+        Refrigerator refrigerator = refrigeratorRepository.findById(refrigeratorId).orElseThrow(()-> new FoodHandler(ErrorStatus.RERFIGERATOR_NOT_FOUND));
+        Food newFood = FoodConverter.toFoodDTO(request, refrigerator);
         foodRepository.save(newFood);
         return;
     }

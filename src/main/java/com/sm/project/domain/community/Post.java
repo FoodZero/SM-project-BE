@@ -49,8 +49,9 @@ public class Post extends BaseDateTimeEntity {
     @JoinColumn(name = "location_id")
     private Location location;
 
-    public void changePost(String content) {
+    public void changePost(String content, PostStatusType postStatusType) {
         this.content = content;
+        this.status = postStatusType;
     }
 
 }

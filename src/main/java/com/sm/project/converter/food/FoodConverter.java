@@ -2,7 +2,6 @@ package com.sm.project.converter.food;
 
 import com.sm.project.domain.food.Food;
 import com.sm.project.domain.food.Refrigerator;
-import com.sm.project.domain.member.Member;
 import com.sm.project.feignClient.dto.Image;
 import com.sm.project.feignClient.dto.NaverOCRRequest;
 import com.sm.project.web.dto.food.FoodRequestDTO;
@@ -15,13 +14,14 @@ import java.util.stream.Collectors;
 
 public class FoodConverter {
 
-    public static Food toFoodDTO(FoodRequestDTO.UploadFoodDTO request, Member member, Integer refrigeratorId) {
+    public static Food toFoodDTO(FoodRequestDTO.UploadFoodDTO request, Refrigerator refrigerator) {
 
         return Food.builder()
                 .name(request.getName())
                 .count(request.getCount())
                 .expire(request.getExpire())
                 .foodType(request.getFoodType())
+                .refrigerator(refrigerator)
                 .build();
     }
 
@@ -40,6 +40,7 @@ public class FoodConverter {
     }
     public static FoodResponseDTO.FoodListDTO toGetFoodListResultDTO(List<Food> foodList){
         List<FoodResponseDTO.FoodDTO> foodListDTO = foodList.stream().map(food -> FoodResponseDTO.FoodDTO.builder()
+                .id(food.getId())
                                                                                                     .name(food.getName())
                                                                                                     .count(food.getCount())
                                                                                                     .expire(food.getExpire())

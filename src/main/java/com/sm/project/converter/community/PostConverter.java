@@ -1,8 +1,6 @@
 package com.sm.project.converter.community;
 
 import com.sm.project.domain.community.Post;
-import com.sm.project.domain.member.Member;
-import com.sm.project.web.dto.community.PostRequestDTO;
 import com.sm.project.domain.enums.PostStatusType;
 import com.sm.project.domain.enums.PostTopicType;
 import com.sm.project.domain.member.Location;
@@ -18,9 +16,9 @@ import java.util.stream.Collectors;
 
 public class PostConverter {
 
-    public static Post toPost(Member member, PostRequestDTO.CreateDTO request) {
+    public static Post toPost(Member member, PostRequestDTO.CreateDTO request, Location location) {
         PostTopicType topic;
-        PostStatusType status;
+
 
         switch (request.getTopic()) {
             case "나눔":
@@ -35,17 +33,17 @@ public class PostConverter {
                 topic = PostTopicType.ETC;
         }
 
-        if (request.getStatus().equals("마감")) {
-            status = PostStatusType.END;
-        }
-        else status = PostStatusType.PROCEEDING;
+        PostStatusType status = PostStatusType.PROCEEDING;
+
 
         return Post.builder()
                 .member(member)
+                .title(request.getTitle())
                 .content(request.getContent())
                 .topic(topic)
                 .status(status)
                 .postImgs(new ArrayList<>())
+                .location(location)
                 .build();
     }
 

@@ -39,7 +39,7 @@ public class FoodController {
     @PostMapping("/food/{refrigeratorId}")
     @Operation(summary = "음식 추가 API", description = "request: String 음식이름, 유통기한(2024-01-01), Integer 개수, 음식종류(COLD, FROZEN, OUTSIDE) ")
     public ResponseDTO<?> uploadFood(@RequestBody FoodRequestDTO.UploadFoodDTO request,
-                                     @PathVariable(name = "refrigeratorId") Integer refrigeratorId,
+                                     @PathVariable(name = "refrigeratorId") Long refrigeratorId,
                                      Authentication authentication){
 
         Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
