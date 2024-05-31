@@ -29,7 +29,7 @@ public enum SuccessStatus implements BaseCode {
 
 
     //LOCATION
-    LOCATION_POST_SUCCESS(HttpStatus.OK, "LOCATION200", "위치 저장 성공입니다.");
+    LOCATION_POST_SUCCESS(HttpStatus.OK, "LOCATION200", "위치 저장 성공입니다."),
 
     REFRIGERATOR_UPLOAD_SUCCESS(HttpStatus.OK, "REF200", "냉장고 등록 성공");
 
