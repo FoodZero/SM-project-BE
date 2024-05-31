@@ -5,6 +5,7 @@ import com.sm.project.apiPayload.code.status.ErrorStatus;
 import com.sm.project.apiPayload.code.status.SuccessStatus;
 import com.sm.project.apiPayload.exception.handler.MemberHandler;
 import com.sm.project.converter.community.PostConverter;
+import com.sm.project.domain.community.Post;
 import com.sm.project.domain.enums.PostTopicType;
 import com.sm.project.domain.member.Location;
 import com.sm.project.domain.member.Member;
@@ -13,6 +14,8 @@ import com.sm.project.service.member.MemberQueryService;
 import com.sm.project.web.dto.community.PostRequestDTO;
 import com.sm.project.web.dto.community.PostResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,15 +60,22 @@ public class PostController {
     }
 
     @GetMapping("/")
-    @Operation(summary = "커뮤니티 글 조회 API", description = "커뮤니티에서 글 조회하는 api입니다.")
-    public ResponseDTO<List<PostResponseDTO.PostListDTO>> getPostList(Authentication auth,
+    @Operation(summary = "커뮤니티 글 조회 API", description = "커뮤니티에서 글 조회하는 api입니다.postType: 나눔, 레시피, 빈값(전체 조회) ")
+    @Parameters(value = {
+            @Parameter(name = "lastIndex", description = "lastIndex 첫 조회는 0이고 스크롤 내릴때마다 마지막 index 입력하시면 됩니다."),
+            @Parameter(name = "postType", description = "나눔, 레시피, 선택하지 않으면 전체가 조회됩니다.")
+
+    })
+    public ResponseDTO<PostResponseDTO.PostListDTO> getPostList(Authentication auth,
                                                                       @RequestParam(value = "lastIndex", required = false) Long lastIndex,
-                                                                      @RequestParam(value = "postType") PostTopicType postTopicType){
+                                                                      @RequestParam(value = "postType", required = false) PostTopicType postTopicType){
 
         Member member = memberQueryService.findMemberById(Long.valueOf(auth.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
+        List<Post> posts = postService.getPostList(lastIndex,postTopicType);
+        System.out.println(posts.get(0).getContent());
 
-        return null;
+        return ResponseDTO.onSuccess(PostConverter.toPostList(posts, member));
     }
 
 
@@ -98,4 +108,6 @@ public class PostController {
         postService.deletePost(postId);
         return ResponseDTO.of(SuccessStatus.POST_DELETE_SUCCESS, null);
     }
+
+
 }

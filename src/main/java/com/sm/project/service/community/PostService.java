@@ -6,6 +6,7 @@ import com.sm.project.converter.community.PostConverter;
 import com.sm.project.domain.community.Post;
 import com.sm.project.domain.community.PostImg;
 import com.sm.project.domain.enums.PostStatusType;
+import com.sm.project.domain.enums.PostTopicType;
 import com.sm.project.domain.member.Location;
 import com.sm.project.domain.member.Member;
 import com.sm.project.feignClient.dto.NaverGeoResponse;
@@ -36,6 +37,7 @@ public class PostService {
     private final NaverGeoFeignClient naverGeoFeignClient;
     private final UtilService utilService;
     private final PostImgRepository postImgRepository;
+
 
     public void createPost(PostRequestDTO.CreateDTO request, Member member, List<MultipartFile> imgList) {
 
@@ -97,6 +99,11 @@ public class PostService {
 
         return locationRepository.findAllByMember(member);
 
+    }
+
+    public List<Post> getPostList(Long lastIndex, PostTopicType postTopicType){
+
+        return postRepository.findPostList(lastIndex, postTopicType);
     }
 
 }

@@ -1,6 +1,6 @@
 package com.sm.project.web.dto.community;
 
-import com.sm.project.domain.enums.StatusType;
+import com.sm.project.domain.enums.PostStatusType;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -35,7 +35,7 @@ public class PostResponseDTO {
         String address;
         String title;
         String content;
-        StatusType status;
+        PostStatusType status;
         LocalDateTime createdAt;
         List<PostImgResponseDTO> itemImgUrlList;
         Integer commentCount;
