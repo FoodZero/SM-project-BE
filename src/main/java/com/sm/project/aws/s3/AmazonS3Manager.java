@@ -35,6 +35,10 @@ public class AmazonS3Manager{
                 keyName = generateReceiptKeyName(uuid);
                 break;
 
+            case "post":
+                keyName = generatePostKeyName(uuid);
+                break;
+
             default:
                 keyName = "./" + uuid.getUuid();
         }
@@ -55,6 +59,10 @@ public class AmazonS3Manager{
 
     public String generateReceiptKeyName(Uuid uuid) {
         return amazonConfig.getReceiptPath() + '/' + uuid.getUuid();
+    }
+
+    public String generatePostKeyName(Uuid uuid) {
+        return amazonConfig.getPostPath() + '/' + uuid.getUuid();
     }
 
 }

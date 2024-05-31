@@ -15,13 +15,14 @@ import java.util.stream.Collectors;
 
 public class FoodConverter {
 
-    public static Food toFoodDTO(FoodRequestDTO.UploadFoodDTO request, Member member, Integer refrigeratorId) {
+    public static Food toFoodDTO(FoodRequestDTO.UploadFoodDTO request, Refrigerator refrigerator) {
 
         return Food.builder()
                 .name(request.getName())
                 .count(request.getCount())
                 .expire(request.getExpire())
                 .foodType(request.getFoodType())
+                .refrigerator(refrigerator)
                 .build();
     }
 
@@ -40,6 +41,7 @@ public class FoodConverter {
     }
     public static FoodResponseDTO.FoodListDTO toGetFoodListResultDTO(List<Food> foodList){
         List<FoodResponseDTO.FoodDTO> foodListDTO = foodList.stream().map(food -> FoodResponseDTO.FoodDTO.builder()
+                .id(food.getId())
                                                                                                     .name(food.getName())
                                                                                                     .count(food.getCount())
                                                                                                     .expire(food.getExpire())
