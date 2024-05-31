@@ -39,34 +39,14 @@ public class FoodController {
     @PostMapping("/food/{refrigeratorId}")
     @Operation(summary = "음식 추가 API", description = "request: String 음식이름, 유통기한(2024-01-01), Integer 개수, 음식종류(COLD, FROZEN, OUTSIDE) ")
     public ResponseDTO<?> uploadFood(@RequestBody FoodRequestDTO.UploadFoodDTO request,
-                                                                       @PathVariable(name = "refrigeratorId") Integer refrigeratorId,
-                                                                       Authentication authentication){
+                                     @PathVariable(name = "refrigeratorId") Integer refrigeratorId,
+                                     Authentication authentication){
 
         Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
         foodService.uploadFood(request, member, refrigeratorId);
 
         return ResponseDTO.of(SuccessStatus.FOOD_UPLOAD_SUCCESS,null);
 
-    }
-
-    @PostMapping("/refrigerator")
-    @Operation(summary = "냉장고 생성 API", description = "name에 냉장고 이름 적고 냉장고 추가할 때 사용하면 됩니다.")
-    public ResponseDTO<?> postRefrigerator(Authentication authentication,
-                                           @RequestBody FoodRequestDTO.UploadRefrigeratorDTO request){
-        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
-        foodService.uploadRefrigerator(request,member);
-
-        return ResponseDTO.of(SuccessStatus.REFRIGERATOR_UPLOAD_SUCCESS,null);
-    }
-
-    @GetMapping("/refrigerator")
-    @Operation(summary = "냉장고 조회 API", description = "냉장고 조회 api")
-    public ResponseDTO<FoodResponseDTO.RefrigeratorListDTO> getRefrigerator(Authentication authentication){
-        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
-
-        List<Refrigerator> refrigeratorList = foodService.getRefrigeratorList(member);
-
-        return ResponseDTO.onSuccess(FoodConverter.toGetRefrigeratorListResultDTO(refrigeratorList));
     }
 
     @PostMapping("/refrigerator")
@@ -104,8 +84,8 @@ public class FoodController {
     @Operation(summary = "음식 수정 api", description = "음식 번호와 냉장고 번호를 request param으로 담고 request body에 수정해서 사용하면 수정됩니다.")
     public ResponseDTO<?> updateFood(@RequestBody FoodRequestDTO.UpdateFoodDTO request,
                                      @PathVariable(name = "refrigeratorId") Long refrigeratorId,
-                                                                       @PathVariable(name = "foodId") Long foodId,
-                                                                       Authentication authentication){
+                                     @PathVariable(name = "foodId") Long foodId,
+                                     Authentication authentication){
 
         Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
         foodService.updateFood(request,foodId,refrigeratorId);
@@ -116,7 +96,7 @@ public class FoodController {
     @Operation(summary = "음식 삭제 api", description = "음식 번호와 냉장고 번호를  request param으로 담아서 사용하면 삭제됩니다.")
     public ResponseDTO<?> deleteFood(@PathVariable(name = "foodId") Long foodId,
                                      @PathVariable(name = "refrigeratorId") Long refrigeratorId,
-                                                                       Authentication authentication){
+                                     Authentication authentication){
 
         Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
         foodService.deleteFood(foodId,refrigeratorId);
@@ -129,7 +109,7 @@ public class FoodController {
     public ResponseDTO<?> uploadReceipt(@RequestParam("receipt") MultipartFile receipt, Authentication authentication) throws Exception{
 
         Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
-        
+
         //S3에 영수증 사진 업로드
         String receiptUrl = foodService.uploadReceipt(member,receipt);
 

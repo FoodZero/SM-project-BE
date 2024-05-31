@@ -40,6 +40,7 @@ public class FoodService {
     private final UtilService utilService;
     private final NaverOCRFeignClient naverOCRFeignClient;
     private final LambdaFeignClient lambdaFeignClient;
+    private final RefrigeratorRepository refrigeratorRepository;
 
     public void uploadFood(FoodRequestDTO.UploadFoodDTO request, Member member, Integer refrigeratorId){
 
@@ -77,41 +78,7 @@ public class FoodService {
 
         Refrigerator refrigerator = refrigeratorRepository.findById(refrigeratorId).orElseThrow(() -> new FoodHandler(ErrorStatus.RERFIGERATOR_NOT_FOUND));
         foodRepository.changeFood(request.getName(),request.getCount(),request.getExpire(),request.getFoodType(),foodId, refrigerator);
-    public void uploadRefrigerator(FoodRequestDTO.UploadRefrigeratorDTO request, Member member){
-        Refrigerator refrigerator = Refrigerator.builder()
-                .member(member)
-                .name(request.getName())
-                .build();
-        refrigeratorRepository.save(refrigerator);
-    }
 
-    public List<Refrigerator> getRefrigeratorList(Member member){
-
-        return refrigeratorRepository.findAllByMember(member);
-
-    }
-
-    public List<Food> getFoodList(Member member, Long refigeratorId){
-
-        Refrigerator refrigerator = refrigeratorRepository.findByIdAndMember(refigeratorId,member).orElseThrow(() -> new FoodHandler(ErrorStatus.RERFIGERATOR_NOT_FOUND));
-
-
-
-        return foodRepository.findAllByRefrigerator(refrigerator);
-
-    }
-
-    public void updateFood(FoodRequestDTO.UpdateFoodDTO request, Long foodId, Long refrigeratorId){
-
-        Refrigerator refrigerator = refrigeratorRepository.findById(refrigeratorId).orElseThrow(() -> new FoodHandler(ErrorStatus.RERFIGERATOR_NOT_FOUND));
-        foodRepository.changeFood(request.getName(),request.getCount(),request.getExpire(),request.getFoodType(),foodId, refrigerator);
-
-    }
-
-    public void deleteFood(Long foodId, Long refrigeratorId){
-
-        Refrigerator refrigerator = refrigeratorRepository.findById(refrigeratorId).orElseThrow(() -> new FoodHandler(ErrorStatus.RERFIGERATOR_NOT_FOUND));
-        Food deleteFood = foodRepository.findByRefrigeratorAndId(refrigerator, foodId).orElseThrow(() -> new FoodHandler(ErrorStatus.FOOD_NOT_FOUND));
     }
 
     public void deleteFood(Long foodId, Long refrigeratorId){
@@ -199,7 +166,7 @@ public class FoodService {
                 iterator.remove();
             }
 
-            }
+        }
 
 
 
