@@ -49,6 +49,9 @@ jobs:
           naver.ocr.template: ${{ secrets.NAVER_OCR_TEMPLATE }}
           naver.ocr.url: ${{ secrets.NAVER_OCR_URL }}
           chatgpt.key: ${{ secrets.GPT_KEY }}
+          naver.geo.url: ${{ secrets.NAVER_GEO_URL }}
+          naver.geo.client: ${{ secrets.NAVER_GEO_CLIENT }}
+          naver.geo.key: ${{ secrets.NAVER_GEO_KEY }}
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
