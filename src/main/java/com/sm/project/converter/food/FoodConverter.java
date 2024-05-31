@@ -2,6 +2,7 @@ package com.sm.project.converter.food;
 
 import com.sm.project.domain.food.Food;
 import com.sm.project.domain.food.Refrigerator;
+import com.sm.project.domain.member.Member;
 import com.sm.project.feignClient.dto.Image;
 import com.sm.project.feignClient.dto.NaverOCRRequest;
 import com.sm.project.web.dto.food.FoodRequestDTO;

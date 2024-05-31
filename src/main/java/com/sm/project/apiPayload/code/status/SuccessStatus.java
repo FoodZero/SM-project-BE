@@ -22,9 +22,6 @@ public enum SuccessStatus implements BaseCode {
     //MEMBER
     MEMBER_PUSH_SUCCESS(HttpStatus.OK, "MEMBER200", "앱 푸쉬 성공"),
 
-    //REFRIGERATOR
-    REFRIGERATOR_UPLOAD_SUCCESS(HttpStatus.OK, "REF200", "냉장고 등록 성공"),
-
     //POST
     POST_CREATE_SUCCESS(HttpStatus.OK, "POST200", "글 등록 성공"),
     POST_UPDATE_SUCCESS(HttpStatus.OK, "POST2001", "글 수정 성공"),
@@ -34,6 +31,7 @@ public enum SuccessStatus implements BaseCode {
     //LOCATION
     LOCATION_POST_SUCCESS(HttpStatus.OK, "LOCATION200", "위치 저장 성공입니다.");
 
+    REFRIGERATOR_UPLOAD_SUCCESS(HttpStatus.OK, "REF200", "냉장고 등록 성공");
 
 
     private final HttpStatus httpStatus;
