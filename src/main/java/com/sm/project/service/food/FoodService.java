@@ -109,7 +109,8 @@ public class FoodService {
         return naverOCRResponse;
     }
 
-    public List<String> filterReceipt(NaverOCRResponse naverOCRResponse){
+
+    public List<String> filterReceipt(NaverOCRResponse naverOCRResponse) {
 
         List<String> foodList = new ArrayList<>();
         // 양 끝 숫자 문자 filter
@@ -120,11 +121,13 @@ public class FoodService {
         Pattern pattern3 = Pattern.compile(".*원$");
         // 0~9 숫자 filter
         Pattern pattern4 = Pattern.compile("[0-9]");
-        Matcher matcher1, matcher2, matcher3, matcher4;
+        // 숫자만 있는 문자열 filter
+        Pattern pattern5 = Pattern.compile("^\\d+$");
+        Matcher matcher1, matcher2, matcher3, matcher4, matcher5;
 
         // json으로 넘어오는 데이터 List로 변환
-        if(naverOCRResponse != null && naverOCRResponse.getImages() != null){
-            for(NaverOCRResponse.Image image : naverOCRResponse.getImages()){
+        if (naverOCRResponse != null && naverOCRResponse.getImages() != null) {
+            for (NaverOCRResponse.Image image : naverOCRResponse.getImages()) {
                 if (image.getFields() != null) {
                     for (NaverOCRResponse.Field field : image.getFields()) {
                         if (field != null && field.getInferText() != null) {
@@ -135,40 +138,50 @@ public class FoodService {
             }
         }
 
-        //위에서 작성한 pattern에 해당하는 문자열 List에서 제거
+        // 위에서 작성한 pattern에 해당하는 문자열 List에서 제거
         Iterator<String> iterator = foodList.iterator();
-        while(iterator.hasNext()){
+        while (iterator.hasNext()) {
             String food = iterator.next();
             matcher1 = pattern1.matcher(food);
-            if(matcher1.matches()){
+            if (matcher1.matches()) {
                 iterator.remove();
                 continue;
             }
             matcher2 = pattern2.matcher(food);
-            if(matcher2.matches()){
+            if (matcher2.matches()) {
                 iterator.remove();
                 continue;
             }
 
             matcher3 = pattern3.matcher(food);
-            if(matcher3.matches()){
+            if (matcher3.matches()) {
                 iterator.remove();
                 continue;
             }
 
             matcher4 = pattern4.matcher(food);
-            if(matcher4.matches()){
+            if (matcher4.matches()) {
                 iterator.remove();
                 continue;
             }
 
-            if(food.equals("상품명") || food.equals("단가") || food.equals("수량") || food.equals("금 액")){
+            matcher5 = pattern5.matcher(food);
+            if (matcher5.matches()) {
+                iterator.remove();
+                continue;
+            }
+
+            if (food.equals("상품명") || food.equals("단가") || food.equals("수량") || food.equals("금 액") ||
+                    food.equals("합계") || food.equals("총액") || food.equals("할인") || food.equals("부가세")) {
+                iterator.remove();
+            }
+
+            // 길이가 1 또는 2인 문자열 필터링
+            if (food.length() <= 2) {
                 iterator.remove();
             }
 
         }
-
-
 
         return foodList;
     }
