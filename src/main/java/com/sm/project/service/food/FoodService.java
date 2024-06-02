@@ -28,7 +28,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -109,21 +108,36 @@ public class FoodService {
         return naverOCRResponse;
     }
 
+    // 영어로만 된 문자열 필터링 패턴
+    private static final Pattern patternEnglishOnly = Pattern.compile("^[a-zA-Z]+$");
+    // 특수 문자가 포함된 문자열 중 유효한 패턴을 제외한 필터링 패턴
+    private static final Pattern patternSpecialChars = Pattern.compile(".*[^a-zA-Z0-9가-힣\\s\\*\\.].*");
 
     public List<String> filterReceipt(NaverOCRResponse naverOCRResponse) {
 
         List<String> foodList = new ArrayList<>();
         // 양 끝 숫자 문자 filter
         Pattern pattern1 = Pattern.compile("^\\d.*\\d$");
-        // 특수 문자로된 문자열 filter
-        Pattern pattern2 = Pattern.compile("[^a-zA-Z0-9]");
         // 원으로 끝나는 문자열 filter
         Pattern pattern3 = Pattern.compile(".*원$");
-        // 0~9 숫자 filter
-        Pattern pattern4 = Pattern.compile("[0-9]");
         // 숫자만 있는 문자열 filter
         Pattern pattern5 = Pattern.compile("^\\d+$");
-        Matcher matcher1, matcher2, matcher3, matcher4, matcher5;
+        // g로 끝나는 문자열 filter
+        Pattern pattern6 = Pattern.compile(".*g$");
+        // 전화번호 패턴 filter
+        Pattern pattern7 = Pattern.compile(".*Tel.*");
+        // 날짜 패턴 filter
+        Pattern pattern8 = Pattern.compile(".*[0-9]{2}:[0-9]{2}.*");
+        // 주소 패턴 filter
+        Pattern pattern9 = Pattern.compile(".*[점|로|길].*");
+        // 할인,쿠폰 패턴 filter
+        Pattern pattern10 = Pattern.compile(".*[할인|쿠폰|합계|면세품목|상품|매장|카드|가능].*");
+        // 자사, IRC 패턴 filter
+        Pattern pattern11 = Pattern.compile(".*자사.*|.*IRC.*");
+        // 쉼표, 온점, 콜론으로 끝나는 문자열 filter
+        Pattern pattern12 = Pattern.compile(".*[.,:]$");
+
+        Matcher matcher1, matcher3, matcher5, matcher6, matcher7, matcher8, matcher9, matcher10, matcher11, matcher12, matcherEnglishOnly, matcherSpecialChars;
 
         // json으로 넘어오는 데이터 List로 변환
         if (naverOCRResponse != null && naverOCRResponse.getImages() != null) {
@@ -142,13 +156,14 @@ public class FoodService {
         Iterator<String> iterator = foodList.iterator();
         while (iterator.hasNext()) {
             String food = iterator.next();
+            System.out.println(food);
             matcher1 = pattern1.matcher(food);
             if (matcher1.matches()) {
                 iterator.remove();
                 continue;
             }
-            matcher2 = pattern2.matcher(food);
-            if (matcher2.matches()) {
+            matcherSpecialChars = patternSpecialChars.matcher(food);
+            if (matcherSpecialChars.matches()) {
                 iterator.remove();
                 continue;
             }
@@ -159,21 +174,66 @@ public class FoodService {
                 continue;
             }
 
-            matcher4 = pattern4.matcher(food);
-            if (matcher4.matches()) {
-                iterator.remove();
-                continue;
-            }
-
             matcher5 = pattern5.matcher(food);
             if (matcher5.matches()) {
                 iterator.remove();
                 continue;
             }
 
-            if (food.equals("상품명") || food.equals("단가") || food.equals("수량") || food.equals("금 액") ||
-                    food.equals("합계") || food.equals("총액") || food.equals("할인") || food.equals("부가세")) {
+            matcher6 = pattern6.matcher(food);
+            if (matcher6.matches() && food.length() <= 4) { // "g"로 끝나는 두 글자 이하 문자열만 필터링
                 iterator.remove();
+                continue;
+            }
+
+            matcher7 = pattern7.matcher(food);
+            if (matcher7.matches()) {
+                iterator.remove();
+                continue;
+            }
+
+            matcher8 = pattern8.matcher(food);
+            if (matcher8.matches()) {
+                iterator.remove();
+                continue;
+            }
+
+            matcher9 = pattern9.matcher(food);
+            if (matcher9.matches()) {
+                iterator.remove();
+                continue;
+            }
+
+            matcher10 = pattern10.matcher(food);
+            if (matcher10.matches()) {
+                iterator.remove();
+                continue;
+            }
+
+            matcher11 = pattern11.matcher(food);
+            if (matcher11.matches()) {
+                iterator.remove();
+                continue;
+            }
+
+            matcher12 = pattern12.matcher(food);
+            if (matcher12.matches()) {
+                iterator.remove();
+                continue;
+            }
+
+            matcherEnglishOnly = patternEnglishOnly.matcher(food);
+            if (matcherEnglishOnly.matches()) {
+                iterator.remove();
+                continue;
+            }
+
+            if (food.equals("상품명") || food.equals("단가") || food.equals("수량") || food.equals("금 액") ||
+                    food.equals("합계") || food.equals("총액") || food.equals("부가세") ||
+                    food.equals("교환") || food.equals("환불") || food.equals("결제변경") || food.equals("점포")||
+                    food.equals("영수증") || food.equals("T") || food.equals("****")) {
+                iterator.remove();
+                continue;
             }
 
             // 길이가 1 또는 2인 문자열 필터링
@@ -185,6 +245,9 @@ public class FoodService {
 
         return foodList;
     }
+
+
+
 
     public List<String> classifyFood(List<String> foodList) throws Exception{
         //구현한 모델을 lambda 함수를 이용해서 만든 api를 호출합니다.
