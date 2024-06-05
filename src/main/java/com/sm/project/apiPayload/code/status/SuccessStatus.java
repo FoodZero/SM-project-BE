@@ -31,7 +31,12 @@ public enum SuccessStatus implements BaseCode {
     //LOCATION
     LOCATION_POST_SUCCESS(HttpStatus.OK, "LOCATION200", "위치 저장 성공입니다."),
 
-    REFRIGERATOR_UPLOAD_SUCCESS(HttpStatus.OK, "REF200", "냉장고 등록 성공");
+    REFRIGERATOR_UPLOAD_SUCCESS(HttpStatus.OK, "REF200", "냉장고 등록 성공"),
+
+    //COMMENT
+    COMMENT_CREATE_SUCCESS(HttpStatus.OK, "COMMENT200", "댓글 등록 성공"),
+    COMMENT_UPDATE_SUCCESS(HttpStatus.OK, "COMMENT2001", "댓글 수정 성공"),
+    COMMENT_DELETE_SUCCESS(HttpStatus.OK, "COMMENT2002", "댓글 삭제 성공");
 
 
     private final HttpStatus httpStatus;
