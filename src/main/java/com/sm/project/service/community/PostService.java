@@ -101,9 +101,17 @@ public class PostService {
 
     }
 
-    public List<Post> getPostList(Long lastIndex, PostTopicType postTopicType){
+    public List<Post> getPostList(Long lastIndex, PostTopicType postTopicType, Long locationId){
+        Location location;
 
-        return postRepository.findPostList(lastIndex, postTopicType);
+        if(locationId == null){
+            location = null;
+        }else{
+            location = locationRepository.findById(locationId).orElseThrow(()->new PostHandler(ErrorStatus.LOCATION_NOT_FOUND));
+        }
+
+
+        return postRepository.findPostList(lastIndex, postTopicType, location);
     }
 
     public Post getPost(Long postId){

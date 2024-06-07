@@ -62,18 +62,21 @@ public class PostController {
     @GetMapping("/")
     @Operation(summary = "커뮤니티 글 조회 API", description = "커뮤니티에서 글 조회하는 api입니다.postType: 나눔, 레시피, 빈값(전체 조회) ")
     @Parameters(value = {
-            @Parameter(name = "lastIndex", description = "lastIndex 첫 조회는 0이고 스크롤 내릴때마다 마지막 index 입력하시면 됩니다."),
-            @Parameter(name = "postType", description = "나눔, 레시피, 선택하지 않으면 전체가 조회됩니다.")
+            @Parameter(name = "lastIndex", description = "lastIndex 첫 조회는 0이고 스크롤 내릴때마다 마지막 index 입력하시면 됩니다. 맨 처음인 경우 Null"),
+            @Parameter(name = "postType", description = "나눔, 레시피, 선택하지 않으면 전체가 조회됩니다."),
+            @Parameter(name = "locationId", description = "위치 조회 해서 나온 현재 위치 id를 입력하면 됩니다. Null인 경우 전체 조회")
 
     })
     public ResponseDTO<PostResponseDTO.PostListDTO> getPostList(Authentication auth,
                                                                       @RequestParam(value = "lastIndex", required = false) Long lastIndex,
-                                                                      @RequestParam(value = "postType", required = false) PostTopicType postTopicType){
+                                                                      @RequestParam(value = "postType", required = false) PostTopicType postTopicType,
+                                                                @RequestParam(value = "locationId",required = false) Long locationId ){
 
         Member member = memberQueryService.findMemberById(Long.valueOf(auth.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
-
-        List<Post> posts = postService.getPostList(lastIndex,postTopicType);
-        System.out.println(posts.get(0).getContent());
+        if(lastIndex == null){
+            lastIndex = 0L;
+        }
+        List<Post> posts = postService.getPostList(lastIndex,postTopicType,locationId);
 
         return ResponseDTO.onSuccess(PostConverter.toPostList(posts, member));
     }
