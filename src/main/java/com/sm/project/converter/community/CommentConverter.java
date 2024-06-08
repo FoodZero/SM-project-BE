@@ -16,4 +16,16 @@ public class CommentConverter {
          comment.setPost(post);
          return comment;
     }
+
+    public static Comment toChildComment(Member member, Post post, Comment parent, CommentRequestDTO.CreateCommentDTO request) {
+        Comment comment = Comment.builder()
+                .content(request.getContent())
+                .member(member)
+                .build();
+
+        comment.setPost(post);
+        comment.createChildComments(parent);
+
+        return comment;
+    }
 }

@@ -18,9 +18,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class CommentService {
 
     private final CommentRepository commentRepository;
+    private final PostQueryService postQueryService;
 
     public void createComment(Member member, Post post, CommentRequestDTO.CreateCommentDTO request) {
         Comment comment = CommentConverter.toParentComment(member, post, request);
         commentRepository.save(comment);
+    }
+
+    public void createChildComment(Member member, Comment parent, CommentRequestDTO.CreateCommentDTO request) {
+        Post post = postQueryService.findPostById(parent.getPost().getId());
+        Comment childComment = CommentConverter.toChildComment(member, post, parent, request);
+        commentRepository.save(childComment);
     }
 }
