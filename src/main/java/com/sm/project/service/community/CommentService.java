@@ -36,6 +36,12 @@ public class CommentService {
     public void updateComment(Member member, Comment comment, CommentRequestDTO.UpdateCommentDTO request) {
         if (comment.getMember() == member) {
             comment.setContent(request.getContent());
-        } else throw new CommentHandler(ErrorStatus.COMMENT_NOT_OWNED);
+        } else throw new CommentHandler(ErrorStatus.COMMENT_NOT_OWNED); //본인이 작성한 댓글이 아니면 수정 불가
+    }
+
+    public void deleteComment(Member member, Comment comment) {
+        if (comment.getMember() == member) {
+            commentRepository.delete(comment);
+        } else throw new CommentHandler(ErrorStatus.COMMENT_NOT_OWNED); //본인이 작성한 댓글이 아니면 삭제 불가
     }
 }

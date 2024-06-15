@@ -42,11 +42,11 @@ public class CommentController {
     @PostMapping("/{postId}")
     @Operation(summary = "커뮤니티 댓글 등록 API", description = "커뮤니티에서 댓글을 등록하는 api입니다. postId는 댓글을 등록할 포스트의 식별자입니다.")
     @ApiResponses({
-                    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMENT200", description = "댓글 등록 성공"),
-                    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER4001", description = "해당 회원을 찾을 수 없습니다.",
-                            content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
-                    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "POST4001", description = "해당 포스트를 찾을 수 없습니다.",
-                            content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMENT200", description = "댓글 등록 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER4001", description = "해당 회원을 찾을 수 없습니다.",
+                    content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "POST4001", description = "해당 포스트를 찾을 수 없습니다.",
+                    content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
     public ResponseDTO<?> createComment(Authentication auth, @PathVariable(name = "postId") Long postId, @RequestBody CommentRequestDTO.CreateCommentDTO request) {
         Member member = memberQueryService.findMemberById(Long.valueOf(auth.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
@@ -66,7 +66,7 @@ public class CommentController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMENT4001", description = "해당 댓글을 찾을 수 없습니다.",
                     content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
-    public ResponseDTO<?> createChildComment(Authentication auth, @PathVariable(name = "commentId") Long commentId,  @RequestBody CommentRequestDTO.CreateCommentDTO request) {
+    public ResponseDTO<?> createChildComment(Authentication auth, @PathVariable(name = "commentId") Long commentId, @RequestBody CommentRequestDTO.CreateCommentDTO request) {
         Member member = memberQueryService.findMemberById(Long.valueOf(auth.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
         Comment parent = commentQueryService.findCommentById(commentId);
         commentService.createChildComment(member, parent, request);
@@ -81,7 +81,7 @@ public class CommentController {
                     content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMENT4001", description = "해당 댓글을 찾을 수 없습니다.",
                     content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMENT4002", description = "자신이 작성한 댓글만 수정할 수 있습니다.",
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMENT4002", description = "자신이 작성한 댓글이 아닙니다.",
                     content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
     public ResponseDTO<?> updateComment(Authentication auth, @PathVariable(name = "commentId") Long commentId, @RequestBody CommentRequestDTO.UpdateCommentDTO request) {
@@ -89,5 +89,23 @@ public class CommentController {
         Comment comment = commentQueryService.findCommentById(commentId);
         commentService.updateComment(member, comment, request);
         return ResponseDTO.of(SuccessStatus.COMMENT_UPDATE_SUCCESS, null);
+    }
+
+    @DeleteMapping("/{commentId}")
+    @Operation(summary = "커뮤니티 댓글 삭제 API", description = "삭제할 댓글의 식별자를 입력하세요. 댓글 작성자가 아닐 시 예외가 발생합니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMENT2002", description = "댓글 삭제 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER4001", description = "해당 회원을 찾을 수 없습니다.",
+                    content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMENT4001", description = "해당 댓글을 찾을 수 없습니다.",
+                    content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMENT4002", description = "자신이 작성한 댓글이 아닙니다.",
+                    content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+    })
+    public ResponseDTO<?> deleteComment(Authentication auth, @PathVariable(name = "commentId") Long commentId) {
+        Member member = memberQueryService.findMemberById(Long.valueOf(auth.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Comment comment = commentQueryService.findCommentById(commentId);
+        commentService.deleteComment(member, comment);
+        return ResponseDTO.of(SuccessStatus.COMMENT_DELETE_SUCCESS, null);
     }
 }

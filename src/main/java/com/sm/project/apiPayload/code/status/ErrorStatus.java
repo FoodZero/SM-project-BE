@@ -51,7 +51,7 @@ public enum ErrorStatus implements BaseErrorCode {
 
     //Comment
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "COMMENT4001", "해당 댓글을 찾을 수 없습니다."),
-    COMMENT_NOT_OWNED(HttpStatus.BAD_REQUEST, "COMMENT4002", "자신이 작성한 댓글만 수정할 수 있습니다.")
+    COMMENT_NOT_OWNED(HttpStatus.BAD_REQUEST, "COMMENT4002", "자신이 작성한 댓글이 아닙니다.")
     ;
 
 
