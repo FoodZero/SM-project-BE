@@ -1,5 +1,7 @@
 package com.sm.project.service.community;
 
+import com.sm.project.apiPayload.code.status.ErrorStatus;
+import com.sm.project.apiPayload.exception.handler.CommentHandler;
 import com.sm.project.converter.community.CommentConverter;
 import com.sm.project.domain.community.Comment;
 import com.sm.project.domain.community.Post;
@@ -29,5 +31,11 @@ public class CommentService {
         Post post = postQueryService.findPostById(parent.getPost().getId());
         Comment childComment = CommentConverter.toChildComment(member, post, parent, request);
         commentRepository.save(childComment);
+    }
+
+    public void updateComment(Member member, Comment comment, CommentRequestDTO.UpdateCommentDTO request) {
+        if (comment.getMember() == member) {
+            comment.setContent(request.getContent());
+        } else throw new CommentHandler(ErrorStatus.COMMENT_NOT_OWNED);
     }
 }

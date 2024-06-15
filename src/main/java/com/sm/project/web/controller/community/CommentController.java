@@ -72,4 +72,22 @@ public class CommentController {
         commentService.createChildComment(member, parent, request);
         return ResponseDTO.of(SuccessStatus.COMMENT_CREATE_SUCCESS, null);
     }
+
+    @PatchMapping("/{commentId}")
+    @Operation(summary = "커뮤니티 댓글 수정 API", description = "수정할 댓글의 식별자를 입력하고, request body에 수정할 내용을 입력하세요. 댓글 작성자가 아닐 시 예외가 발생합니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMENT2001", description = "댓글 수정 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER4001", description = "해당 회원을 찾을 수 없습니다.",
+                    content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMENT4001", description = "해당 댓글을 찾을 수 없습니다.",
+                    content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMENT4002", description = "자신이 작성한 댓글만 수정할 수 있습니다.",
+                    content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+    })
+    public ResponseDTO<?> updateComment(Authentication auth, @PathVariable(name = "commentId") Long commentId, @RequestBody CommentRequestDTO.UpdateCommentDTO request) {
+        Member member = memberQueryService.findMemberById(Long.valueOf(auth.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Comment comment = commentQueryService.findCommentById(commentId);
+        commentService.updateComment(member, comment, request);
+        return ResponseDTO.of(SuccessStatus.COMMENT_UPDATE_SUCCESS, null);
+    }
 }
