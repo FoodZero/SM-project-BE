@@ -52,6 +52,9 @@ jobs:
           naver.geo.url: ${{ secrets.NAVER_GEO_URL }}
           naver.geo.client: ${{ secrets.NAVER_GEO_CLIENT }}
           naver.geo.key: ${{ secrets.NAVER_GEO_KEY }}
+          spring.elasticsearch.username: ${{ secrets.ELASTIC_USERNAME }}
+          spring.elasticsearch.password: ${{ secrets.ELASTIC_PASSWORD }}
+          spring.elastic.url: ${{ secrets.ELASTIC_URL }}
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
