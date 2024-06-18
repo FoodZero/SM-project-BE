@@ -26,9 +26,9 @@ public class CommentQueryService {
         return commentRepository.findById(id).orElseThrow(() -> new CommentHandler(ErrorStatus.COMMENT_NOT_FOUND));
     }
 
-    public Slice<Comment> findCommentListByPostId(Long postId) {
+    public Slice<Comment> findCommentListByPostId(Long postId, int page) {
 
-        PageRequest pageRequest = PageRequest.of(0, 2); //페이지 0부터 시작해서 2개씩 조회(더보기 방식)
+        PageRequest pageRequest = PageRequest.of(page, 2); //page부터 시작해서 10개씩 조회(더보기 방식)
         return commentRepository.findCommentListByPostId(postId, pageRequest);
     }
 }

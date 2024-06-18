@@ -115,10 +115,10 @@ public class CommentController {
     }
 
     @GetMapping("/{postId}")
-    @Operation(summary = "커뮤니티 댓글 조회 API", description = "조회할 댓글 목록의 post 식별자를 입력하세요.")
+    @Operation(summary = "커뮤니티 댓글 조회 API", description = "조회할 댓글 목록의 post 식별자를 입력하고, page의 인덱스를 입력하세요. page의 인덱스는 0부터 시작합니다.")
     @ApiResponses()
-    public ResponseDTO<?> readCommentList(@PathVariable(name = "postId") Long postId) {
-        Slice<Comment> commentList = commentQueryService.findCommentListByPostId(postId);
+    public ResponseDTO<?> readCommentList(@PathVariable(name = "postId") Long postId, @RequestParam(name = "page") int page) {
+        Slice<Comment> commentList = commentQueryService.findCommentListByPostId(postId, page);
         return ResponseDTO.of(SuccessStatus.COMMENT_READ_SUCCESS, CommentConverter.toCommentListDTO(commentList));
     }
 }
