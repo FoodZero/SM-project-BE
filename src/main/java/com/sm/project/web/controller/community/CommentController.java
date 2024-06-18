@@ -6,6 +6,7 @@ import com.sm.project.apiPayload.code.ErrorReasonDTO;
 import com.sm.project.apiPayload.code.status.ErrorStatus;
 import com.sm.project.apiPayload.code.status.SuccessStatus;
 import com.sm.project.apiPayload.exception.handler.MemberHandler;
+import com.sm.project.converter.community.CommentConverter;
 import com.sm.project.domain.community.Comment;
 import com.sm.project.domain.community.Post;
 import com.sm.project.domain.member.Member;
@@ -14,6 +15,7 @@ import com.sm.project.service.community.CommentService;
 import com.sm.project.service.community.PostQueryService;
 import com.sm.project.service.member.MemberQueryService;
 import com.sm.project.web.dto.community.CommentRequestDTO;
+import com.sm.project.web.dto.community.CommentResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -21,10 +23,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -107,5 +112,13 @@ public class CommentController {
         Comment comment = commentQueryService.findCommentById(commentId);
         commentService.deleteComment(member, comment);
         return ResponseDTO.of(SuccessStatus.COMMENT_DELETE_SUCCESS, null);
+    }
+
+    @GetMapping("/{postId}")
+    @Operation(summary = "커뮤니티 댓글 조회 API", description = "조회할 댓글 목록의 post 식별자를 입력하세요.")
+    @ApiResponses()
+    public ResponseDTO<?> readCommentList(@PathVariable(name = "postId") Long postId) {
+        Slice<Comment> commentList = commentQueryService.findCommentListByPostId(postId);
+        return ResponseDTO.of(SuccessStatus.COMMENT_READ_SUCCESS, CommentConverter.toCommentListDTO(commentList));
     }
 }

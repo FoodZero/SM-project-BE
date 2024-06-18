@@ -4,6 +4,11 @@ import com.sm.project.domain.community.Comment;
 import com.sm.project.domain.community.Post;
 import com.sm.project.domain.member.Member;
 import com.sm.project.web.dto.community.CommentRequestDTO;
+import com.sm.project.web.dto.community.CommentResponseDTO;
+import org.springframework.data.domain.Slice;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class CommentConverter {
 
@@ -27,5 +32,19 @@ public class CommentConverter {
         comment.createChildComments(parent);
 
         return comment;
+    }
+
+    public static CommentResponseDTO.CommentListDTO toCommentListDTO(Slice<Comment> commentList) {
+
+        List<CommentResponseDTO.CommentDTO> commentListDto =
+                commentList.stream().map(c -> CommentResponseDTO.CommentDTO.builder()
+                        .commentId(c.getId())
+                        .writerName(c.getMember().getNickname())
+                        .time(c.getCreatedAt())
+                        .content(c.getContent())
+                        .build())
+                .collect(Collectors.toList());
+
+        return CommentResponseDTO.CommentListDTO.builder().commentDTOList(commentListDto).build();
     }
 }
