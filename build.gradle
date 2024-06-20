@@ -81,6 +81,9 @@ dependencies {
 
 	//elasticsearch
 	implementation 'org.springframework.data:spring-data-elasticsearch:4.4.2'
+
+	//bucket4j
+	implementation 'com.giffing.bucket4j.spring.boot.starter:bucket4j-spring-boot-starter:0.2.0'
 }
 
 tasks.named('test') {
