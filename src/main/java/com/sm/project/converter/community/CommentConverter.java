@@ -7,6 +7,7 @@ import com.sm.project.web.dto.community.CommentRequestDTO;
 import com.sm.project.web.dto.community.CommentResponseDTO;
 import org.springframework.data.domain.Slice;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,15 +37,34 @@ public class CommentConverter {
 
     public static CommentResponseDTO.CommentListDTO toCommentListDTO(Slice<Comment> commentList) {
 
-        List<CommentResponseDTO.CommentDTO> commentListDto =
-                commentList.stream().map(c -> CommentResponseDTO.CommentDTO.builder()
-                        .commentId(c.getId())
-                        .writerName(c.getMember().getNickname())
-                        .time(c.getCreatedAt())
-                        .content(c.getContent())
+        List<CommentResponseDTO.CommentDTO> commentDTOList =
+                commentList.stream().map(comment -> CommentResponseDTO.CommentDTO.builder()
+                        .commentId(comment.getId())
+                        .writerName(comment.getMember().getNickname())
+                        .createdAt(comment.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                        .content(comment.getContent())
+                        .childList(childToCommentDTO(comment.getChildComments()))
                         .build())
                 .collect(Collectors.toList());
 
-        return CommentResponseDTO.CommentListDTO.builder().commentDTOList(commentListDto).build();
+        return CommentResponseDTO.CommentListDTO.builder()
+                .isLast(commentList.isLast())
+                .commentDTOList(commentDTOList)
+                .build();
+    }
+
+    public static List<CommentResponseDTO.CommentDTO> childToCommentDTO(List<Comment> childList) {
+
+        List<CommentResponseDTO.CommentDTO> childCommentDTOList =
+                childList.stream().map(comment -> CommentResponseDTO.CommentDTO.builder()
+                                .commentId(comment.getId())
+                                .writerName(comment.getMember().getNickname())
+                                .createdAt(comment.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                                .content(comment.getContent())
+                                .parentId(comment.getParentComment().getId())
+                                .childList(childToCommentDTO(comment.getChildComments()))
+                                .build())
+                        .collect(Collectors.toList());
+        return childCommentDTOList;
     }
 }

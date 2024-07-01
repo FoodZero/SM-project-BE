@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +29,7 @@ public class CommentQueryService {
 
     public Slice<Comment> findCommentListByPostId(Long postId, int page) {
 
-        PageRequest pageRequest = PageRequest.of(page, 2); //page부터 시작해서 10개씩 조회(더보기 방식)
+        PageRequest pageRequest = PageRequest.of(page, 10, Sort.by(Sort.Direction.ASC, "createdAt")); //page부터 시작해서 10개씩 조회(더보기 방식)
         return commentRepository.findCommentListByPostId(postId, pageRequest);
     }
 }
