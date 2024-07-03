@@ -28,6 +28,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+/**
+ * FoodService는 음식 관련 기능을 제공하는 서비스 클래스입니다.
+ * 음식 추가, 조회, 수정, 삭제 및 영수증 OCR 기능을 담당합니다.
+ */
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -41,70 +46,110 @@ public class FoodService {
     private final LambdaFeignClient lambdaFeignClient;
     private final RefrigeratorRepository refrigeratorRepository;
 
-    public void uploadFood(FoodRequestDTO.UploadFoodDTO request, Member member, Long refrigeratorId){
-
-        Refrigerator refrigerator = refrigeratorRepository.findById(refrigeratorId).orElseThrow(()-> new FoodHandler(ErrorStatus.RERFIGERATOR_NOT_FOUND));
+    /**
+     * 음식을 추가하는 메서드입니다.
+     *
+     * @param request 음식 추가 요청 데이터
+     * @param member 회원 객체
+     * @param refrigeratorId 냉장고 ID
+     */
+    public void uploadFood(FoodRequestDTO.UploadFoodDTO request, Member member, Long refrigeratorId) {
+        Refrigerator refrigerator = refrigeratorRepository.findById(refrigeratorId)
+            .orElseThrow(() -> new FoodHandler(ErrorStatus.RERFIGERATOR_NOT_FOUND));
         Food newFood = FoodConverter.toFoodDTO(request, refrigerator);
         foodRepository.save(newFood);
-        return;
     }
 
-    public void uploadRefrigerator(FoodRequestDTO.UploadRefrigeratorDTO request, Member member){
+    /**
+     * 냉장고를 추가하는 메서드입니다.
+     *
+     * @param request 냉장고 추가 요청 데이터
+     * @param member 회원 객체
+     */
+    public void uploadRefrigerator(FoodRequestDTO.UploadRefrigeratorDTO request, Member member) {
         Refrigerator refrigerator = Refrigerator.builder()
-                .member(member)
-                .name(request.getName())
-                .build();
+            .member(member)
+            .name(request.getName())
+            .build();
         refrigeratorRepository.save(refrigerator);
     }
 
-    public List<Refrigerator> getRefrigeratorList(Member member){
-
+    /**
+     * 회원의 모든 냉장고 목록을 조회하는 메서드입니다.
+     *
+     * @param member 회원 객체
+     * @return 냉장고 목록
+     */
+    public List<Refrigerator> getRefrigeratorList(Member member) {
         return refrigeratorRepository.findAllByMember(member);
-
     }
 
-    public List<Food> getFoodList(Member member, Long refigeratorId){
-
-        Refrigerator refrigerator = refrigeratorRepository.findByIdAndMember(refigeratorId,member).orElseThrow(() -> new FoodHandler(ErrorStatus.RERFIGERATOR_NOT_FOUND));
-
-
-
+    /**
+     * 특정 냉장고의 음식 목록을 조회하는 메서드입니다.
+     *
+     * @param member 회원 객체
+     * @param refrigeratorId 냉장고 ID
+     * @return 음식 목록
+     */
+    public List<Food> getFoodList(Member member, Long refrigeratorId) {
+        Refrigerator refrigerator = refrigeratorRepository.findByIdAndMember(refrigeratorId, member)
+            .orElseThrow(() -> new FoodHandler(ErrorStatus.RERFIGERATOR_NOT_FOUND));
         return foodRepository.findAllByRefrigerator(refrigerator);
-
     }
 
-    public void updateFood(FoodRequestDTO.UpdateFoodDTO request, Long foodId, Long refrigeratorId){
-
-        Refrigerator refrigerator = refrigeratorRepository.findById(refrigeratorId).orElseThrow(() -> new FoodHandler(ErrorStatus.RERFIGERATOR_NOT_FOUND));
-        foodRepository.changeFood(request.getName(),request.getCount(),request.getExpire(),request.getFoodType(),foodId, refrigerator);
-
+    /**
+     * 음식을 수정하는 메서드입니다.
+     *
+     * @param request 음식 수정 요청 데이터
+     * @param foodId 음식 ID
+     * @param refrigeratorId 냉장고 ID
+     */
+    public void updateFood(FoodRequestDTO.UpdateFoodDTO request, Long foodId, Long refrigeratorId) {
+        Refrigerator refrigerator = refrigeratorRepository.findById(refrigeratorId)
+            .orElseThrow(() -> new FoodHandler(ErrorStatus.RERFIGERATOR_NOT_FOUND));
+        foodRepository.changeFood(request.getName(), request.getCount(), request.getExpire(), request.getFoodType(), foodId, refrigerator);
     }
 
-    public void deleteFood(Long foodId, Long refrigeratorId){
-
-        Refrigerator refrigerator = refrigeratorRepository.findById(refrigeratorId).orElseThrow(() -> new FoodHandler(ErrorStatus.RERFIGERATOR_NOT_FOUND));
-        Food deleteFood = foodRepository.findByRefrigeratorAndId(refrigerator, foodId).orElseThrow(() -> new FoodHandler(ErrorStatus.FOOD_NOT_FOUND));
+    /**
+     * 음식을 삭제하는 메서드입니다.
+     *
+     * @param foodId 음식 ID
+     * @param refrigeratorId 냉장고 ID
+     */
+    public void deleteFood(Long foodId, Long refrigeratorId) {
+        Refrigerator refrigerator = refrigeratorRepository.findById(refrigeratorId)
+            .orElseThrow(() -> new FoodHandler(ErrorStatus.RERFIGERATOR_NOT_FOUND));
+        Food deleteFood = foodRepository.findByRefrigeratorAndId(refrigerator, foodId)
+            .orElseThrow(() -> new FoodHandler(ErrorStatus.FOOD_NOT_FOUND));
         foodRepository.delete(deleteFood);
-
     }
 
-    public String uploadReceipt(Member member, MultipartFile receipt){
-
+    /**
+     * 영수증 사진을 업로드하는 메서드입니다.
+     *
+     * @param member 회원 객체
+     * @param receipt 영수증 사진 파일
+     * @return 영수증 URL
+     */
+    public String uploadReceipt(Member member, MultipartFile receipt) {
         String receiptUrl = utilService.uploadS3Img("receipt", receipt);
         ReceiptImage receiptImage = ReceiptImage.builder()
-                .url(receiptUrl)
-                .member(member)
-                .build();
+            .url(receiptUrl)
+            .member(member)
+            .build();
         receiptImageRepository.save(receiptImage);
         return receiptUrl;
     }
 
+    /**
+     * 영수증 데이터를 OCR 처리하는 메서드입니다.
+     *
+     * @param receiptUrl 영수증 URL
+     * @return OCR 결과
+     */
     @Transactional
-    public NaverOCRResponse uploadReceiptData(String receiptUrl){
-
-
+    public NaverOCRResponse uploadReceiptData(String receiptUrl) {
         NaverOCRResponse naverOCRResponse = naverOCRFeignClient.generateText(FoodConverter.toNaverOCRRequestDTO(receiptUrl));
-
         return naverOCRResponse;
     }
 
@@ -112,6 +157,13 @@ public class FoodService {
     private static final Pattern patternEnglishOnly = Pattern.compile("^[a-zA-Z]+$");
     // 특수 문자가 포함된 문자열 중 유효한 패턴을 제외한 필터링 패턴
     private static final Pattern patternSpecialChars = Pattern.compile(".*[^a-zA-Z0-9가-힣\\s\\*\\.].*");
+
+    /**
+     * OCR 결과에서 유효한 음식 이름만 필터링하는 메서드입니다.
+     *
+     * @param naverOCRResponse OCR 결과
+     * @return 유효한 음식 이름 목록
+     */
 
     public List<String> filterReceipt(NaverOCRResponse naverOCRResponse) {
 
@@ -139,7 +191,7 @@ public class FoodService {
 
         Matcher matcher1, matcher3, matcher5, matcher6, matcher7, matcher8, matcher9, matcher10, matcher11, matcher12, matcherEnglishOnly, matcherSpecialChars;
 
-        // json으로 넘어오는 데이터 List로 변환
+        // OCR 결과에서 텍스트 추출하여 foodList에 추가
         if (naverOCRResponse != null && naverOCRResponse.getImages() != null) {
             for (NaverOCRResponse.Image image : naverOCRResponse.getImages()) {
                 if (image.getFields() != null) {
@@ -152,7 +204,7 @@ public class FoodService {
             }
         }
 
-        // 위에서 작성한 pattern에 해당하는 문자열 List에서 제거
+        // 패턴에 해당하는 문자열을 foodList에서 제거
         Iterator<String> iterator = foodList.iterator();
         while (iterator.hasNext()) {
             String food = iterator.next();
@@ -246,9 +298,13 @@ public class FoodService {
         return foodList;
     }
 
-
-
-
+    /**
+     * 필터링된 음식 목록을 식품 분류 모델을 사용하여 분류하는 메서드입니다.
+     *
+     * @param foodList 필터링된 음식 목록
+     * @return 식품으로 분류된 목록
+     * @throws Exception 예외 발생 시
+     */
     public List<String> classifyFood(List<String> foodList) throws Exception{
         //구현한 모델을 lambda 함수를 이용해서 만든 api를 호출합니다.
         //request로는 영수증에서 추출하고 1차적으로 필터링한 상품들

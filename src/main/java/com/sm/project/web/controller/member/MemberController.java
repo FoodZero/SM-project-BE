@@ -28,6 +28,10 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
+/**
+ * MemberController는 회원 관련 API 요청을 처리하는 컨트롤러 클래스입니다.
+ * 회원가입, 로그인, 이메일 찾기, 비밀번호 재설정 등의 기능을 제공합니다.
+ */
 @RestController
 @Slf4j
 @RequiredArgsConstructor
@@ -40,27 +44,41 @@ public class MemberController {
     private final MemberQueryService memberQueryService;
     private final MailService mailService;
 
+    /**
+     * 테스트 엔드포인트
+     * @return 성공 메시지
+     */
     @GetMapping("/test")
     public ResponseEntity<?> test() {
         return ResponseEntity.ok().body("성공");
     }
 
+    /**
+     * 로그인 API
+     * @param request 이메일과 비밀번호를 포함한 로그인 요청 데이터
+     * @return 로그인 결과를 포함한 응답
+     */
     @PostMapping("/login")
     @Operation(summary = "로그인 API", description = "request 파라미터 : 이메일, 비밀번호(String)")
     public ResponseDTO<MemberResponseDTO.LoginDTO> login(@RequestBody MemberRequestDTO.LoginDTO request) {
-
-
         return ResponseDTO.onSuccess(memberService.login(request));
     }
 
-
+    /**
+     * 카카오 계정 정보 조회 API
+     * @param code 카카오 인증 코드
+     * @return 카카오 계정 정보
+     */
     @GetMapping("/callback/kakao")
     public ResponseDTO<?> getKakaoAccount(@RequestParam("code") String code) {
-
         return memberService.getKakaoInfo(code);
-
     }
 
+    /**
+     * 회원가입 API
+     * @param request 회원가입 요청 데이터
+     * @return 회원가입 결과를 포함한 응답
+     */
     @PostMapping("/register")
     @Operation(summary = "회원가입 API", description = "이메일을 통해 회원가입하는 API입니다.")
     @ApiResponses({
@@ -75,6 +93,11 @@ public class MemberController {
         return ResponseDTO.of(SuccessStatus._OK, MemberConverter.toJoinResultDTO(newMember));
     }
 
+    /**
+     * 닉네임 중복 확인 API
+     * @param request 닉네임 중복 확인 요청 데이터
+     * @return 닉네임 중복 여부를 포함한 응답
+     */
     @PostMapping("/nickname")
     @Operation(summary = "닉네임 중복 확인 API", description = "회원가입 시 회원이 입력한 닉네임의 중복 여부를 확인하는 API입니다.")
     @ApiResponses({
@@ -89,6 +112,11 @@ public class MemberController {
         return ResponseDTO.onSuccess("닉네임 중복이 아닙니다.");
     }
 
+    /**
+     * 이메일 찾기 API
+     * @param request 닉네임과 전화번호로 이메일을 찾기 위한 요청 데이터
+     * @return 이메일 찾기 결과를 포함한 응답
+     */
     @PostMapping("/email")
     @Operation(summary = "이메일 찾기 API", description = "닉네임과 전화번호로 이메일을 찾는 API입니다.")
     @ApiResponses({
@@ -104,6 +132,11 @@ public class MemberController {
         return ResponseDTO.of(SuccessStatus._OK, MemberConverter.toEmailResultDTO(member.getEmail()));
     }
 
+    /**
+     * 본인인증 문자 전송 API
+     * @param request 본인인증을 위한 요청 데이터
+     * @return 인증문자 전송 결과를 포함한 응답
+     */
     @PostMapping("/send")
     @Operation(summary = "본인인증 문자 전송 API", description = "본인인증을 위한 인증번호 문자를 보내는 API입니다.")
     public ResponseDTO sendSMS(@RequestBody MemberRequestDTO.SmsDTO request) {
@@ -111,6 +144,11 @@ public class MemberController {
         return ResponseDTO.onSuccess("인증문자 전송 성공");
     }
 
+    /**
+     * 비밀번호 찾기 이메일 전송 API
+     * @param request 비밀번호 찾기 요청 데이터
+     * @return 이메일 전송 결과를 포함한 응답
+     */
     @PostMapping("/password/send")
     @Operation(summary = "비빌번호 찾기 이메일 전송 API", description = "비밀번호를 찾기 위한 인증코드 이메일을 전송하는 API입니다.")
     @ApiResponses({
@@ -123,6 +161,11 @@ public class MemberController {
         return ResponseDTO.of(SuccessStatus._OK, "메일 전송 성공");
     }
 
+    /**
+     * 비밀번호 찾기 API
+     * @param request 비밀번호 찾기 요청 데이터
+     * @return 인증 결과를 포함한 응답
+     */
     @PostMapping("/password")
     @Operation(summary = "비밀번호 찾기 API", description = "비밀번호 찾기 페이지에서 인증코드가 맞는지 검사하는 API입니다. 해당 이메일을 응답으로 줍니다.")
     @ApiResponses({
@@ -135,6 +178,15 @@ public class MemberController {
         return ResponseDTO.of(SuccessStatus._OK, MemberConverter.toEmailResultDTO(request.getEmail()));
     }
 
+
+     /**
+     * 비밀번호 재설정 API
+     * 
+     * 비밀번호 찾기 이후 재설정 페이지에서 새로운 비밀번호를 설정하는 API입니다.
+     * 
+     * @param request 비밀번호 재설정을 위한 요청 데이터
+     * @return 비밀번호 재설정 결과를 포함한 응답
+     */
     @PostMapping("/password/reset")
     @Operation(summary = "비밀번호 재설정 API", description = "비밀번호 찾기 이후 재설정 페이지에서 비밀번호를 재설정하는 API입니다.")
     @ApiResponses({
@@ -147,15 +199,20 @@ public class MemberController {
         return ResponseDTO.of(SuccessStatus._OK, "비밀번호 재설정 성공");
     }
 
-
+    /**
+     * 앱 푸쉬 전송 API
+     * 
+     * FCM(Firebase Cloud Messaging)을 사용하여 앱 푸쉬 알림을 전송하는 API입니다.
+     * 
+     * @return 푸쉬 알림 전송 결과를 포함한 응답
+     * @throws IOException 입출력 예외 발생 시
+     */
     @PostMapping("/fcm/send")
     @Operation(summary = "앱 푸쉬 전송 api", description = "")
     public ResponseDTO<?> pushMessage() throws IOException {
-
         //Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
         memberService.sendPushAlarm();
-
-        return ResponseDTO.of(SuccessStatus.MEMBER_PUSH_SUCCESS,null);
+        return ResponseDTO.of(SuccessStatus.MEMBER_PUSH_SUCCESS, null);
     }
 
 
