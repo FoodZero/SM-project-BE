@@ -15,7 +15,6 @@ import java.util.List;
 @Getter
 @Builder
 @DynamicInsert
-@DynamicUpdate
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Comment extends BaseDateTimeEntity {
@@ -48,7 +47,7 @@ public class Comment extends BaseDateTimeEntity {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
-    @Column(columnDefinition = "TINYINT(1) DEFAULT 0")
+    @Column(columnDefinition = "boolean default false")
     private Boolean isDeleted = false;
 
     public void createChildComments(Comment parentComment) { //대댓글 생성할 때 사용. 부모, 자식 관계 설정
