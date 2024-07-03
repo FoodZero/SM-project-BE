@@ -9,6 +9,7 @@ import org.springframework.data.domain.Slice;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class CommentConverter {
@@ -40,7 +41,9 @@ public class CommentConverter {
         List<CommentResponseDTO.CommentDTO> commentDTOList =
                 commentList.stream().map(comment -> CommentResponseDTO.CommentDTO.builder()
                         .commentId(comment.getId())
-                        .writerName(comment.getMember().getNickname())
+                        .writerName(Optional.ofNullable(comment.getMember())
+                                .map(Member::getNickname)
+                                .orElse(null))
                         .createdAt(comment.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                         .content(comment.getContent())
                         .childList(childToCommentDTO(comment.getChildComments()))

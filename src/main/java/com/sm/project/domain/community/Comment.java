@@ -5,6 +5,7 @@ import com.sm.project.domain.member.Member;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import java.util.List;
 @Getter
 @Builder
 @DynamicInsert
+@DynamicUpdate
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Comment extends BaseDateTimeEntity {
@@ -38,7 +40,6 @@ public class Comment extends BaseDateTimeEntity {
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_comment_id")
-    //@ColumnDefault()
     private Comment parentComment;
 
     @OneToMany(mappedBy = "parentComment")
@@ -46,6 +47,9 @@ public class Comment extends BaseDateTimeEntity {
 
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
+
+    @Column(columnDefinition = "TINYINT(1) DEFAULT 0")
+    private Boolean isDeleted = false;
 
     public void createChildComments(Comment parentComment) { //대댓글 생성할 때 사용. 부모, 자식 관계 설정
         this.parentComment = parentComment;
@@ -59,5 +63,10 @@ public class Comment extends BaseDateTimeEntity {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public void deleteParentComment() {
+        this.member = null;
+        this.isDeleted = true;
     }
 }

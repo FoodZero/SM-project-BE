@@ -5,6 +5,7 @@ import com.sm.project.apiPayload.ResponseDTO;
 import com.sm.project.apiPayload.code.ErrorReasonDTO;
 import com.sm.project.apiPayload.code.status.ErrorStatus;
 import com.sm.project.apiPayload.code.status.SuccessStatus;
+import com.sm.project.apiPayload.exception.handler.CommentHandler;
 import com.sm.project.apiPayload.exception.handler.MemberHandler;
 import com.sm.project.converter.community.CommentConverter;
 import com.sm.project.domain.community.Comment;
@@ -97,7 +98,7 @@ public class CommentController {
     }
 
     @DeleteMapping("/{commentId}")
-    @Operation(summary = "커뮤니티 댓글 삭제 API", description = "삭제할 댓글의 식별자를 입력하세요. 댓글 작성자가 아닐 시 예외가 발생합니다.")
+    @Operation(summary = "커뮤니티 자식이 없는 댓글 삭제 API", description = "자식이 없는 댓글 삭제 입니다! 삭제할 댓글의 식별자를 입력하세요. 댓글 작성자가 아닐 시 예외가 발생합니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMENT2002", description = "댓글 삭제 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER4001", description = "해당 회원을 찾을 수 없습니다.",
@@ -106,11 +107,38 @@ public class CommentController {
                     content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMENT4002", description = "자신이 작성한 댓글이 아닙니다.",
                     content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMENT4003", description = "자식이 존재하는 댓글입니다.",
+                    content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class)))
     })
     public ResponseDTO<?> deleteComment(Authentication auth, @PathVariable(name = "commentId") Long commentId) {
         Member member = memberQueryService.findMemberById(Long.valueOf(auth.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
         Comment comment = commentQueryService.findCommentById(commentId);
-        commentService.deleteComment(member, comment);
+        if (comment.getChildComments().isEmpty()) {
+            commentService.deleteComment(member, comment);
+        } else throw new CommentHandler(ErrorStatus.COMMENT_CHILD_EXIST);
+        return ResponseDTO.of(SuccessStatus.COMMENT_DELETE_SUCCESS, null);
+    }
+
+    @PatchMapping("/parent/{commentId}")
+    @Operation(summary = "커뮤니티 자식이 있는 댓글 삭제 API", description = "자식이 있는 댓글 삭제 입니다! 삭제할 댓글의 식별자를 입력하세요. 댓글 작성자가 아닐 시 예외가 발생합니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMENT2002", description = "댓글 삭제 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER4001", description = "해당 회원을 찾을 수 없습니다.",
+                    content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMENT4001", description = "해당 댓글을 찾을 수 없습니다.",
+                    content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMENT4002", description = "자신이 작성한 댓글이 아닙니다.",
+                    content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMENT4004", description = "자식이 존재하지 않는 댓글입니다.",
+                    content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class)))
+    })
+    public ResponseDTO<?> deleteParentComment(Authentication auth, @PathVariable(name = "commentId") Long commentId) {
+        Member member = memberQueryService.findMemberById(Long.valueOf(auth.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Comment comment = commentQueryService.findCommentById(commentId);
+        if (comment.getChildComments().isEmpty()) {
+            throw new CommentHandler(ErrorStatus.COMMENT_NOT_PARENT);
+        }
+        commentService.deleteParentComment(member, comment);
         return ResponseDTO.of(SuccessStatus.COMMENT_DELETE_SUCCESS, null);
     }
 

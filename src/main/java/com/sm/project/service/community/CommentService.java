@@ -34,14 +34,24 @@ public class CommentService {
     }
 
     public void updateComment(Member member, Comment comment, CommentRequestDTO.UpdateCommentDTO request) {
-        if (comment.getMember() == member) {
-            comment.setContent(request.getContent());
-        } else throw new CommentHandler(ErrorStatus.COMMENT_NOT_OWNED); //본인이 작성한 댓글이 아니면 수정 불가
+        if(!comment.getMember().equals(member)) throw new CommentHandler(ErrorStatus.COMMENT_NOT_OWNED); //본인이 작성한 댓글이 아니면 수정 불가
+        comment.setContent(request.getContent());
     }
 
     public void deleteComment(Member member, Comment comment) {
-        if (comment.getMember() == member) {
-            commentRepository.delete(comment);
-        } else throw new CommentHandler(ErrorStatus.COMMENT_NOT_OWNED); //본인이 작성한 댓글이 아니면 삭제 불가
+        if (!comment.getMember().equals(member)) throw new CommentHandler(ErrorStatus.COMMENT_NOT_OWNED); //본인이 작성한 댓글이 아니면 삭제 불가
+
+        Comment parent = comment.getParentComment();
+        if (parent != null && parent.getChildComments().size() == 1 && parent.getIsDeleted()) {
+            commentRepository.delete(parent); //자식 혼자 남고, 이미 삭제된 부모면 부모도 삭제
+        }
+        commentRepository.delete(comment);
+    }
+
+    public void deleteParentComment(Member member, Comment comment) {
+        if (!comment.getMember().equals(member)) throw new CommentHandler(ErrorStatus.COMMENT_NOT_OWNED); //본인이 작성한 댓글이 아니면 삭제 불가
+
+        comment.deleteParentComment();
+        comment.setContent("삭제된 댓글입니다.");
     }
 }
