@@ -44,6 +44,13 @@ spring:
           charset: UTF-8
         transport:
           protocol: smtp
+  elastic:
+    url: ${ELASTIC_SEARCH_URL}
+  elasticsearch:
+    password: ${ELASTIC_PASSWORD}
+    username: ${ELASTIC_USERNAME}
+  main:
+    allow-bean-definition-overriding: true
 
 
 logging:
