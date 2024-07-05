@@ -30,7 +30,4 @@ public class MemberQueryService {
         return memberRepository.findByEmail(email).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
     }
 
-    public Member findByResetToken(String resetToken) {
-        return memberRepository.findByResetToken(resetToken).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_WRONG_RESET_TOKEN));
-    }
 }

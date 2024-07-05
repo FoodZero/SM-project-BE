@@ -13,8 +13,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Optional<Member> findByPhone(String phone);
 
-    Optional<Member> findByResetToken(String resetToken);
-
     Member findByNickname(String nickname);
 
     Member findByMemberRefrigeratorListContaining(Refrigerator refrigerator);
