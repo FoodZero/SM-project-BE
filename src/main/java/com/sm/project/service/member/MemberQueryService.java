@@ -23,7 +23,7 @@ public class MemberQueryService {
 
     /**
      * ID를 통해 회원을 조회하는 메서드입니다.
-     * 
+     *
      * @param id 회원 ID
      * @return 회원 객체 (Optional)
      */
@@ -33,7 +33,7 @@ public class MemberQueryService {
 
     /**
      * 전화번호를 통해 회원의 이메일을 조회하는 메서드입니다.
-     * 
+     *
      * @param phone 회원 전화번호
      * @return 회원 객체
      * @throws MemberHandler 회원을 찾을 수 없는 경우 예외 발생
@@ -45,7 +45,7 @@ public class MemberQueryService {
 
     /**
      * 이메일을 통해 회원을 조회하는 메서드입니다.
-     * 
+     *
      * @param email 회원 이메일
      * @return 회원 객체
      * @throws MemberHandler 회원을 찾을 수 없는 경우 예외 발생
@@ -54,14 +54,4 @@ public class MemberQueryService {
         return memberRepository.findByEmail(email).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
     }
 
-    /**
-     * 비밀번호 재설정 토큰을 통해 회원을 조회하는 메서드입니다.
-     * 
-     * @param resetToken 비밀번호 재설정 토큰
-     * @return 회원 객체
-     * @throws MemberHandler 잘못된 재설정 토큰인 경우 예외 발생
-     */
-    public Member findByResetToken(String resetToken) {
-        return memberRepository.findByResetToken(resetToken).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_WRONG_RESET_TOKEN));
-    }
 }

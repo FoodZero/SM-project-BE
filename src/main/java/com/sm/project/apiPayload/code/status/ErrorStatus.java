@@ -47,7 +47,13 @@ public enum ErrorStatus implements BaseErrorCode {
 
     //Post
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "POST4001", "해당 포스트를 찾을 수 없습니다."),
-    LOCATION_NOT_FOUND(HttpStatus.NOT_FOUND, "POST4002", "해당 위치는 존재하지 않습니다.")
+    LOCATION_NOT_FOUND(HttpStatus.NOT_FOUND, "POST4002", "해당 위치는 존재하지 않습니다."),
+
+    //Comment
+    COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "COMMENT4001", "해당 댓글을 찾을 수 없습니다."),
+    COMMENT_NOT_OWNED(HttpStatus.BAD_REQUEST, "COMMENT4002", "자신이 작성한 댓글이 아닙니다."),
+    COMMENT_CHILD_EXIST(HttpStatus.BAD_REQUEST, "COMMENT4003", "자식이 존재하는 댓글입니다."),
+    COMMENT_NOT_PARENT(HttpStatus.BAD_REQUEST, "COMMENT4004", "자식이 존재하지 않는 댓글입니다.")
     ;
 
 

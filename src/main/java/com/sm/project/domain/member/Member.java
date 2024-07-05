@@ -61,8 +61,6 @@ public class Member extends BaseDateTimeEntity {
     private List<ReceiptImage> memberReceiptImageList = new ArrayList<>();
 
 
-    private String resetToken;
-
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<FcmToken> fcmTokenList;
 
@@ -71,8 +69,4 @@ public class Member extends BaseDateTimeEntity {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Location> locationList;
-
-    public void setResetToken(String resetToken) {
-        this.resetToken = resetToken;
-    }
 }
