@@ -27,13 +27,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
      */
     Optional<Member> findByPhone(String phone);
 
-    /**
-     * 비밀번호 재설정 토큰을 통해 회원을 조회하는 메서드입니다.
-     *
-     * @param resetToken 비밀번호 재설정 토큰
-     * @return 조회된 회원 객체
-     */
-    Optional<Member> findByResetToken(String resetToken);
+
 
     /**
      * 닉네임을 통해 회원을 조회하는 메서드입니다.
@@ -51,3 +45,4 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
      */
     Member findByMemberRefrigeratorListContaining(Refrigerator refrigerator);
 }
+
