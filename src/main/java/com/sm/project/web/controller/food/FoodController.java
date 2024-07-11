@@ -79,6 +79,21 @@ public class FoodController {
     }
 
     /**
+     * 냉장고 삭제 API
+     * @param authentication 인증정보
+     * @return 냉장고 삭제 성공 응답
+     */
+    @DeleteMapping("/refrigerator/{refrigeratorId}")
+    @Operation(summary = "냉장고 삭제 api", description = "냉장고 번호 request param으로 넘겨주면 됩니다.")
+    public ResponseDTO<?> deleteRefrigerator(Authentication authentication,
+                                             @PathVariable(name = "refrigeratorId") Long refrigeratorId){
+        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString()))
+                .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        foodService.deleteRefrigerator(refrigeratorId, member);
+        return ResponseDTO.of(SuccessStatus.REFRIGERATOR_DELETE_SUCCESS, null);
+    }
+
+    /**
      * 냉장고 조회 API
      * 
      * @param authentication 인증 정보

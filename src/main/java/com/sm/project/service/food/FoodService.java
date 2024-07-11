@@ -83,7 +83,14 @@ public class FoodService {
     public List<Refrigerator> getRefrigeratorList(Member member) {
         return refrigeratorRepository.findAllByMember(member);
     }
-
+    /**
+     * 냉장고 삭제하는 메서드입니다.
+     */
+    public void deleteRefrigerator(Long refrigeratorId,Member member){
+        Refrigerator refrigerator = refrigeratorRepository.findById(refrigeratorId)
+                .orElseThrow(() -> new FoodHandler(ErrorStatus.RERFIGERATOR_NOT_FOUND));
+        refrigeratorRepository.deleteByMemberAndId(member,refrigeratorId);
+    }
     /**
      * 특정 냉장고의 음식 목록을 조회하는 메서드입니다.
      *
