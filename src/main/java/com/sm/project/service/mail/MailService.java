@@ -33,7 +33,8 @@ public class MailService {
      * @throws MessagingException 예외 발생 시
      * @throws UnsupportedEncodingException 예외 발생 시
      */
-    public void sendResetPwdEmail(String email, String certificationCode) throws MessagingException, UnsupportedEncodingException {
+    public void sendResetPwdEmail(String email, String certificationCode)
+            throws MessagingException, UnsupportedEncodingException {
         MimeMessage message = mailSender.createMimeMessage();
 
         // 수신자 설정
@@ -61,4 +62,19 @@ public class MailService {
         // 이메일 전송
         mailSender.send(message);
     }
+    
+   // 인증 코드를 이메일로 발송하는 메서드
+    public void sendVerificationCode(String email, String verificationCode) throws MessagingException, UnsupportedEncodingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        message.addRecipients(MimeMessage.RecipientType.TO, email);
+        message.setSubject("[서비스 이름] 인증 코드 발송");
+        String content = "<div>"
+                + "<p> 안녕하세요. 인증 코드가 발송되었습니다.<p>"
+                + "<p> 인증코드: " + verificationCode + "<p>"
+                + "</div>";
+        message.setFrom(new InternetAddress(fromMail, "서비스 이름"));
+        message.setText(content, "utf-8", "html");
+        mailSender.send(message);
+    }
+    
 }
