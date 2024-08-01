@@ -2,6 +2,7 @@ package com.sm.project.service.food;
 
 import com.sm.project.apiPayload.code.status.ErrorStatus;
 import com.sm.project.apiPayload.exception.handler.FoodHandler;
+import com.sm.project.config.PerformanceLoggingUtil;
 import com.sm.project.converter.food.FoodConverter;
 import com.sm.project.domain.food.Food;
 import com.sm.project.domain.food.Refrigerator;
@@ -26,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,6 +47,7 @@ public class FoodService {
     private final NaverOCRFeignClient naverOCRFeignClient;
     private final LambdaFeignClient lambdaFeignClient;
     private final RefrigeratorRepository refrigeratorRepository;
+    private final ReentrantLock lock = new ReentrantLock();
 
     /**
      * 음식을 추가하는 메서드입니다.
@@ -148,6 +151,7 @@ public class FoodService {
         return receiptUrl;
     }
 
+
     /**
      * 영수증 데이터를 OCR 처리하는 메서드입니다.
      *
@@ -156,8 +160,21 @@ public class FoodService {
      */
     @Transactional
     public NaverOCRResponse uploadReceiptData(String receiptUrl) {
+        lock.lock();
+        try{
+
+            PerformanceLoggingUtil.logPerformanceInfo(FoodService.class,"");
         NaverOCRResponse naverOCRResponse = naverOCRFeignClient.generateText(FoodConverter.toNaverOCRRequestDTO(receiptUrl));
+            PerformanceLoggingUtil.logPerformanceInfo(FoodService.class,naverOCRResponse.toString());
         return naverOCRResponse;
+
+    } catch (Exception e) {
+        PerformanceLoggingUtil.logPerformanceError(FoodService.class, "Feign Client 오류 발생: " , e);
+        throw e;
+    }finally {
+            lock.unlock();
+        }
+
     }
 
     // 영어로만 된 문자열 필터링 패턴
@@ -171,7 +188,6 @@ public class FoodService {
      * @param naverOCRResponse OCR 결과
      * @return 유효한 음식 이름 목록
      */
-
     public List<String> filterReceipt(NaverOCRResponse naverOCRResponse) {
 
         List<String> foodList = new ArrayList<>();
@@ -215,7 +231,6 @@ public class FoodService {
         Iterator<String> iterator = foodList.iterator();
         while (iterator.hasNext()) {
             String food = iterator.next();
-            System.out.println(food);
             matcher1 = pattern1.matcher(food);
             if (matcher1.matches()) {
                 iterator.remove();
@@ -296,7 +311,7 @@ public class FoodService {
             }
 
             // 길이가 1 또는 2인 문자열 필터링
-            if (food.length() <= 2) {
+            if (food.length() <= 1) {
                 iterator.remove();
             }
 

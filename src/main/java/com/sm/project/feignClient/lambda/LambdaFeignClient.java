@@ -12,6 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient(name = "LambdaFeignClient", url = "${cloud.aws.lambda.url}", configuration = LambdaFeignConfiguration.class)
 public interface LambdaFeignClient {
 
-    @PostMapping("/default")
+    @PostMapping("/predict")
     LambdaResponse getFood(@RequestBody LambdaRequest foodRequest);
 }

@@ -58,6 +58,7 @@ logging:
     org.hibernate.SQL: info
     org.hibernate.type: trace
 
+
 servlet:
   multipart:
     enabled: true
