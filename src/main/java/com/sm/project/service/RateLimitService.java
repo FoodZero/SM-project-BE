@@ -49,7 +49,7 @@ public class RateLimitService {
     private Bucket newBucket(String apiKey) {
         return Bucket4j.builder()
                 // 10개의 클라이언트가 10초에 10개씩 보낼 수 있는 대역폭
-                .addLimit(Bandwidth.classic(100000000, Refill.intervally(10000000, Duration.ofSeconds(10))))
+                .addLimit(Bandwidth.classic(10, Refill.intervally(10, Duration.ofSeconds(10))))
                 .build();
     }
 }
