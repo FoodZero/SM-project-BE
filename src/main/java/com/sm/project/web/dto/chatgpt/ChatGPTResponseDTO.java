@@ -15,4 +15,14 @@ public class ChatGPTResponseDTO {
         private String response; //지피티 대답.
     }
 
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RecipeResultDTO {
+
+        private String recipeName;
+        private String ingredient;
+        private String description;
+    }
 }

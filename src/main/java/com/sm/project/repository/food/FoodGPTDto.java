@@ -15,6 +15,7 @@ public class FoodGPTDto {
     private Integer count;
 
     public String toString() {
-        return name + " " + expire + " " + count;
+        //return name + " " + expire + " " + count;
+        return name;
     }
 }

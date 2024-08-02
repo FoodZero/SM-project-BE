@@ -4,6 +4,7 @@ import com.sm.project.apiPayload.ResponseDTO;
 import com.sm.project.apiPayload.code.status.SuccessStatus;
 import com.sm.project.service.chatgpt.ChatGPTService;
 import com.sm.project.web.dto.chatgpt.ChatGPTRequestDTO;
+import com.sm.project.web.dto.chatgpt.ChatGPTResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * ChatGPTController는 ChatGPT 관련 API 요청을 처리하는 컨트롤러 클래스입니다.
@@ -35,10 +37,10 @@ public class ChatGPTController {
      * @return ChatGPT의 응답을 포함한 응답 DTO
      */
     @GetMapping("/recipe")
-    @Operation(summary = "ChatGPT 레시피 API", description = "ChatGPT를 이용해 레시피를 조회하는 API입니다. 응답으로 레시피 설명을 해줍니다.")
+    @Operation(summary = "ChatGPT 레시피 API", description = "ChatGPT를 이용해 레시피를 조회하는 API입니다.(레시피 이름, 재료, 설명)")
     public ResponseDTO<?> getGptRecipe(Authentication authentication) {
         Long memberId = Long.valueOf(authentication.getName().toString());
-        String request = chatGPTService.createRequest(memberId);
-        return ResponseDTO.of(SuccessStatus._OK, chatGPTService.prompt(request));
+        List<ChatGPTResponseDTO.RecipeResultDTO> result = chatGPTService.getGptRecipe(memberId);
+        return ResponseDTO.of(SuccessStatus._OK, result);
     }
 }
