@@ -65,7 +65,9 @@ public class MemberController {
     @PostMapping("/login")
     @Operation(summary = "로그인 API", description = "request 파라미터 : 이메일, 비밀번호(String)")
     public ResponseDTO<MemberResponseDTO.LoginDTO> login(@RequestBody MemberRequestDTO.LoginDTO request) {
+
         return ResponseDTO.onSuccess(memberService.login(request));
+
     }
 
     /**
@@ -91,7 +93,9 @@ public class MemberController {
      */
     @GetMapping("/callback/kakao")
     public ResponseDTO<?> getKakaoAccount(@RequestParam("code") String code) {
+
         return memberService.getKakaoInfo(code);
+
     }
 
     /**
@@ -109,8 +113,9 @@ public class MemberController {
                     content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
     public ResponseDTO<MemberResponseDTO.JoinResultDTO> join(@RequestBody @Valid MemberRequestDTO.JoinDTO request) {
-        Member newMember = memberService.joinMember(request);
-        return ResponseDTO.of(SuccessStatus._OK, MemberConverter.toJoinResultDTO(newMember));
+
+        return ResponseDTO.of(SuccessStatus._OK, MemberConverter.toJoinResultDTO(memberService.joinMember(request)));
+
     }
 
     @DeleteMapping("/delete")
@@ -140,6 +145,7 @@ public class MemberController {
         if (memberService.isDuplicate(request)) {
             throw new MemberHandler(ErrorStatus.MEMBER_NICKNAME_DUPLICATE);
         }
+
         return ResponseDTO.onSuccess("닉네임 중복이 아닙니다.");
     }
 
@@ -174,9 +180,13 @@ public class MemberController {
                     content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
     public ResponseDTO<MemberResponseDTO.EmailResultDTO> findEmail(@RequestBody @Valid MemberRequestDTO.FindEmailDTO request) {
+
         memberService.verifySms(request.getPhone(), request.getCertificationCode());
+
         Member member = memberQueryService.findEmail(request.getPhone());
+
         return ResponseDTO.of(SuccessStatus._OK, MemberConverter.toEmailResultDTO(member.getEmail()));
+
     }
 
     /**
@@ -186,9 +196,12 @@ public class MemberController {
      */
     @PostMapping("/send")
     @Operation(summary = "본인인증 문자 전송 API", description = "본인인증을 위한 인증번호 문자를 보내는 API입니다.")
-    public ResponseDTO sendSMS(@RequestBody MemberRequestDTO.SmsDTO request) {
+    public ResponseDTO<?> sendSMS(@RequestBody MemberRequestDTO.SmsDTO request) {
+
         memberService.sendSms(request);
+
         return ResponseDTO.onSuccess("인증문자 전송 성공");
+
     }
 
     /**
@@ -204,8 +217,11 @@ public class MemberController {
                     content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
     public ResponseDTO<?> sendEmail(@RequestBody @Valid MemberRequestDTO.SendEmailDTO request) throws MessagingException, UnsupportedEncodingException {
+
         memberService.sendEmail(request);
+
         return ResponseDTO.of(SuccessStatus._OK, "메일 전송 성공");
+
     }
 
     /**
@@ -221,8 +237,11 @@ public class MemberController {
                     content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class)))
     })
     public ResponseDTO<MemberResponseDTO.EmailResultDTO> findPassword(@RequestBody @Valid MemberRequestDTO.FindPassword request) {
+
         memberService.verifyEmail(request.getEmail(), request.getCertificationCode()); //인증 코드 검사
+
         return ResponseDTO.of(SuccessStatus._OK, MemberConverter.toEmailResultDTO(request.getEmail()));
+
     }
 
 
@@ -242,8 +261,11 @@ public class MemberController {
                     content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
     public ResponseDTO<?> resetPassword(@RequestBody @Valid MemberRequestDTO.PasswordDTO request) {
+
         memberService.resetPassword(request);
+
         return ResponseDTO.of(SuccessStatus._OK, "비밀번호 재설정 성공");
+
     }
 
     /**
@@ -257,9 +279,11 @@ public class MemberController {
     @PostMapping("/fcm/send")
     @Operation(summary = "앱 푸쉬 전송 api", description = "")
     public ResponseDTO<?> pushMessage() throws IOException {
-        //Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
         memberService.sendPushAlarm();
+
         return ResponseDTO.of(SuccessStatus.MEMBER_PUSH_SUCCESS, null);
+
     }
 
     /**

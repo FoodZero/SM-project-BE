@@ -44,8 +44,11 @@ public class RecipeService {
      * @return 페이징된 레시피 목록
      */
     public Page<RecipeDocument> findTopRecipes(int lastIndex, int limit) {
+
         Pageable pageable = PageRequest.of(lastIndex / limit, limit, Sort.by(Sort.Direction.DESC, "recommendCount"));
+
         return recipeDocumentRepository.findAllByOrderByRecommendCountDesc(pageable);
+
     }
 
     /**
@@ -57,8 +60,11 @@ public class RecipeService {
      * @return 페이징된 레시피 목록
      */
     public Page<RecipeDocument> searchByIngredient(String ingredient, int lastIndex, int limit) {
+
         Pageable pageable = PageRequest.of(lastIndex / limit, limit, Sort.by(Sort.Direction.DESC, "recommendCount"));
+
         return recipeElasticRepository.findByIngredientContainingOrderByRecommendCountDesc(ingredient, pageable);
+
     }
 
     /**

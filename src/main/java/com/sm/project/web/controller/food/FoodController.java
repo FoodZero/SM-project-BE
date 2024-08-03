@@ -6,8 +6,6 @@ import com.sm.project.apiPayload.code.status.SuccessStatus;
 import com.sm.project.apiPayload.exception.handler.MemberHandler;
 import com.sm.project.converter.food.FoodConverter;
 import com.sm.project.converter.member.MemberConverter;
-import com.sm.project.domain.food.Food;
-import com.sm.project.domain.food.Refrigerator;
 import com.sm.project.domain.member.Member;
 import com.sm.project.feignClient.dto.NaverOCRResponse;
 import com.sm.project.service.food.FoodService;
@@ -106,12 +104,11 @@ public class FoodController {
     @GetMapping("/refrigerator")
     @Operation(summary = "냉장고 조회 API", description = "냉장고 조회 api")
     public ResponseDTO<FoodResponseDTO.RefrigeratorListDTO> getRefrigerator(Authentication authentication) {
+
         Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString()))
                                           .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
-        List<Refrigerator> refrigeratorList = foodService.getRefrigeratorList(member);
-
-        return ResponseDTO.onSuccess(FoodConverter.toGetRefrigeratorListResultDTO(refrigeratorList));
+        return ResponseDTO.onSuccess(FoodConverter.toGetRefrigeratorListResultDTO(foodService.getRefrigeratorList(member)));
     }
 
     @PutMapping("/refrigerator/{refrigeratorId}")
@@ -141,9 +138,8 @@ public class FoodController {
 
         Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString()))
                                           .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
-        List<Food> foodList = foodService.getFoodList(member, refrigeratorId);
 
-        return ResponseDTO.of(SuccessStatus.FOOD_GET_SUCCESS, FoodConverter.toGetFoodListResultDTO(foodList));
+        return ResponseDTO.of(SuccessStatus.FOOD_GET_SUCCESS, FoodConverter.toGetFoodListResultDTO(foodService.getFoodList(member, refrigeratorId)));
     }
 
     /**
@@ -164,7 +160,9 @@ public class FoodController {
 
         Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString()))
                                           .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
         foodService.updateFood(request, foodId, refrigeratorId);
+
         return ResponseDTO.of(SuccessStatus.FOOD_UPDATE_SUCCESS, null);
     }
 

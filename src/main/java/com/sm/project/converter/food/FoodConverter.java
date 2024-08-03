@@ -2,6 +2,7 @@ package com.sm.project.converter.food;
 
 import com.sm.project.domain.food.Food;
 import com.sm.project.domain.food.Refrigerator;
+import com.sm.project.domain.image.ReceiptImage;
 import com.sm.project.domain.member.Member;
 import com.sm.project.feignClient.dto.Image;
 import com.sm.project.feignClient.dto.NaverOCRRequest;
@@ -85,6 +86,14 @@ public class FoodConverter {
 
         return FoodResponseDTO.OCRResponseDTO.builder()
                 .foodList(foodList)
+                .build();
+    }
+
+    public static ReceiptImage toReceiptImage(Member member, String receiptUrl){
+
+        return ReceiptImage.builder()
+                .url(receiptUrl)
+                .member(member)
                 .build();
     }
 }

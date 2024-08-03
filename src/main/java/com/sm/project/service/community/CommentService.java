@@ -23,14 +23,15 @@ public class CommentService {
     private final PostQueryService postQueryService;
 
     public void createComment(Member member, Post post, CommentRequestDTO.CreateCommentDTO request) {
-        Comment comment = CommentConverter.toParentComment(member, post, request);
-        commentRepository.save(comment);
+
+        commentRepository.save(CommentConverter.toParentComment(member, post, request));
     }
 
     public void createChildComment(Member member, Comment parent, CommentRequestDTO.CreateCommentDTO request) {
+
         Post post = postQueryService.findPostById(parent.getPost().getId());
-        Comment childComment = CommentConverter.toChildComment(member, post, parent, request);
-        commentRepository.save(childComment);
+
+        commentRepository.save(CommentConverter.toChildComment(member, post, parent, request));
     }
 
     public void updateComment(Member member, Comment comment, CommentRequestDTO.UpdateCommentDTO request) {

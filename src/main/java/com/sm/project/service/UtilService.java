@@ -38,8 +38,6 @@ public class UtilService {
                 .uuid(uuid).build());
         
         // S3에 파일 업로드 및 URL 반환
-        String imgUrl = s3Manager.uploadFile(path, saveUuid, multipartFile);
-
-        return imgUrl;
+        return s3Manager.uploadFile(path, saveUuid, multipartFile);
     }
 }

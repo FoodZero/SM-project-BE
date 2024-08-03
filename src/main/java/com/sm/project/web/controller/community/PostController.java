@@ -5,9 +5,7 @@ import com.sm.project.apiPayload.code.status.ErrorStatus;
 import com.sm.project.apiPayload.code.status.SuccessStatus;
 import com.sm.project.apiPayload.exception.handler.MemberHandler;
 import com.sm.project.converter.community.PostConverter;
-import com.sm.project.domain.community.Post;
 import com.sm.project.domain.enums.PostTopicType;
-import com.sm.project.domain.member.Location;
 import com.sm.project.domain.member.Member;
 import com.sm.project.service.community.PostService;
 import com.sm.project.service.member.MemberQueryService;
@@ -72,9 +70,8 @@ public class PostController {
 
         Member member = memberQueryService.findMemberById(Long.valueOf(auth.getName().toString()))
                                           .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
-        List<Location> locationList = postService.getLocationList(member);
 
-        return ResponseDTO.onSuccess(PostConverter.toLocationList(locationList));
+        return ResponseDTO.onSuccess(PostConverter.toLocationList(postService.getLocationList(member)));
     }
 
     /**
@@ -103,9 +100,8 @@ public class PostController {
         if (lastIndex == null) {
             lastIndex = 0L;
         }
-        List<Post> posts = postService.getPostList(lastIndex, postTopicType, locationId);
 
-        return ResponseDTO.onSuccess(PostConverter.toPostList(posts, member));
+        return ResponseDTO.onSuccess(PostConverter.toPostList(postService.getPostList(lastIndex, postTopicType, locationId), member));
     }
 
     /**
@@ -120,11 +116,10 @@ public class PostController {
     public ResponseDTO<?> getPost(Authentication auth,
                                   @PathVariable(name = "postId") Long postId) {
 
-        Post post = postService.getPost(postId);
         Member member = memberQueryService.findMemberById(Long.valueOf(auth.getName().toString()))
                                           .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
-        return ResponseDTO.onSuccess(PostConverter.toPostDTO(post, member));
+        return ResponseDTO.onSuccess(PostConverter.toPostDTO(postService.getPost(postId), member));
     }
 
     /**
@@ -140,7 +135,9 @@ public class PostController {
     public ResponseDTO<?> createPost(Authentication auth, @RequestPart("request") PostRequestDTO.CreateDTO request, @RequestPart(value= "images", required = false) List<MultipartFile> imgList) {
         Member member = memberQueryService.findMemberById(Long.valueOf(auth.getName().toString()))
                                           .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
         postService.createPost(request, member, imgList);
+
         return ResponseDTO.of(SuccessStatus.POST_CREATE_SUCCESS, null);
     }
 
@@ -164,8 +161,11 @@ public class PostController {
     @PatchMapping("/update/{postId}")
     @Operation(summary = "커뮤니티 글 수정 API", description = "커뮤니티에서 게시글을 수정하는 API입니다. status: 진행 중이면 true, 마감이면 false")
     public ResponseDTO<?> updatePost(@PathVariable(name = "postId") Long postId, @RequestBody PostRequestDTO.UpdateDTO request) {
+
         postService.updatePost(postId, request);
+
         return ResponseDTO.of(SuccessStatus.POST_UPDATE_SUCCESS, null);
+
     }
 
     /**
@@ -177,7 +177,10 @@ public class PostController {
     @DeleteMapping("/delete/{postId}")
     @Operation(summary = "커뮤니티 글 삭제 API", description = "커뮤니티에서 게시글을 삭제하는 API입니다.")
     public ResponseDTO<?> deletePost(@PathVariable(name = "postId") Long postId) {
+
         postService.deletePost(postId);
+
         return ResponseDTO.of(SuccessStatus.POST_DELETE_SUCCESS, null);
+
     }
 }

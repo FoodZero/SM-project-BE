@@ -50,20 +50,25 @@ public class PostService {
      * @param imgList 이미지 파일 목록
      */
     public void createPost(PostRequestDTO.CreateDTO request, Member member, List<MultipartFile> imgList) {
+
         Location location = locationRepository.findByAddress(request.getAddress())
             .orElseThrow(() -> new PostHandler(ErrorStatus.LOCATION_NOT_FOUND));
+
         Post post = PostConverter.toPost(member, request, location);
-        postRepository.save(post);
+
+        postRepository.save(PostConverter.toPost(member, request, location));
 
         // 이미지 업로드
         for (MultipartFile multipartFile : imgList) {
+
             String imgUrl = utilService.uploadS3Img("post", multipartFile);
-            PostImg newPostImg = PostImg.builder()
-                .url(imgUrl)
-                .name(multipartFile.getOriginalFilename())
-                .build();
+
+            PostImg newPostImg = PostConverter.toPostImg(imgUrl,multipartFile);
+
             newPostImg.changePost(post);
+
             postImgRepository.save(newPostImg);
+
         }
     }
 
@@ -81,9 +86,12 @@ public class PostService {
      * @param request 게시글 수정 요청 데이터
      */
     public void updatePost(Long postId, PostRequestDTO.UpdateDTO request) {
+
         Post post = postQueryService.findPostById(postId);
+
         if (request.isStatus()) {
             post.changePost(request.getContent(), PostStatusType.PROCEEDING); // 변경 감지
+
         } else {
             post.changePost(request.getContent(), PostStatusType.END);
         }
@@ -95,8 +103,8 @@ public class PostService {
      * @param postId 게시글 ID
      */
     public void deletePost(Long postId) {
-        Post post = postQueryService.findPostById(postId);
-        postRepository.delete(post);
+
+        postRepository.delete(postQueryService.findPostById(postId));
     }
 
     /**
@@ -111,12 +119,7 @@ public class PostService {
         Optional<Location> location = locationRepository.findByAddress(naverGeoResponse.getResults().get(0).getRegion().getArea3().getName());
 
         if (!location.isPresent()) {
-            Location newLocation = Location.builder()
-                .latitude(request.getLatitude())
-                .longitude(request.getLongitude())
-                .address(naverGeoResponse.getResults().get(0).getRegion().getArea3().getName())
-                .member(member)
-                .build();
+            Location newLocation = PostConverter.toLocation(request, naverGeoResponse,member);
             locationRepository.save(newLocation);
         }
     }
@@ -140,8 +143,10 @@ public class PostService {
      * @return 게시글 목록
      */
     public List<Post> getPostList(Long lastIndex, PostTopicType postTopicType, Long locationId) {
+
         Location location = (locationId == null) ? null : locationRepository.findById(locationId)
             .orElseThrow(() -> new PostHandler(ErrorStatus.LOCATION_NOT_FOUND));
+
         return postRepository.findPostList(lastIndex, postTopicType, location);
     }
 
@@ -152,6 +157,7 @@ public class PostService {
      * @return 게시글 객체
      */
     public Post getPost(Long postId) {
+
         return postRepository.findById(postId)
             .orElseThrow(() -> new PostHandler(ErrorStatus.POST_NOT_FOUND));
     }
