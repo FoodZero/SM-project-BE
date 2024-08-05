@@ -24,5 +24,9 @@ public class ChatGPTResponseDTO {
         private String recipeName;
         private String ingredient;
         private String description;
+
+        public String toString() {
+            return recipeName + " / " + ingredient + " / " + description;
+        }
     }
 }
