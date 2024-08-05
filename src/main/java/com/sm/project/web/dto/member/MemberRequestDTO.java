@@ -1,9 +1,6 @@
 package com.sm.project.web.dto.member;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.validation.constraints.*;
 
@@ -24,6 +21,7 @@ public class MemberRequestDTO {
     }
 
     @Getter
+    @Builder
     public static class JoinDTO {
         @NotBlank(message = "이메일은 필수 입력값입니다.")
         @Email(message = "이메일 형식이 올바르지 않습니다.")
