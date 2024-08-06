@@ -239,7 +239,7 @@ public class MemberService {
 
     /**
      * SMS 인증 코드 검증 메서드
-     * 
+     *
      * @param phone 전화번호
      * @param certificationCode 인증 코드
      */
@@ -252,7 +252,7 @@ public class MemberService {
 
     /**
      * SMS 인증 코드 검증 여부 확인 메서드
-     * 
+     *
      * @param phone 전화번호
      * @param certificationCode 인증 코드
      * @return 검증 여부
@@ -263,9 +263,9 @@ public class MemberService {
 
      /**
      * 이메일 전송 메서드
-     * 
+     *
      * 가입된 이메일인지 확인하고, 비밀번호 재설정을 위한 인증 코드를 생성하여 이메일로 전송합니다.
-     * 
+     *
      * @param request 이메일 전송 요청 데이터
      * @throws MessagingException 예외 발생 시
      * @throws UnsupportedEncodingException 예외 발생 시
@@ -322,6 +322,7 @@ public class MemberService {
         } else {
             throw new MemberHandler(ErrorStatus.MEMBER_PASSWORD_MISMATCH);
         }
+
     }
 
     /**

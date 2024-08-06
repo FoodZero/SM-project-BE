@@ -64,11 +64,13 @@ public class MemberRequestDTO {
     }
 
     @Getter
+    @Builder
     public static class SmsDTO {
         private String phone;
     }
 
     @Getter
+    @Builder
     public static class SendEmailDTO {
         @Email
         @NotEmpty(message = "이메일은 필수 입력값입니다.")
@@ -86,6 +88,7 @@ public class MemberRequestDTO {
     }
 
     @Getter
+    @Builder
     public static class PasswordDTO {
         @Email
         @NotBlank(message = "이메일은 필수 입력값입니다.")
