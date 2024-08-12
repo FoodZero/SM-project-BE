@@ -8,6 +8,7 @@ import com.sm.project.converter.chatgpt.ChatGPTConverter;
 import com.sm.project.domain.food.Recipe;
 import com.sm.project.domain.member.Member;
 import com.sm.project.repository.chatgpt.RecipeNameDto;
+import com.sm.project.repository.food.BookmarkRepository;
 import com.sm.project.repository.food.FoodGPTDto;
 import com.sm.project.repository.food.FoodRepository;
 import com.sm.project.repository.food.RecipeRepository;
@@ -42,6 +43,7 @@ public class ChatGPTService {
     private final FoodRepository foodRepository;
     private final RecipeRepository recipeRepository;
     private final MemberRepository memberRepository;
+    private final BookmarkRepository bookmarkRepository;
 
     /**
      * ChatGPT의 응답을 생성하는 메서드입니다.
@@ -224,7 +226,7 @@ public class ChatGPTService {
         List<Recipe> recipeList = recipeRepository.findByMemberId(memberId);
 
         recipeList.stream()
-                .filter(recipe -> recipeRepository.existsByNameAndIdNot(recipe.getName(), recipe.getId()) /*&& !recipe.getBookmark()*/)  //북마크가 0이고, 동일한 이름의 이름이 존재하는 레시피만 남겨서 삭제 -> 북마크 테이블 따로 만들면 수정 필요
+                .filter(recipe -> recipeRepository.existsByNameAndIdNot(recipe.getName(), recipe.getId()) && !bookmarkRepository.existsByRecipe(recipe))  //북마크가 안되어있고, 동일한 이름의 레시피는 삭제 -> 중복되는 레시피가 많아지는 걸 방지하기 위함
                 .forEach(recipe -> recipeRepository.delete(recipe));
     }
 }

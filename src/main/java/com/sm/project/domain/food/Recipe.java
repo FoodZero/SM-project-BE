@@ -38,10 +38,6 @@ public class Recipe {
     @ColumnDefault("0")
     private Long recommendCount;// 추천수
 
-    @Column(columnDefinition = "BOOLEAN")
-    @ColumnDefault("false")
-    private Boolean bookmark;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="member_gpt_id")
     private Member member; //해당 멤버가 gpt로 생성한 레시피임을 나타냄
