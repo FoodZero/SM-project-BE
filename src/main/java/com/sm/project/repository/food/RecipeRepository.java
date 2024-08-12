@@ -15,4 +15,6 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
             "join Member m on r.member = m " +
             "where m.id = :memberId")
     List<RecipeNameDto> findRecipeName(@Param("memberId") Long memberId);
+
+    List<Recipe> findByMemberId(Long memberId);
 }

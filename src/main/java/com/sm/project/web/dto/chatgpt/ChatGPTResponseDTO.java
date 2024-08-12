@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 public class ChatGPTResponseDTO {
 
     @Getter
@@ -34,4 +36,26 @@ public class ChatGPTResponseDTO {
             this.recipeId = id;
         }
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RecipeListResultDto {
+
+        private int recipeCount;
+        private List<RecipeDto> recipeDtoList;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RecipeDto {
+        private Long recipeId;
+        private String recipeName;
+        private String ingredient;
+        private Long recommendCount;
+    }
+
 }

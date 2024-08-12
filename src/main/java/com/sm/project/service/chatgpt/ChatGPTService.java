@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -41,7 +42,6 @@ public class ChatGPTService {
     private final FoodRepository foodRepository;
     private final RecipeRepository recipeRepository;
     private final MemberRepository memberRepository;
-    //private final GptRecipeRepository gptRecipeRepository;
 
     /**
      * ChatGPT의 응답을 생성하는 메서드입니다.
@@ -193,5 +193,19 @@ public class ChatGPTService {
         System.out.println("===============================");
 
         return result;
+    }
+
+    public ChatGPTResponseDTO.RecipeListResultDto getGptRecipeList(Long memberId) {
+        List<Recipe> recipeList = recipeRepository.findByMemberId(memberId);
+
+        List<ChatGPTResponseDTO.RecipeDto> recipeDtoList = recipeList.stream().map(r -> ChatGPTResponseDTO.RecipeDto.builder()
+                .recipeId(r.getId())
+                .recipeName(r.getName())
+                .ingredient(r.getIngredient())
+                .recommendCount(r.getRecommendCount())
+                .build())
+                .collect(Collectors.toList());
+
+        return ChatGPTConverter.toRecipeListResultDto(recipeList.size(), recipeDtoList);
     }
 }

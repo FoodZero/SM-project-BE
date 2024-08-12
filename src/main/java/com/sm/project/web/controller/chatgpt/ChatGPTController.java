@@ -34,10 +34,18 @@ public class ChatGPTController {
      * @return ChatGPT의 응답을 포함한 응답 DTO
      */
     @GetMapping("/recipe")
-    @Operation(summary = "ChatGPT 레시피 API", description = "ChatGPT를 이용해 레시피를 조회하는 API입니다.(레시피 이름, 재료, 설명)")
+    @Operation(summary = "ChatGPT 레시피 추천 API", description = "ChatGPT 버튼을 눌렀을 때 레시피를 추천받는 API입니다.(레시피 id, 레시피 이름, 재료, 설명)")
     public ResponseDTO<?> getGptRecipe(Authentication authentication) {
         Long memberId = Long.valueOf(authentication.getName().toString());
         ChatGPTResponseDTO.RecipeResultDTO result = chatGPTService.getGptRecipe(memberId); //그냥 멤버 엔티티를 인자로 넣는거로 바꾸기!!!
+        return ResponseDTO.of(SuccessStatus._OK, result);
+    }
+
+    @GetMapping("/recipe-list")
+    @Operation(summary = "ChatGPT 레시피 목록 조회 API", description = "ChatGPT로 추천받은 레시피들의 목록을 조회하는 API입니다.")
+    public ResponseDTO<?> getGptRecipeList(Authentication authentication) {
+        Long memberId = Long.valueOf(authentication.getName().toString());
+        ChatGPTResponseDTO.RecipeListResultDto result = chatGPTService.getGptRecipeList(memberId);
         return ResponseDTO.of(SuccessStatus._OK, result);
     }
 }
