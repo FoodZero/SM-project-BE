@@ -56,7 +56,7 @@ public enum ErrorStatus implements BaseErrorCode {
     COMMENT_NOT_PARENT(HttpStatus.BAD_REQUEST, "COMMENT4004", "자식이 존재하지 않는 댓글입니다."),
 
     //ChatGPT
-    GPT_RESPONSE_ERROR(HttpStatus.NOT_FOUND, "GPT4002", "GPT 응답이 존재하지 않습니다.")
+    GPT_RESPONSE_ERROR(HttpStatus.NOT_FOUND, "GPT4002", "잘못된 GPT 응답입니다.")
     ;
 
 

@@ -21,12 +21,17 @@ public class ChatGPTResponseDTO {
     @AllArgsConstructor
     public static class RecipeResultDTO {
 
+        private Long recipeId;
         private String recipeName;
         private String ingredient;
         private String description;
 
         public String toString() {
             return recipeName + " / " + ingredient + " / " + description;
+        }
+
+        public void setRecipeId(Long id) {
+            this.recipeId = id;
         }
     }
 }
