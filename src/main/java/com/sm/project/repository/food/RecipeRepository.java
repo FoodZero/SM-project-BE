@@ -9,7 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface RecipeRepository extends JpaRepository<Recipe, Long> {
-    boolean existsByName(String name);
+
+    boolean existsByNameAndIdNot(String name, Long recipeId);
 
     @Query("select new com.sm.project.repository.chatgpt.RecipeNameDto(r.name) from Recipe r " +
             "join Member m on r.member = m " +

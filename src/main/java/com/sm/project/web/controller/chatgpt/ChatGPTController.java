@@ -29,8 +29,9 @@ public class ChatGPTController {
 
     /**
      * ChatGPT 질문 API
-     * 
-     //* @param ChatGPT에게 보낼 질문을 포함한 요청 데이터
+     * <p>
+     * //* @param ChatGPT에게 보낼 질문을 포함한 요청 데이터
+     *
      * @return ChatGPT의 응답을 포함한 응답 DTO
      */
     @GetMapping("/recipe")
@@ -41,11 +42,29 @@ public class ChatGPTController {
         return ResponseDTO.of(SuccessStatus._OK, result);
     }
 
+    /**
+     * ChatGPT 레시피 목록 조회 API
+     * @param authentication
+     * @return
+     */
     @GetMapping("/recipe-list")
     @Operation(summary = "ChatGPT 레시피 목록 조회 API", description = "ChatGPT로 추천받은 레시피들의 목록을 조회하는 API입니다.")
     public ResponseDTO<?> getGptRecipeList(Authentication authentication) {
         Long memberId = Long.valueOf(authentication.getName().toString());
         ChatGPTResponseDTO.RecipeListResultDto result = chatGPTService.getGptRecipeList(memberId);
         return ResponseDTO.of(SuccessStatus._OK, result);
+    }
+
+    /**
+     * ChatGPT 레시피 초기화 API
+     * @param authentication
+     * @return
+     */
+    @DeleteMapping("/recipe")
+    @Operation(summary = "ChatGPT 레시피 초기화 API", description = "ChatGPT 레시피 목록에서 뒤로가기 버튼을 눌렀을 때 초기화에 필요한 API입니다.")
+    public ResponseDTO<?> deleteGptRecipe(Authentication authentication) {
+        Long memberId = Long.valueOf(authentication.getName().toString());
+        chatGPTService.deleteGptRecipe(memberId);
+        return ResponseDTO.of(SuccessStatus._OK, "ChatGPT 레시피 초기화 성공");
     }
 }

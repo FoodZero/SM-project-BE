@@ -129,7 +129,7 @@ public class ChatGPTService {
     }
 
     /**
-     *
+     * gpt의 응답을 잘라서 dto에 담는 메소드입니다.
      * @param response
      * @return
      */
@@ -155,7 +155,7 @@ public class ChatGPTService {
     }
 
     /**
-     *
+     * gpt로 생성된 레시피를 저장하는 메소드입니다.
      * @param recipeResultDTO
      */
     public Long saveGptRecipe(ChatGPTResponseDTO.RecipeResultDTO recipeResultDTO, Long memberId) {
@@ -176,7 +176,9 @@ public class ChatGPTService {
     }
 
     /**
-     *
+     * gpt 레시피를 추천받는데 필요한 메소드들을 통합한 메소드입니다.
+     * @param memberId
+     * @return
      */
     public ChatGPTResponseDTO.RecipeResultDTO getGptRecipe(Long memberId) {
         ChatGPTResponseDTO.RecipeResultDTO result;
@@ -195,6 +197,11 @@ public class ChatGPTService {
         return result;
     }
 
+    /**
+     * gpt 레시피 목록을 조회하여 dto에 담아 반환하는 메소드입니다.
+     * @param memberId
+     * @return
+     */
     public ChatGPTResponseDTO.RecipeListResultDto getGptRecipeList(Long memberId) {
         List<Recipe> recipeList = recipeRepository.findByMemberId(memberId);
 
@@ -207,5 +214,17 @@ public class ChatGPTService {
                 .collect(Collectors.toList());
 
         return ChatGPTConverter.toRecipeListResultDto(recipeList.size(), recipeDtoList);
+    }
+
+    /**
+     * gpt 레시피가 북마크 되어있지 않고, 이미 존재한다면 초기화(삭제)하는 메소드입니다.
+     * @param memberId
+     */
+    public void deleteGptRecipe(Long memberId) {
+        List<Recipe> recipeList = recipeRepository.findByMemberId(memberId);
+
+        recipeList.stream()
+                .filter(recipe -> recipeRepository.existsByNameAndIdNot(recipe.getName(), recipe.getId()) /*&& !recipe.getBookmark()*/)  //북마크가 0이고, 동일한 이름의 이름이 존재하는 레시피만 남겨서 삭제 -> 북마크 테이블 따로 만들면 수정 필요
+                .forEach(recipe -> recipeRepository.delete(recipe));
     }
 }
