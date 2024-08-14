@@ -1,5 +1,7 @@
 package com.sm.project.web.controller.recipe;
 
+import com.sm.project.apiPayload.code.status.SuccessStatus;
+import com.sm.project.service.recipe.BookmarkService;
 import org.springframework.data.domain.Page;
 import com.sm.project.apiPayload.ResponseDTO;
 import com.sm.project.elasticsearch.RecipeDocument;
@@ -11,10 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * RecipeController는 레시피 관련 API 요청을 처리하는 컨트롤러 클래스입니다.
@@ -29,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class RecipeController {
 
     private final RecipeService recipeService;
+    private final BookmarkService bookmarkService;
 
     /**
      * 레시피를 추천순으로 5개씩 조회하는 API입니다.
@@ -63,5 +63,21 @@ public class RecipeController {
                                                        @RequestParam(value = "lastIndex", required = false, defaultValue = "0") int lastIndex){
 
         return ResponseDTO.onSuccess(recipeService.searchByIngredient(ingredient, lastIndex, 5));
+    }
+
+    @PostMapping("/{recipeId}/bookmark")
+    @Operation(summary = "레시피 북마크 저장 API", description = "레시피 상세보기 화면에서 북마크를 눌렀을 때 저장하는 api입니다.(gpt 레시피 화면에서도 사용) 북마크할 레시피 아이디를 입력하세요.")
+    public ResponseDTO<?> bookmarkRecipe(Authentication auth, @PathVariable(name = "recipeId")Long recipeId) {
+        Long memberId = Long.valueOf(auth.getName().toString());
+        bookmarkService.saveBookmark(memberId, recipeId);
+        return ResponseDTO.of(SuccessStatus._OK, "북마크 저장 성공");
+    }
+
+    @DeleteMapping("/{recipeId}/bookmark")
+    @Operation(summary = "레시피 북마크 해제 API", description = "레시피 상세보기 화면에서 북마크를 눌렀을 때 해제하는 api입니다.(gpt 레시피 화면에서도 사용) 북마크된 레시피 아이디를 입력하세요.")
+    public ResponseDTO<?> unbookmarkRecipe(Authentication auth, @PathVariable(name = "recipeId")Long recipeId) {
+        Long memberId = Long.valueOf(auth.getName().toString());
+        bookmarkService.deleteBookmark(memberId, recipeId);
+        return ResponseDTO.of(SuccessStatus._OK, "북마크 해제 성공");
     }
 }
