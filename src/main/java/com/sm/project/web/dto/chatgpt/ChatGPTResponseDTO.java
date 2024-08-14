@@ -13,14 +13,6 @@ public class ChatGPTResponseDTO {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class PromptResultDTO {
-        private String response; //지피티 대답.
-    }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
     public static class RecipeResultDTO {
 
         private Long recipeId;
@@ -51,7 +43,7 @@ public class ChatGPTResponseDTO {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class RecipeDto {
+    public static class RecipeDto { //레시피 목록에서 보이는 정보들
         private Long recipeId;
         private String recipeName;
         private String ingredient;

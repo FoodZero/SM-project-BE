@@ -9,5 +9,7 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
 
     boolean existsByRecipe(Recipe recipe);
 
+    boolean existsByMemberIdAndRecipeId(Long memberId, Long RecipeId);
+
     Bookmark findByMemberIdAndRecipeId(Long memberId, Long recipeId);
 }

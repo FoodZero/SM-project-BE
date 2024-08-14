@@ -2,6 +2,7 @@ package com.sm.project.web.controller.recipe;
 
 import com.sm.project.apiPayload.code.status.SuccessStatus;
 import com.sm.project.service.recipe.BookmarkService;
+import com.sm.project.web.dto.recipe.RecipeResponseDTO;
 import org.springframework.data.domain.Page;
 import com.sm.project.apiPayload.ResponseDTO;
 import com.sm.project.elasticsearch.RecipeDocument;
@@ -63,6 +64,14 @@ public class RecipeController {
                                                        @RequestParam(value = "lastIndex", required = false, defaultValue = "0") int lastIndex){
 
         return ResponseDTO.onSuccess(recipeService.searchByIngredient(ingredient, lastIndex, 5));
+    }
+
+    @GetMapping("/{recipeId}")
+    @Operation(summary = "레시피 상세 조회 API", description = "레시피 목록에서 레시피를 눌렀을 때 레시피 상세를 조회하는 api입니다. 상세 조회할 레시피 아이디를 입력하세요.")
+    public ResponseDTO<?> getRecipeDetail(Authentication auth, @PathVariable(name = "recipeId")Long recipeId) {
+        Long memberId = Long.valueOf(auth.getName().toString());
+        RecipeResponseDTO.RecipeDetailDto recipeDetailDto = recipeService.findRecipe(memberId, recipeId);
+        return ResponseDTO.of(SuccessStatus._OK, recipeDetailDto);
     }
 
     @PostMapping("/{recipeId}/bookmark")

@@ -1,7 +1,13 @@
 package com.sm.project.service.recipe;
 
+import com.sm.project.apiPayload.code.status.ErrorStatus;
+import com.sm.project.apiPayload.exception.handler.RecipeHandler;
+import com.sm.project.domain.food.Recipe;
 import com.sm.project.elasticsearch.RecipeDocument;
 import com.sm.project.elasticsearch.repository.RecipeElasticRepository;
+import com.sm.project.repository.food.BookmarkRepository;
+import com.sm.project.repository.food.RecipeRepository;
+import com.sm.project.web.dto.recipe.RecipeResponseDTO;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class RecipeService {
 
     private final RecipeElasticRepository recipeDocumentRepository;
+    private final RecipeRepository recipeRepository;
+    private final BookmarkRepository bookmarkRepository;
 
     /**
      * 추천 수가 높은 순으로 페이징된 레시피를 조회하는 메서드입니다.
@@ -44,5 +52,19 @@ public class RecipeService {
     public Page<RecipeDocument> searchByIngredient(String ingredient, int lastIndex, int limit) {
         Pageable pageable = PageRequest.of(lastIndex / limit, limit, Sort.by(Sort.Direction.DESC, "recommendCount"));
         return recipeDocumentRepository.findByIngredientContainingOrderByRecommendCountDesc(ingredient, pageable);
+    }
+
+    public RecipeResponseDTO.RecipeDetailDto findRecipe(Long memberId, Long recipeId) {
+        Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() -> new RecipeHandler(ErrorStatus.RECIPE_NOT_FOUND));
+
+        return RecipeResponseDTO.RecipeDetailDto.builder()
+                .recipeId(recipeId)
+                .recipeName(recipe.getName())
+                .ingredient(recipe.getIngredient())
+                .description(recipe.getDescription())
+                .isBookmark(bookmarkRepository.existsByMemberIdAndRecipeId(memberId, recipeId))
+                .isRecommend(false)
+                .recommendCount(0L)
+                .build();
     }
 }
