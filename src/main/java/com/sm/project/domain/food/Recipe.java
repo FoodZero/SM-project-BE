@@ -1,8 +1,11 @@
 package com.sm.project.domain.food;
 
 
+import com.sm.project.domain.member.Member;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 
@@ -11,6 +14,7 @@ import javax.persistence.*;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@DynamicInsert
 public class Recipe {
 
     @Id
@@ -34,9 +38,15 @@ public class Recipe {
     @ColumnDefault("0")
     private Long recommendCount;// 추천수
 
-    @Column(columnDefinition = "BOOLEAN")
-    @ColumnDefault("false")
-    private Boolean bookmark;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="member_gpt_id")
+    private Member member; //해당 멤버가 gpt로 생성한 레시피임을 나타냄. null이면 일반 레시피
 
+    public void addRecommendCount() {
+        this.recommendCount++;
+    }
 
+    public void subRecommendCount() {
+        this.recommendCount--;
+    }
 }
