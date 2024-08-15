@@ -5,6 +5,7 @@ import com.sm.project.apiPayload.exception.handler.RecipeHandler;
 import com.sm.project.domain.food.Recipe;
 import com.sm.project.elasticsearch.RecipeDocument;
 import com.sm.project.elasticsearch.repository.RecipeElasticRepository;
+import com.sm.project.elasticsearch.repository.RecipeElasticRepositoryImpl;
 import com.sm.project.repository.food.BookmarkRepository;
 import com.sm.project.repository.food.RecipeRepository;
 import com.sm.project.repository.food.RecommendRepository;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class RecipeService {
 
     private final RecipeElasticRepository recipeDocumentRepository;
+    private final RecipeElasticRepositoryImpl recipeElasticRepository;
     private final RecipeRepository recipeRepository;
     private final BookmarkRepository bookmarkRepository;
     private final RecommendRepository recommendRepository;
@@ -53,7 +55,7 @@ public class RecipeService {
      */
     public Page<RecipeDocument> searchByIngredient(String ingredient, int lastIndex, int limit) {
         Pageable pageable = PageRequest.of(lastIndex / limit, limit, Sort.by(Sort.Direction.DESC, "recommendCount"));
-        return recipeDocumentRepository.findByIngredientContainingOrderByRecommendCountDesc(ingredient, pageable);
+        return recipeElasticRepository.findByIngredientContainingOrderByRecommendCountDesc(ingredient, pageable);
     }
 
     /**

@@ -28,4 +28,6 @@ public interface RefrigeratorRepository extends JpaRepository<Refrigerator, Long
      * @return 조회된 냉장고 객체
      */
     Optional<Refrigerator> findByIdAndMember(Long id, Member member);
+
+    void deleteByMemberAndId(Member member, Long id);
 }

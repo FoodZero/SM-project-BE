@@ -33,11 +33,14 @@ public enum SuccessStatus implements BaseCode {
 
     REFRIGERATOR_UPLOAD_SUCCESS(HttpStatus.OK, "REF200", "냉장고 등록 성공"),
 
+    REFRIGERATOR_DELETE_SUCCESS(HttpStatus.OK, "REF2001", "냉장고 삭제 성공"),
+
     //COMMENT
     COMMENT_CREATE_SUCCESS(HttpStatus.OK, "COMMENT200", "댓글 등록 성공"),
     COMMENT_UPDATE_SUCCESS(HttpStatus.OK, "COMMENT2001", "댓글 수정 성공"),
     COMMENT_DELETE_SUCCESS(HttpStatus.OK, "COMMENT2002", "댓글 삭제 성공"),
     COMMENT_READ_SUCCESS(HttpStatus.OK, "COMMENT2003", "댓글 조회 성공");
+
 
 
     private final HttpStatus httpStatus;

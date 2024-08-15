@@ -35,7 +35,7 @@ public class Post extends BaseDateTimeEntity {
     @Enumerated(EnumType.STRING)
     private PostStatusType status;
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<PostImg> postImgs = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
