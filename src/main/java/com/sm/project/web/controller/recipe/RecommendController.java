@@ -22,7 +22,7 @@ public class RecommendController {
     private final RecommendService recommendService;
 
     /**
-     * 레시피에 추천을 누르는 메소드입니다.
+     * 레시피에 추천을 누르는 api입니다.
      * @param auth
      * @param recipeId
      * @return
@@ -36,7 +36,7 @@ public class RecommendController {
     }
 
     /**
-     * 레시피에 추천을 해제하는 메소드입니다.
+     * 레시피에 추천을 해제하는 api입니다.
      * @param auth
      * @param recipeId
      * @return

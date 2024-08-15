@@ -63,7 +63,11 @@ public enum ErrorStatus implements BaseErrorCode {
 
     //Recommend
     RECOMMEND_EXIST(HttpStatus.BAD_REQUEST, "RECOMMEND4001", "이미 추천 하였습니다."),
-    RECOMMEND_NOT_FOUND(HttpStatus.NOT_FOUND, "RECOMMEND4002", "추천을 찾을 수 없습니다.")
+    RECOMMEND_NOT_FOUND(HttpStatus.NOT_FOUND, "RECOMMEND4002", "추천을 찾을 수 없습니다."),
+
+    //Bookmark
+    BOOKMARK_EXIST(HttpStatus.BAD_REQUEST, "BOOKMARK4001", "이미 북마크 하였습니다."),
+    BOOKMARK_NOT_FOUND(HttpStatus.NOT_FOUND, "BOOKMARK4002", "북마크를 찾을 수 없습니다.")
     ;
 
 

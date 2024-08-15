@@ -29,7 +29,6 @@ import org.springframework.web.bind.annotation.*;
 public class RecipeController {
 
     private final RecipeService recipeService;
-    private final BookmarkService bookmarkService;
 
     /**
      * 레시피를 추천순으로 5개씩 조회하는 API입니다.
@@ -72,21 +71,5 @@ public class RecipeController {
         Long memberId = Long.valueOf(auth.getName().toString());
         RecipeResponseDTO.RecipeDetailDto recipeDetailDto = recipeService.findRecipe(memberId, recipeId);
         return ResponseDTO.of(SuccessStatus._OK, recipeDetailDto);
-    }
-
-    @PostMapping("/{recipeId}/bookmark")
-    @Operation(summary = "레시피 북마크 저장 API", description = "레시피 상세보기 화면에서 북마크를 눌렀을 때 저장하는 api입니다.(gpt 레시피 화면에서도 사용) 북마크할 레시피 아이디를 입력하세요.")
-    public ResponseDTO<?> bookmarkRecipe(Authentication auth, @PathVariable(name = "recipeId")Long recipeId) {
-        Long memberId = Long.valueOf(auth.getName().toString());
-        bookmarkService.saveBookmark(memberId, recipeId);
-        return ResponseDTO.of(SuccessStatus._OK, "북마크 저장 성공");
-    }
-
-    @DeleteMapping("/{recipeId}/bookmark")
-    @Operation(summary = "레시피 북마크 해제 API", description = "레시피 상세보기 화면에서 북마크를 눌렀을 때 해제하는 api입니다.(gpt 레시피 화면에서도 사용) 북마크된 레시피 아이디를 입력하세요.")
-    public ResponseDTO<?> unbookmarkRecipe(Authentication auth, @PathVariable(name = "recipeId")Long recipeId) {
-        Long memberId = Long.valueOf(auth.getName().toString());
-        bookmarkService.deleteBookmark(memberId, recipeId);
-        return ResponseDTO.of(SuccessStatus._OK, "북마크 해제 성공");
     }
 }

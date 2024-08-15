@@ -1,6 +1,7 @@
 package com.sm.project.service.recipe;
 
 import com.sm.project.apiPayload.code.status.ErrorStatus;
+import com.sm.project.apiPayload.exception.handler.BookmarkHandler;
 import com.sm.project.apiPayload.exception.handler.MemberHandler;
 import com.sm.project.apiPayload.exception.handler.RecipeHandler;
 import com.sm.project.domain.food.Bookmark;
@@ -35,7 +36,10 @@ public class BookmarkService {
                 .member(member)
                 .recipe(recipe)
                 .build();
-        bookmarkRepository.save(bookmark);
+
+        if (!bookmarkRepository.existsByMemberIdAndRecipeId(memberId, recipeId)) {
+            bookmarkRepository.save(bookmark);
+        } else throw new BookmarkHandler(ErrorStatus.BOOKMARK_EXIST);
     }
 
     /**
@@ -45,6 +49,8 @@ public class BookmarkService {
      */
     public void deleteBookmark(Long memberId, Long recipeId) {
         Bookmark bookmark = bookmarkRepository.findByMemberIdAndRecipeId(memberId, recipeId);
-        bookmarkRepository.delete(bookmark);
+        if (bookmark != null) {
+            bookmarkRepository.delete(bookmark);
+        } else throw new BookmarkHandler(ErrorStatus.BOOKMARK_NOT_FOUND);
     }
 }
