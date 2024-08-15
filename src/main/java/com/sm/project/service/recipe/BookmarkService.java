@@ -22,6 +22,11 @@ public class BookmarkService {
     private final RecipeRepository recipeRepository;
     private final BookmarkRepository bookmarkRepository;
 
+    /**
+     * 레시피에 북마크를 하는 메소드입니다.
+     * @param memberId
+     * @param recipeId
+     */
     public void saveBookmark(Long memberId, Long recipeId) {
         Member member = memberQueryService.findMemberById(memberId).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
         Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() -> new RecipeHandler(ErrorStatus.RECIPE_NOT_FOUND));
@@ -33,6 +38,11 @@ public class BookmarkService {
         bookmarkRepository.save(bookmark);
     }
 
+    /**
+     * 북마크 해제하는 메소드입니다.
+     * @param memberId
+     * @param recipeId
+     */
     public void deleteBookmark(Long memberId, Long recipeId) {
         Bookmark bookmark = bookmarkRepository.findByMemberIdAndRecipeId(memberId, recipeId);
         bookmarkRepository.delete(bookmark);

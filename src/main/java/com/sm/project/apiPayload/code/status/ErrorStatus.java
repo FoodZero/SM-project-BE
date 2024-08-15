@@ -59,7 +59,11 @@ public enum ErrorStatus implements BaseErrorCode {
     GPT_RESPONSE_ERROR(HttpStatus.NOT_FOUND, "GPT4002", "잘못된 GPT 응답입니다."),
 
     //Recipe
-    RECIPE_NOT_FOUND(HttpStatus.NOT_FOUND, "RECIPE4001", "해당 레시피를 찾을 수 없습니다.")
+    RECIPE_NOT_FOUND(HttpStatus.NOT_FOUND, "RECIPE4001", "해당 레시피를 찾을 수 없습니다."),
+
+    //Recommend
+    RECOMMEND_EXIST(HttpStatus.BAD_REQUEST, "RECOMMEND4001", "이미 추천 하였습니다."),
+    RECOMMEND_NOT_FOUND(HttpStatus.NOT_FOUND, "RECOMMEND4002", "추천을 찾을 수 없습니다.")
     ;
 
 

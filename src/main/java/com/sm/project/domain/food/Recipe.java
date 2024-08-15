@@ -40,5 +40,13 @@ public class Recipe {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="member_gpt_id")
-    private Member member; //해당 멤버가 gpt로 생성한 레시피임을 나타냄
+    private Member member; //해당 멤버가 gpt로 생성한 레시피임을 나타냄. null이면 일반 레시피
+
+    public void addRecommendCount() {
+        this.recommendCount++;
+    }
+
+    public void subRecommendCount() {
+        this.recommendCount--;
+    }
 }

@@ -54,6 +54,12 @@ public class RecipeService {
         return recipeDocumentRepository.findByIngredientContainingOrderByRecommendCountDesc(ingredient, pageable);
     }
 
+    /**
+     * 레시피 상세 정보를 찾아서 반환하는 메소드입니다.
+     * @param memberId
+     * @param recipeId
+     * @return
+     */
     public RecipeResponseDTO.RecipeDetailDto findRecipe(Long memberId, Long recipeId) {
         Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() -> new RecipeHandler(ErrorStatus.RECIPE_NOT_FOUND));
 
