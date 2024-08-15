@@ -7,6 +7,7 @@ import com.sm.project.elasticsearch.RecipeDocument;
 import com.sm.project.elasticsearch.repository.RecipeElasticRepository;
 import com.sm.project.repository.food.BookmarkRepository;
 import com.sm.project.repository.food.RecipeRepository;
+import com.sm.project.repository.food.RecommendRepository;
 import com.sm.project.web.dto.recipe.RecipeResponseDTO;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -28,6 +29,7 @@ public class RecipeService {
     private final RecipeElasticRepository recipeDocumentRepository;
     private final RecipeRepository recipeRepository;
     private final BookmarkRepository bookmarkRepository;
+    private final RecommendRepository recommendRepository;
 
     /**
      * 추천 수가 높은 순으로 페이징된 레시피를 조회하는 메서드입니다.
@@ -69,8 +71,8 @@ public class RecipeService {
                 .ingredient(recipe.getIngredient())
                 .description(recipe.getDescription())
                 .isBookmark(bookmarkRepository.existsByMemberIdAndRecipeId(memberId, recipeId))
-                .isRecommend(false)
-                .recommendCount(0L)
+                .isRecommend(recommendRepository.existsByMemberIdAndRecipeId(memberId,recipeId))
+                .recommendCount(recipe.getRecommendCount())
                 .build();
     }
 }
