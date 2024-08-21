@@ -7,9 +7,11 @@ import com.sm.project.apiPayload.code.status.SuccessStatus;
 import com.sm.project.apiPayload.exception.handler.MemberHandler;
 import com.sm.project.converter.member.MemberConverter;
 import com.sm.project.domain.member.Member;
+import com.sm.project.service.family.FamilyService;
 import com.sm.project.service.mail.MailService;
 import com.sm.project.service.member.MemberQueryService;
 import com.sm.project.service.member.MemberService;
+import com.sm.project.web.dto.family.FamilyRequestDTO;
 import com.sm.project.web.dto.member.MemberRequestDTO;
 import com.sm.project.web.dto.member.MemberResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -213,6 +215,38 @@ public class MemberController {
         //Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
         memberService.sendPushAlarm();
         return ResponseDTO.of(SuccessStatus.MEMBER_PUSH_SUCCESS, null);
+    }
+
+    /**
+     * Family 초대 관련된 API를 처리하는 컨트롤러 클래스입니다.
+     */
+    private final FamilyService familyService;
+
+    /**
+     * 인증 코드를 이메일로 발송하는 API입니다.
+     *
+     * @param request 이메일 요청 DTO
+     * @return 성공 메시지와 함께 응답을 반환합니다.
+     */
+    @PostMapping("/send-code")
+    @Operation(summary = "인증 코드 발송 API", description = "이메일로 인증 코드를 발송하는 API입니다.")
+    public ResponseDTO<?> sendVerificationCode(@RequestBody @Valid FamilyRequestDTO.EmailRequestDTO request) {
+        System.out.println("컨트롤러");
+        familyService.sendVerificationCode(request.getEmail());
+        return ResponseDTO.onSuccess("인증 코드 발송 성공");
+    }
+
+    /**
+     * 이메일과 인증 코드를 검증하고 패밀리에 등록하는 API입니다.
+     *
+     * @param request 인증 요청 DTO
+     * @return 성공 메시지와 함께 응답을 반환합니다.
+     */
+    @PostMapping("/verify")
+    @Operation(summary = "인증 코드 검증 및 패밀리 등록 API", description = "이메일과 인증 코드를 검증하고 패밀리에 등록하는 API입니다.")
+    public ResponseDTO<?> verifyAndRegisterFamily(@RequestBody @Valid FamilyRequestDTO.VerificationDTO request) {
+        familyService.verifyAndRegisterFamily(request);
+        return ResponseDTO.onSuccess("패밀리 등록 성공");
     }
 
 
