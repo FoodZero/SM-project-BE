@@ -1,5 +1,6 @@
 package com.sm.project.domain.food;
 
+import com.sm.project.domain.Common.BaseDateTimeEntity;
 import com.sm.project.domain.member.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,10 +14,11 @@ import javax.persistence.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Bookmark {
+public class Bookmark extends BaseDateTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "bookmark_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
