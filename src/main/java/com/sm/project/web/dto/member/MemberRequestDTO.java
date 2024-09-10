@@ -99,4 +99,12 @@ public class MemberRequestDTO {
         private String passwordCheck;
     }
 
+    @Getter
+    public static class ShareDTO{
+
+        Long refrigeratorId;
+        @Email
+        private String eamil;
+    }
+
 }

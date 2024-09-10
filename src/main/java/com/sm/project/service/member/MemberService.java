@@ -3,11 +3,13 @@ package com.sm.project.service.member;
 import com.sm.project.apiPayload.ResponseDTO;
 import com.sm.project.apiPayload.code.status.ErrorStatus;
 import com.sm.project.apiPayload.exception.handler.MemberHandler;
+import com.sm.project.apiPayload.exception.handler.RefrigeratorHandler;
 import com.sm.project.config.springSecurity.TokenProvider;
 import com.sm.project.converter.member.MemberConverter;
 import com.sm.project.coolsms.RedisUtil;
 import com.sm.project.coolsms.SmsUtil;
 import com.sm.project.domain.food.Refrigerator;
+import com.sm.project.domain.mapping.MemberRefrigerator;
 import com.sm.project.domain.member.FcmRepository;
 import com.sm.project.domain.member.FcmToken;
 import com.sm.project.domain.member.Member;
@@ -21,6 +23,7 @@ import com.sm.project.redis.service.RedisService;
 import com.sm.project.repository.food.FoodRepository;
 import com.sm.project.repository.food.RefrigeratorRepository;
 import com.sm.project.repository.member.MemberPasswordRepository;
+import com.sm.project.repository.member.MemberRefrigeratorRepository;
 import com.sm.project.repository.member.MemberRepository;
 import com.sm.project.service.mail.MailService;
 import com.sm.project.web.dto.member.MemberRequestDTO;
@@ -66,6 +69,7 @@ public class MemberService {
     private final MailService mailService;
     private final FcmRepository fcmRepository;
     private final RefrigeratorRepository refrigeratorRepository;
+    private final MemberRefrigeratorRepository memberRefrigeratorRepository;
 
     @Value("${oauth2.kakao.client-id}")
     private String kakaoClientId;
@@ -288,6 +292,41 @@ public class MemberService {
         } else {
             throw new MemberHandler(ErrorStatus.MEMBER_PASSWORD_MISMATCH);
         }
+    }
+
+    /**
+     * 냉장고 사용자 추가 메소드
+     *
+     * 사용자가 이메일을 입력하면 해당 이메일의 사용자를 냉장고를 공유할 수 있습니다.
+     *
+     * @param request 공유를 위한 사용자 이메일
+     */
+    public void shareRefrigerator(MemberRequestDTO.ShareDTO request){
+        Member member = memberQueryService.findByEmail(request.getEamil());
+        Refrigerator refrigerator = refrigeratorRepository.findById(request.getRefrigeratorId()).orElseThrow(() -> new RefrigeratorHandler(ErrorStatus.RERFIGERATOR_NOT_FOUND));
+
+        MemberRefrigerator memberRefrigerator = MemberRefrigerator.builder()
+                .member(member)
+                .refrigerator(refrigerator)
+                .build();
+        memberRefrigeratorRepository.save(memberRefrigerator);
+    }
+
+    /**
+     * 냉장고에 등록된 사용자들을 조회할 수 있습니다.
+     */
+    public List<Member> getShare(Long refrigeratorId){
+
+        return memberRefrigeratorRepository.findMembersByRefrigeratorId(refrigeratorId);
+
+    }
+
+    /**
+     * 냉장고에 등록된 사용자를 삭제할 수 있습니다.
+     */
+    public void deleteShare(Long memberId){
+
+        memberRefrigeratorRepository.deleteByMemberId(memberId);
     }
 
 

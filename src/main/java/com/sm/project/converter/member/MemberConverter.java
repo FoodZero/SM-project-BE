@@ -7,6 +7,8 @@ import com.sm.project.web.dto.member.MemberRequestDTO;
 import com.sm.project.web.dto.member.MemberResponseDTO;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class MemberConverter {
@@ -48,5 +50,11 @@ public class MemberConverter {
         return MemberResponseDTO.EmailResultDTO.builder()
                 .email(email)
                 .build();
+    }
+
+    public static List<MemberResponseDTO.ShareDTO> toShare(List<Member> members) {
+        return members.stream()
+                .map(member -> new MemberResponseDTO.ShareDTO(member.getId()))
+                .collect(Collectors.toList());
     }
 }

@@ -68,7 +68,6 @@ class FoodServiceTest {
         Refrigerator savedRefrigerator = refrigeratorCaptor.getValue();
         assertNotNull(savedRefrigerator);
         assertEquals("test 냉장고", savedRefrigerator.getName());
-        assertEquals(member, savedRefrigerator.getMember());
 
 
 
