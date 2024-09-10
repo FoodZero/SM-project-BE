@@ -46,4 +46,13 @@ public class MemberResponseDTO {
     public static class EmailResultDTO {
         String email;
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ShareDTO {
+        Long id;
+    }
+
 }

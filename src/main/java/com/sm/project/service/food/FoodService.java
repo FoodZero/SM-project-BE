@@ -7,6 +7,7 @@ import com.sm.project.converter.food.FoodConverter;
 import com.sm.project.domain.food.Food;
 import com.sm.project.domain.food.Refrigerator;
 import com.sm.project.domain.image.ReceiptImage;
+import com.sm.project.domain.mapping.MemberRefrigerator;
 import com.sm.project.domain.member.Member;
 import com.sm.project.feignClient.dto.LambdaRequest;
 import com.sm.project.feignClient.dto.LambdaResponse;
@@ -16,6 +17,7 @@ import com.sm.project.feignClient.naver.NaverOCRFeignClient;
 import com.sm.project.repository.food.FoodRepository;
 import com.sm.project.repository.food.ReceiptImageRepository;
 import com.sm.project.repository.food.RefrigeratorRepository;
+import com.sm.project.repository.member.MemberRefrigeratorRepository;
 import com.sm.project.service.UtilService;
 import com.sm.project.web.dto.food.FoodRequestDTO;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,7 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * FoodService는 음식 관련 기능을 제공하는 서비스 클래스입니다.
@@ -47,6 +50,7 @@ public class FoodService {
     private final NaverOCRFeignClient naverOCRFeignClient;
     private final LambdaFeignClient lambdaFeignClient;
     private final RefrigeratorRepository refrigeratorRepository;
+    private final MemberRefrigeratorRepository memberRefrigeratorRepository;
     private final ReentrantLock lock = new ReentrantLock();
 
     /**
@@ -70,10 +74,16 @@ public class FoodService {
      * @param member 회원 객체
      */
     public void uploadRefrigerator(FoodRequestDTO.UploadRefrigeratorDTO request, Member member) {
+
         Refrigerator refrigerator = Refrigerator.builder()
-            .member(member)
             .name(request.getName())
             .build();
+
+        MemberRefrigerator memberRefrigerator =MemberRefrigerator.builder()
+                .refrigerator(refrigerator)
+                .member(member)
+                .build();
+        memberRefrigeratorRepository.save(memberRefrigerator);
         refrigeratorRepository.save(refrigerator);
     }
 
@@ -84,15 +94,21 @@ public class FoodService {
      * @return 냉장고 목록
      */
     public List<Refrigerator> getRefrigeratorList(Member member) {
-        return refrigeratorRepository.findAllByMember(member);
+
+        List<MemberRefrigerator> memberRefrigerator = memberRefrigeratorRepository.findByMember(member);
+
+        return memberRefrigerator.stream()
+                .map(MemberRefrigerator::getRefrigerator)  // 각 MemberRefrigerator에서 Refrigerator 추출
+                .collect(Collectors.toList());
     }
     /**
      * 냉장고 삭제하는 메서드입니다.
      */
     public void deleteRefrigerator(Long refrigeratorId,Member member){
-        Refrigerator refrigerator = refrigeratorRepository.findById(refrigeratorId)
+
+        refrigeratorRepository.findById(refrigeratorId)
                 .orElseThrow(() -> new FoodHandler(ErrorStatus.RERFIGERATOR_NOT_FOUND));
-        refrigeratorRepository.deleteByMemberAndId(member,refrigeratorId);
+        refrigeratorRepository.deleteById(refrigeratorId);
     }
     /**
      * 특정 냉장고의 음식 목록을 조회하는 메서드입니다.
@@ -102,7 +118,7 @@ public class FoodService {
      * @return 음식 목록
      */
     public List<Food> getFoodList(Member member, Long refrigeratorId) {
-        Refrigerator refrigerator = refrigeratorRepository.findByIdAndMember(refrigeratorId, member)
+        Refrigerator refrigerator = refrigeratorRepository.findById(refrigeratorId)
             .orElseThrow(() -> new FoodHandler(ErrorStatus.RERFIGERATOR_NOT_FOUND));
         return foodRepository.findAllByRefrigerator(refrigerator);
     }

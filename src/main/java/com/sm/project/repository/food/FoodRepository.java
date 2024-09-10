@@ -63,11 +63,12 @@ public interface FoodRepository extends JpaRepository<Food, Long> {
      * @param memberId
      * @return FoodDto 리스트
      */
-    @Query("select new com.sm.project.repository.food.FoodGPTDto(f.name, f.expire, f.count) from Food f " +
-            "join Refrigerator r on f.refrigerator = r " +
-            "join Member m on r.member = m " +
+    @Query("select new com.sm.project.repository.food.FoodGPTDto(f.name, f.expire, f.count) " +
+            "from Food f " +
+            "join f.refrigerator r " +
+            "join MemberRefrigerator mr on r = mr.refrigerator " +
+            "join mr.member m " +
             "where m.id = :memberId " +
-            "order by f.expire asc"
-            )
+            "order by f.expire asc")
     List<FoodGPTDto> findFoodGptDto(@Param("memberId") Long memberId);
 }

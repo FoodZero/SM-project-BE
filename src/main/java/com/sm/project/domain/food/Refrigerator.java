@@ -1,7 +1,7 @@
 package com.sm.project.domain.food;
 
 import com.sm.project.domain.Common.BaseDateTimeEntity;
-import com.sm.project.domain.member.Member;
+import com.sm.project.domain.mapping.MemberRefrigerator;
 import lombok.*;
 
 import javax.persistence.*;
@@ -23,13 +23,11 @@ public class Refrigerator extends BaseDateTimeEntity {
     @Column(nullable = false, columnDefinition = "VARCHAR(20)")
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
+    @OneToMany(mappedBy = "refrigerator", cascade = CascadeType.ALL)
+    private List<MemberRefrigerator> memberRefrigeratorList = new ArrayList<>();
 
     @OneToMany(mappedBy = "refrigerator", cascade = CascadeType.ALL)
     private List<Food> refrigeratorFoodList = new ArrayList<>();
-
 
 
 }
