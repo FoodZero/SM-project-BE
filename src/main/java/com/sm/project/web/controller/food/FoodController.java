@@ -5,6 +5,7 @@ import com.sm.project.apiPayload.code.status.ErrorStatus;
 import com.sm.project.apiPayload.code.status.SuccessStatus;
 import com.sm.project.apiPayload.exception.handler.MemberHandler;
 import com.sm.project.converter.food.FoodConverter;
+import com.sm.project.converter.member.MemberConverter;
 import com.sm.project.domain.food.Food;
 import com.sm.project.domain.food.Refrigerator;
 import com.sm.project.domain.member.Member;
@@ -13,6 +14,7 @@ import com.sm.project.service.food.FoodService;
 import com.sm.project.service.member.MemberQueryService;
 import com.sm.project.web.dto.food.FoodRequestDTO;
 import com.sm.project.web.dto.food.FoodResponseDTO;
+import com.sm.project.web.dto.member.MemberRequestDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -38,6 +41,7 @@ public class FoodController {
 
     private final FoodService foodService;
     private final MemberQueryService memberQueryService;
+
 
     /**
      * 음식 추가 API
@@ -200,6 +204,57 @@ public class FoodController {
         List<String> classifyFoodList = foodService.classifyFood(foodList);
 
         return ResponseDTO.of(SuccessStatus.RECEIPT_UPLOAD_SUCCESS, FoodConverter.toOCRResponseDTO(classifyFoodList));
+    }
+
+    /**
+     * 냉장고 공유를 위해 사용자 추가 API입니다.
+     * @param authentication 인증 정보
+     * @param request 이메일, 냉장고 Id
+     * @return 성공 메세지 반환합니다.
+     */
+    @PostMapping("/share")
+    @Operation(summary = "냉장고 공유 API", description = "이메일과 냉장고 Id를 입력하면 해당 이메일의 사용자를 냉장고에 등록하는 API입니다.")
+    public ResponseDTO<?> shareRefrigerator(Authentication authentication,
+                                            @RequestBody @Valid MemberRequestDTO.ShareDTO request){
+
+        memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        foodService.shareRefrigerator(request);
+        return ResponseDTO.onSuccess("냉장고 사용자 추가 성공입니다.");
+    }
+
+    /**
+     * 냉장고에 등록된 사용자 조회 API입니다.
+     * @param authentication 인증 정보
+     * @param refrigeratorId 냉장고 id
+     * @return 사용자 정보 반홥
+     */
+    @GetMapping("/share/{refrigeratorId}")
+    @Operation(summary = "냉장고 등록된 사용자 조회 API", description = "냉장고 Id를 입력하면 등록된 사용자를 조회하는 API입니다.")
+    public ResponseDTO<?> getShareRefrigerator(Authentication authentication,
+                                               @PathVariable(name = "refrigeratorId") Long refrigeratorId){
+
+        memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        List<Member> memberList = foodService.getShare(refrigeratorId);
+
+        return ResponseDTO.of(SuccessStatus.SHARE_GET_SUCCESS, MemberConverter.toShare(memberList));
+    }
+
+    /**
+     * 냉장고에 등록된 사용자 삭제 API입니다.
+     * @param authentication 인증 정보
+     * @param memberId 사용자 id
+     *
+     * @return 성공 메세지 반환
+     */
+    @DeleteMapping("/share/{memberId}")
+    @Operation(summary = "냉장고에 등록된 사용자 삭제 API", description = "사용자 id를 입력하면 냉장고를 공유한 사용자가 삭제됩니다.")
+    public ResponseDTO<?> deleteShareRefrigerator(Authentication authentication,
+                                                  @PathVariable(name = "memberId") Long memberId){
+
+        memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        foodService.deleteShare(memberId);
+
+        return ResponseDTO.onSuccess("공유된 사용자 삭제 성공");
     }
 
 }
