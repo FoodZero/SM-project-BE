@@ -13,7 +13,7 @@ public class PostImg {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "post_img")
+    @Column(name = "post_img_id")
     private Long id;
 
     private String name;
