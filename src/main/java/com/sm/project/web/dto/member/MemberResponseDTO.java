@@ -53,6 +53,7 @@ public class MemberResponseDTO {
     @AllArgsConstructor
     public static class ShareDTO {
         Long id;
+        String nickname;
     }
 
 }

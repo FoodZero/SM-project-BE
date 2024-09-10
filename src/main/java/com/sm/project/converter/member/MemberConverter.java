@@ -54,7 +54,7 @@ public class MemberConverter {
 
     public static List<MemberResponseDTO.ShareDTO> toShare(List<Member> members) {
         return members.stream()
-                .map(member -> new MemberResponseDTO.ShareDTO(member.getId()))
+                .map(member -> new MemberResponseDTO.ShareDTO(member.getId(), member.getNickname()))
                 .collect(Collectors.toList());
     }
 }
