@@ -2,6 +2,7 @@ package com.sm.project.service.food;
 
 import com.sm.project.apiPayload.code.status.ErrorStatus;
 import com.sm.project.apiPayload.exception.handler.FoodHandler;
+import com.sm.project.apiPayload.exception.handler.RefrigeratorHandler;
 import com.sm.project.config.PerformanceLoggingUtil;
 import com.sm.project.converter.food.FoodConverter;
 import com.sm.project.domain.food.Food;
@@ -19,7 +20,9 @@ import com.sm.project.repository.food.ReceiptImageRepository;
 import com.sm.project.repository.food.RefrigeratorRepository;
 import com.sm.project.repository.member.MemberRefrigeratorRepository;
 import com.sm.project.service.UtilService;
+import com.sm.project.service.member.MemberQueryService;
 import com.sm.project.web.dto.food.FoodRequestDTO;
+import com.sm.project.web.dto.member.MemberRequestDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -51,6 +54,7 @@ public class FoodService {
     private final LambdaFeignClient lambdaFeignClient;
     private final RefrigeratorRepository refrigeratorRepository;
     private final MemberRefrigeratorRepository memberRefrigeratorRepository;
+    private final MemberQueryService memberQueryService;
     private final ReentrantLock lock = new ReentrantLock();
 
     /**
@@ -367,6 +371,41 @@ public class FoodService {
         return newFoodList;
 
 
+    }
+
+    /**
+     * 냉장고 사용자 추가 메소드
+     *
+     * 사용자가 이메일을 입력하면 해당 이메일의 사용자를 냉장고를 공유할 수 있습니다.
+     *
+     * @param request 공유를 위한 사용자 이메일
+     */
+    public void shareRefrigerator(MemberRequestDTO.ShareDTO request){
+        Member member = memberQueryService.findByEmail(request.getEamil());
+        Refrigerator refrigerator = refrigeratorRepository.findById(request.getRefrigeratorId()).orElseThrow(() -> new RefrigeratorHandler(ErrorStatus.RERFIGERATOR_NOT_FOUND));
+
+        MemberRefrigerator memberRefrigerator = MemberRefrigerator.builder()
+                .member(member)
+                .refrigerator(refrigerator)
+                .build();
+        memberRefrigeratorRepository.save(memberRefrigerator);
+    }
+
+    /**
+     * 냉장고에 등록된 사용자들을 조회할 수 있습니다.
+     */
+    public List<Member> getShare(Long refrigeratorId){
+
+        return memberRefrigeratorRepository.findMembersByRefrigeratorId(refrigeratorId);
+
+    }
+
+    /**
+     * 냉장고에 등록된 사용자를 삭제할 수 있습니다.
+     */
+    public void deleteShare(Long memberId){
+
+        memberRefrigeratorRepository.deleteByMemberId(memberId);
     }
 
 }
