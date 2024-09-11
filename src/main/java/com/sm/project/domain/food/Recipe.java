@@ -38,6 +38,9 @@ public class Recipe {
     @ColumnDefault("0")
     private Long recommendCount;// 추천수
 
+    @Column(columnDefinition = "boolean default false")
+    private Boolean isDeleted; //gpt레시피만 쓰는 필드(초기화 여부 표시)
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="member_gpt_id")
     private Member member; //해당 멤버가 gpt로 생성한 레시피임을 나타냄. null이면 일반 레시피
@@ -48,5 +51,9 @@ public class Recipe {
 
     public void subRecommendCount() {
         this.recommendCount--;
+    }
+
+    public void markAsDeleted() {
+        this.isDeleted = true;
     }
 }

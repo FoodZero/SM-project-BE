@@ -21,6 +21,7 @@ import com.theokanning.openai.service.OpenAiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -205,7 +206,8 @@ public class ChatGPTService {
      * @return
      */
     public ChatGPTResponseDTO.RecipeListResultDto getGptRecipeList(Long memberId) {
-        List<Recipe> recipeList = recipeRepository.findByMemberId(memberId);
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        List<Recipe> recipeList = recipeRepository.findByMemberIdAndIsDeleted(member);
 
         List<ChatGPTResponseDTO.RecipeDto> recipeDtoList = recipeList.stream().map(r -> ChatGPTResponseDTO.RecipeDto.builder()
                 .recipeId(r.getId())
@@ -222,11 +224,15 @@ public class ChatGPTService {
      * gpt 레시피가 북마크 되어있지 않고, 이미 존재한다면 초기화(삭제)하는 메소드입니다.
      * @param memberId
      */
+    @Transactional  //데이터 변경 시에 필요
     public void deleteGptRecipe(Long memberId) {
         List<Recipe> recipeList = recipeRepository.findByMemberId(memberId);
 
+        recipeList.stream().forEach(recipe -> recipe.markAsDeleted());  //삭제 표시만(목록 조회에서 초기화된 레시피 거르기 위함)
+
         recipeList.stream()
                 .filter(recipe -> recipeRepository.existsByNameAndIdNot(recipe.getName(), recipe.getId()) && !bookmarkRepository.existsByRecipe(recipe))  //북마크가 안되어있고, 동일한 이름의 레시피는 삭제 -> 중복되는 레시피가 많아지는 걸 방지하기 위함
-                .forEach(recipe -> recipeRepository.delete(recipe));
+                .forEach(recipe -> recipeRepository.delete(recipe));  //실제 삭제
+
     }
 }
