@@ -15,7 +15,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 
     @Query("select new com.sm.project.repository.chatgpt.RecipeNameDto(r.name) from Recipe r " +
             "join Member m on r.member = m " +
-            "where m.id = :memberId")
+            "where m.id = :memberId and r.isDeleted = false")
     List<RecipeNameDto> findRecipeName(@Param("memberId") Long memberId);
 
     List<Recipe> findByMemberId(Long memberId);

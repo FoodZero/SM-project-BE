@@ -79,7 +79,7 @@ public class ChatGPTService {
         }
 
         String systemRequest2 = "이미 있는 레시피는 또 말하지말고, 절대 레시피를 변형해서 대답하지마. 레시피 이름에 숫자 붙여서 변형하지마! 다른 재료를 선택해서 완전 다른 요리를 소개해. 다음은 이미 있는 레시피야: " + existingRecipeList;
-        System.out.println(systemRequest2);
+        //System.out.println(systemRequest2);
 
         final ChatMessage systemMessage = new ChatMessage(ChatMessageRole.SYSTEM.value(), systemRequest);
         messages.add(systemMessage);
@@ -124,10 +124,10 @@ public class ChatGPTService {
             foodList = foodList.substring(0, foodList.length() - 2);
         }
 
-        request = foodList + " 중에 선택해서 그 재료들이 들어간 레시피를 말해줘. " +
+        request = foodList + " 중에 선택해서 그 재료들이 들어간 레시피를 말해줘. 재료는 유통기한이 짧은 순서대로 나열되어 있어. 최대한 유통기한이 짧은 재료를 넣은 레시피를 우선적으로 말해." +
                 "그리고 주어진 재료 외에 더 필요한 재료가 있으면 재료목록에 추가해. 다른 재료를 선택해서 새로운 종류의 레시피를 말해. 기존 레시피에 숫자 붙이거나 변형한 레시피는 새로운게 아니야";
 
-        System.out.println(request);
+        //System.out.println(request);
         return request;
     }
 
@@ -188,14 +188,14 @@ public class ChatGPTService {
 
         String request = createRequest(memberId);
         String response = prompt(request, memberId);
-        System.out.println("response = " + response);
+        //System.out.println("response = " + response);
 
         result = parseResponse(response);
         result.setRecipeId(saveGptRecipe(result, memberId)); //생성된 gpt 레시피 저장
 
-        System.out.println("===============================");
+        /*System.out.println("===============================");
         System.out.println(result.toString());
-        System.out.println("===============================");
+        System.out.println("===============================");*/
 
         return result;
     }
