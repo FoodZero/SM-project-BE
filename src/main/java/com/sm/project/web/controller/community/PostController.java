@@ -135,7 +135,7 @@ public class PostController {
      * @param imgList 이미지 파일 목록
      * @return 게시글 작성 성공 응답
      */
-    @PostMapping(value = "/create/image")
+    @PostMapping(value = "/create")
     @Operation(summary = "커뮤니티 글 등록 API", description = "커뮤니티에서 게시글을 등록하는 API입니다. topic: 나눔, 레시피 중 선택, address: 위치 조회 결과의 주소 입력")
     public ResponseDTO<?> createPost(Authentication auth, @RequestPart("request") PostRequestDTO.CreateDTO request, @RequestPart(value= "images", required = false) List<MultipartFile> imgList) {
         Member member = memberQueryService.findMemberById(Long.valueOf(auth.getName().toString()))
