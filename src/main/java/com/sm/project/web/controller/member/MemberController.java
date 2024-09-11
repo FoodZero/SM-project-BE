@@ -22,10 +22,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -64,6 +66,22 @@ public class MemberController {
     @Operation(summary = "로그인 API", description = "request 파라미터 : 이메일, 비밀번호(String)")
     public ResponseDTO<MemberResponseDTO.LoginDTO> login(@RequestBody MemberRequestDTO.LoginDTO request) {
         return ResponseDTO.onSuccess(memberService.login(request));
+    }
+
+    /**
+     * 로그아웃 API
+     * @param authentication
+     * @param authorizationHeader
+     * @return 로그아웃 결과 응답
+     */
+    @Operation(summary = "로그아웃 API", description = "로그아웃 API 입니다.")
+    @PostMapping("/logout")
+    public ResponseDTO<?> logout(Authentication authentication,
+                                                                 HttpServletRequest authorizationHeader) {
+        String token = authorizationHeader.getHeader("Authorization").substring(7);
+        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        memberService.logout(token);
+        return ResponseDTO.of(SuccessStatus._OK,null);
     }
 
     /**

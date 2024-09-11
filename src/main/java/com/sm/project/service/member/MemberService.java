@@ -97,6 +97,16 @@ public class MemberService {
     }
 
     /**
+     * 로그 아웃 메서드
+     * 로그인 상태 정보 삭제
+     * @param accessToken
+     */
+    @Transactional
+    public void logout(String accessToken) {
+        redisService.resolveLogout(accessToken);
+    }
+
+    /**
      * 카카오 로그인 정보를 가져오는 메서드
      * 
      * @param code 카카오 인증 코드
