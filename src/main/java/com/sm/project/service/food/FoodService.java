@@ -412,9 +412,9 @@ public class FoodService {
     /**
      * 냉장고에 등록된 사용자를 삭제할 수 있습니다.
      */
-    public void deleteShare(Long memberId){
+    public void deleteShare(Long memberId, Long refrigeratorId){
 
-        memberRefrigeratorRepository.deleteByMemberId(memberId);
+        memberRefrigeratorRepository.deleteByMemberId(memberId, refrigeratorId);
     }
 
 }
