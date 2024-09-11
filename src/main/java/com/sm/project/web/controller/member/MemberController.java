@@ -136,12 +136,28 @@ public class MemberController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER4008", description = "이미 존재하는 닉네임입니다.",
                     content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class)))
     })
-    public ResponseDTO checkNickname(@RequestBody @Valid MemberRequestDTO.NicknameDTO request) {
+    public ResponseDTO<?> checkNickname(@RequestBody @Valid MemberRequestDTO.NicknameDTO request) {
         if (memberService.isDuplicate(request)) {
             throw new MemberHandler(ErrorStatus.MEMBER_NICKNAME_DUPLICATE);
         }
         return ResponseDTO.onSuccess("닉네임 중복이 아닙니다.");
     }
+
+
+    @PutMapping("/nickname/update")
+    @Operation(summary = "닉네임 변경 API", description = "토큰과 닉네임 넣어서 보내시면 됩니다.")
+    public ResponseDTO<?> updateNickname(Authentication authentication,
+                                         @RequestBody @Valid MemberRequestDTO.NicknameDTO request){
+        if (memberService.isDuplicate(request)) {
+            throw new MemberHandler(ErrorStatus.MEMBER_NICKNAME_DUPLICATE);
+        }
+        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        memberService.updateNickname(member, request);
+
+        return ResponseDTO.onSuccess("닉네임 변경 성공입니다.");
+    }
+
 
     /**
      * 이메일 찾기 API

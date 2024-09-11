@@ -324,6 +324,15 @@ public class MemberService {
         }
     }
 
+    /**
+     * 닉네임 변경 메서드
+     * @param member
+     * @param request
+     */
+    public void updateNickname(Member member, MemberRequestDTO.NicknameDTO request){
+        memberRepository.updateMemberName(member.getId(), request.getNickname());
+    }
+
 
 
 
