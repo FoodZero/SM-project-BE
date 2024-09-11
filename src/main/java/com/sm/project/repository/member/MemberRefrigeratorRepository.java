@@ -33,6 +33,6 @@ public interface MemberRefrigeratorRepository extends JpaRepository<MemberRefrig
      */
     @Modifying
     @Transactional
-    @Query("DELETE FROM MemberRefrigerator mr WHERE mr.member.id = :memberId")
-    void deleteByMemberId(Long memberId);
+    @Query("DELETE FROM MemberRefrigerator mr WHERE mr.member.id = :memberId and mr.refrigerator.id = :refrigeratorId")
+    void deleteByMemberId(Long memberId, Long refrigeratorId);
 }
