@@ -113,6 +113,17 @@ public class MemberController {
         return ResponseDTO.of(SuccessStatus._OK, MemberConverter.toJoinResultDTO(newMember));
     }
 
+    @DeleteMapping("/delete")
+    @Operation(summary = "회원 탈퇴 API", description = "회원 탈퇴 API입니다.")
+    public ResponseDTO<?> deleteMember(Authentication authentication){
+
+        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        memberService.deleteMember(member);
+        return ResponseDTO.onSuccess(SuccessStatus.MEMBER_DELETE_SUCCESS);
+    }
+
+
     /**
      * 닉네임 중복 확인 API
      * @param request 닉네임 중복 확인 요청 데이터

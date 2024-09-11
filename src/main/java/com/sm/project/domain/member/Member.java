@@ -54,7 +54,7 @@ public class Member extends BaseDateTimeEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<MemberRefrigerator> memberRefrigeratorList = new ArrayList<>();
 
-    @OneToOne(mappedBy = "member")
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
     private MemberPassword memberPassword;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
@@ -69,4 +69,9 @@ public class Member extends BaseDateTimeEntity {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Location> locationList;
+
+    public Member deleteMember(){
+        this.status = StatusType.INACTIVE;
+        return this;
+    }
 }

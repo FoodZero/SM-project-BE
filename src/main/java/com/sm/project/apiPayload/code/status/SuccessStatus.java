@@ -21,6 +21,7 @@ public enum SuccessStatus implements BaseCode {
     RECEIPT_UPLOAD_SUCCESS(HttpStatus.OK, "RECEIPT200", "영수증 저장 성공"),
     //MEMBER
     MEMBER_PUSH_SUCCESS(HttpStatus.OK, "MEMBER200", "앱 푸쉬 성공"),
+    MEMBER_DELETE_SUCCESS(HttpStatus.OK, "MEMBER2001", "회원 삭제 성공"),
 
     //POST
     POST_CREATE_SUCCESS(HttpStatus.OK, "POST200", "글 등록 성공"),
