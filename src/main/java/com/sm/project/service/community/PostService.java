@@ -67,6 +67,13 @@ public class PostService {
         }
     }
 
+    public void createPost2(PostRequestDTO.CreateDTO request, Member member) {
+        Location location = locationRepository.findByAddress(request.getAddress())
+                .orElseThrow(() -> new PostHandler(ErrorStatus.LOCATION_NOT_FOUND));
+        Post post = PostConverter.toPost(member, request, location);
+        postRepository.save(post);
+    }
+
     /**
      * 게시글을 수정하는 메서드입니다.
      *
