@@ -1,6 +1,7 @@
 package com.sm.project.repository.food;
 
 import com.sm.project.domain.food.Recipe;
+import com.sm.project.domain.member.Member;
 import com.sm.project.repository.chatgpt.RecipeNameDto;
 import feign.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,4 +19,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
     List<RecipeNameDto> findRecipeName(@Param("memberId") Long memberId);
 
     List<Recipe> findByMemberId(Long memberId);
+
+    @Query("select r from Recipe r where r.member = :member and r.isDeleted = false")
+    List<Recipe> findByMemberIdAndIsDeleted(@Param("member")Member member);
 }

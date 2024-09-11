@@ -38,7 +38,7 @@ public class ChatGPTController {
     @Operation(summary = "ChatGPT 레시피 추천 API", description = "ChatGPT 버튼을 눌렀을 때 레시피를 추천받는 API입니다.(레시피 id, 레시피 이름, 재료, 설명)")
     public ResponseDTO<?> getGptRecipe(Authentication authentication) {
         Long memberId = Long.valueOf(authentication.getName().toString());
-        ChatGPTResponseDTO.RecipeResultDTO result = chatGPTService.getGptRecipe(memberId); //그냥 멤버 엔티티를 인자로 넣는거로 바꾸기!!!
+        ChatGPTResponseDTO.RecipeResultDTO result = chatGPTService.getGptRecipe(memberId);
         return ResponseDTO.of(SuccessStatus._OK, result);
     }
 
