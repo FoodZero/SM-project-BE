@@ -35,4 +35,11 @@ public class FoodRequestDTO {
     public static class UploadRefrigeratorDTO{
         String name;
     }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateRefrigeratorDTO{
+        String name;
+    }
 }

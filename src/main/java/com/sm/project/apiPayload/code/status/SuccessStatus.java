@@ -43,7 +43,8 @@ public enum SuccessStatus implements BaseCode {
     COMMENT_READ_SUCCESS(HttpStatus.OK, "COMMENT2003", "댓글 조회 성공"),
 
     //Refrigerator
-    SHARE_GET_SUCCESS(HttpStatus.OK, "REFRIGERATOR200", "공유된 사용자 정보 조회 성공");
+    SHARE_GET_SUCCESS(HttpStatus.OK, "REFRIGERATOR200", "공유된 사용자 정보 조회 성공"),
+    NAME_UPDATE_SUCCESS(HttpStatus.OK, "REFRIGERATOR2001", "냉장고 이름 변경 성공");
 
 
     private final HttpStatus httpStatus;

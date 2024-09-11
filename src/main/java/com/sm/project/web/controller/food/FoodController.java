@@ -114,6 +114,19 @@ public class FoodController {
         return ResponseDTO.onSuccess(FoodConverter.toGetRefrigeratorListResultDTO(refrigeratorList));
     }
 
+    @PutMapping("/refrigerator/{refrigeratorId}")
+    @Operation(summary = "냉장고 이름 수정 API", description = "냉장고 이름 수정 API")
+    public ResponseDTO<?> updateRefrigeratorName(Authentication authentication,
+                                                 @PathVariable(name = "refrigeratorId") Long refrigeratorId,
+                                                 @RequestBody FoodRequestDTO.UpdateRefrigeratorDTO request){
+        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString()))
+                .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        foodService.updateRefrigeratorName(request,refrigeratorId);
+
+        return ResponseDTO.of(SuccessStatus.NAME_UPDATE_SUCCESS,null);
+    }
+
     /**
      * 음식 조회 API
      * 
