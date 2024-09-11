@@ -105,8 +105,11 @@ public class FoodService {
                 .map(MemberRefrigerator::getRefrigerator)  // 각 MemberRefrigerator에서 Refrigerator 추출
                 .collect(Collectors.toList());
     }
+
     /**
-     * 냉장고 삭제하는 메서드입니다.
+     * 냉장고 삭제 메서드
+     * @param refrigeratorId
+     * @param member
      */
     public void deleteRefrigerator(Long refrigeratorId,Member member){
 
@@ -114,6 +117,12 @@ public class FoodService {
                 .orElseThrow(() -> new FoodHandler(ErrorStatus.RERFIGERATOR_NOT_FOUND));
         refrigeratorRepository.deleteById(refrigeratorId);
     }
+
+    public void updateRefrigeratorName(FoodRequestDTO.UpdateRefrigeratorDTO request, Long refrigeratorId){
+
+        refrigeratorRepository.updateRefrigeratorName(refrigeratorId,request.getName());
+    }
+
     /**
      * 특정 냉장고의 음식 목록을 조회하는 메서드입니다.
      *

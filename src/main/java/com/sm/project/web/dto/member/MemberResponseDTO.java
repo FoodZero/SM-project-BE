@@ -56,4 +56,7 @@ public class MemberResponseDTO {
         String nickname;
     }
 
+
+
+
 }

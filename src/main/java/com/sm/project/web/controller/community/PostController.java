@@ -137,7 +137,7 @@ public class PostController {
      */
     @PostMapping(value = "/create", consumes = "multipart/form-data")
     @Operation(summary = "커뮤니티 글 등록 API", description = "커뮤니티에서 게시글을 등록하는 API입니다. topic: 나눔, 레시피 중 선택, address: 위치 조회 결과의 주소 입력")
-    public ResponseDTO<?> createPost(Authentication auth, @RequestPart("request") PostRequestDTO.CreateDTO request, @RequestPart("images") List<MultipartFile> imgList) {
+    public ResponseDTO<?> createPost(Authentication auth, @RequestPart("request") PostRequestDTO.CreateDTO request, @RequestPart(value= "images", required = false) List<MultipartFile> imgList) {
         Member member = memberQueryService.findMemberById(Long.valueOf(auth.getName().toString()))
                                           .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
         postService.createPost(request, member, imgList);
