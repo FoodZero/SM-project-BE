@@ -50,6 +50,9 @@ public class Comment extends BaseDateTimeEntity {
     @Column(columnDefinition = "boolean default false")
     private Boolean isDeleted = false;
 
+    @Column(columnDefinition = "boolean default false")
+    private Boolean isPrivate = false;
+
     public void createChildComments(Comment parentComment) { //대댓글 생성할 때 사용. 부모, 자식 관계 설정
         this.parentComment = parentComment;
         parentComment.childComments.add(this);
@@ -60,8 +63,9 @@ public class Comment extends BaseDateTimeEntity {
         post.getCommentList().add(this);
     }
 
-    public void setContent(String content) {
+    public void changeComment(String content, Boolean isPrivate) {
         this.content = content;
+        this.isPrivate = isPrivate;
     }
 
     public void deleteParentComment() {

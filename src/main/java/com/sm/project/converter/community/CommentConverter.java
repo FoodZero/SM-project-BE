@@ -19,6 +19,7 @@ public class CommentConverter {
                         .content(request.getContent())
                         .member(member)
                         .parentComment(null)
+                        .isPrivate(request.getIsPrivate())
                         .build();
          comment.setPost(post);
          return comment;
@@ -28,6 +29,7 @@ public class CommentConverter {
         Comment comment = Comment.builder()
                 .content(request.getContent())
                 .member(member)
+                .isPrivate(request.getIsPrivate())
                 .build();
 
         comment.setPost(post);
@@ -47,6 +49,7 @@ public class CommentConverter {
                         .createdAt(comment.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                         .content(comment.getContent())
                         .childList(childToCommentDTO(comment.getChildComments()))
+                                .isPrivate(comment.getIsPrivate())
                         .build())
                 .collect(Collectors.toList());
 

@@ -12,6 +12,7 @@ public class CommentRequestDTO {
     public static class CreateCommentDTO {
 
         private String content;
+        private Boolean isPrivate;
     }
 
     @Getter
@@ -20,5 +21,6 @@ public class CommentRequestDTO {
     public static class UpdateCommentDTO {
 
         private String content;
+        private Boolean isPrivate;
     }
 }
