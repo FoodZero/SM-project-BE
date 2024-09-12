@@ -35,7 +35,7 @@ public class CommentService {
 
     public void updateComment(Member member, Comment comment, CommentRequestDTO.UpdateCommentDTO request) {
         if(!comment.getMember().equals(member)) throw new CommentHandler(ErrorStatus.COMMENT_NOT_OWNED); //본인이 작성한 댓글이 아니면 수정 불가
-        comment.setContent(request.getContent());
+        comment.changeComment(request.getContent(), request.getIsPrivate());
     }
 
     public void deleteComment(Member member, Comment comment) {
@@ -52,6 +52,6 @@ public class CommentService {
         if (!comment.getMember().equals(member)) throw new CommentHandler(ErrorStatus.COMMENT_NOT_OWNED); //본인이 작성한 댓글이 아니면 삭제 불가
 
         comment.deleteParentComment();
-        comment.setContent("삭제된 댓글입니다.");
+        comment.changeComment("삭제된 댓글입니다.", comment.getIsPrivate());
     }
 }

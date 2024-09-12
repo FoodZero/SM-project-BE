@@ -31,5 +31,6 @@ public class CommentResponseDTO {
         String content; //댓글 내용
         Long parentId; //부모 댓글 아이디
         List<CommentDTO> childList; //자식 댓글 목록
+        Boolean isPrivate; //비밀 댓글 여부
     }
 }
