@@ -42,7 +42,7 @@ public class SpringSecurityConfig {
                         "/swagger-ui/**",
                         "/swagger-resources/**",
                         "/v3/api-docs/**",
-                        "/api/members/**",
+                        "/api/members/callback/kakao",
                         "/api/members/login",
                         "/api/members/register",
                         "/api/members/send",
@@ -50,7 +50,8 @@ public class SpringSecurityConfig {
                         "/api/members/password/send",
                         "/api/members/password",
                         "/api/members/nickname",
-                        "/api/members/password/reset"
+                        "/api/members/password/reset",
+                        "/api/members/fcm/send"
                 );
     }
     @Bean

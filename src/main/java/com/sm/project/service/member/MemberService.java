@@ -7,6 +7,7 @@ import com.sm.project.config.springSecurity.TokenProvider;
 import com.sm.project.converter.member.MemberConverter;
 import com.sm.project.coolsms.RedisUtil;
 import com.sm.project.coolsms.SmsUtil;
+import com.sm.project.domain.enums.StatusType;
 import com.sm.project.domain.food.Refrigerator;
 import com.sm.project.domain.member.FcmRepository;
 import com.sm.project.domain.member.FcmToken;
@@ -84,7 +85,9 @@ public class MemberService {
     public MemberResponseDTO.LoginDTO login(MemberRequestDTO.LoginDTO request) {
         Member selectedMember = memberRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_EMAIL_NOT_FOUND));
-
+        if(selectedMember.getStatus() == StatusType.INACTIVE){
+            throw new MemberHandler(ErrorStatus.MEMBER_EMAIL_NOT_FOUND);
+        }
         MemberPassword memberPassword = memberPasswordRepository.findByMember(selectedMember);
         if (!encoder.matches(request.getPassword(), memberPassword.getPassword())) {
             throw new MemberHandler(ErrorStatus.MEMBER_PASSWORD_ERROR);
@@ -94,6 +97,16 @@ public class MemberService {
                 .accessToken(redisService.saveLoginStatus(selectedMember.getId(), tokenProvider.createAccessToken(selectedMember.getId(), selectedMember.getJoinType(), request.getEmail(), Arrays.asList(new SimpleGrantedAuthority("USER")))))
                 .refreshToken(redisService.generateRefreshToken(request.getEmail()).getToken())
                 .build();
+    }
+
+    /**
+     * 로그 아웃 메서드
+     * 로그인 상태 정보 삭제
+     * @param accessToken
+     */
+    @Transactional
+    public void logout(String accessToken) {
+        redisService.resolveLogout(accessToken);
     }
 
     /**
@@ -118,6 +131,9 @@ public class MemberService {
         if (member.isEmpty()) {
             return ResponseDTO.onFailure("로그인 실패", "회원가입 필요", MemberConverter.toSocialJoinResultDTO(phone, email));
         } else {
+            if(member.get().getStatus() == StatusType.INACTIVE){
+                return ResponseDTO.onFailure("로그인 실패", "회원가입 필요", MemberConverter.toSocialJoinResultDTO(phone, email));
+            }
             return ResponseDTO.onSuccess(MemberResponseDTO.LoginDTO.builder()
                     .accessToken(redisService.saveLoginStatus(member.get().getId(), tokenProvider.createAccessToken(member.get().getId(), member.get().getJoinType(), email, Arrays.asList(new SimpleGrantedAuthority("USER")))))
                     .refreshToken(redisService.generateRefreshToken(email).getToken())
@@ -133,10 +149,18 @@ public class MemberService {
      */
     @Transactional
     public Member joinMember(MemberRequestDTO.JoinDTO request) {
-        verifySms(request.getPhone(), request.getCertificationCode());
+        //verifySms(request.getPhone(), request.getCertificationCode());
+        Optional<Member> member = memberRepository.findByEmail(request.getEmail());
 
-        if (memberRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new MemberHandler(ErrorStatus.MEMBER_ALREADY_JOIN);
+
+        if (member.isPresent()) {
+            if(member.get().getStatus() == StatusType.INACTIVE){
+                memberRepository.delete(member.get());
+
+            }else{
+                throw new MemberHandler(ErrorStatus.MEMBER_ALREADY_JOIN);
+            }
+
         }
 
         Member newMember = MemberConverter.toMember(request);
@@ -151,6 +175,14 @@ public class MemberService {
         String password = encoder.encode(request.getPassword());
         memberPasswordRepository.save(MemberConverter.toMemberPassword(password, newMember));
         return newMember;
+    }
+
+    /**
+     * 회원 삭제 메서드
+     * @param member
+     */
+    public void deleteMember(Member member){
+        member.deleteMember();
     }
 
     /**
@@ -290,6 +322,15 @@ public class MemberService {
         } else {
             throw new MemberHandler(ErrorStatus.MEMBER_PASSWORD_MISMATCH);
         }
+    }
+
+    /**
+     * 닉네임 변경 메서드
+     * @param member
+     * @param request
+     */
+    public void updateNickname(Member member, MemberRequestDTO.NicknameDTO request){
+        memberRepository.updateMemberName(member.getId(), request.getNickname());
     }
 
 

@@ -21,6 +21,7 @@ public enum SuccessStatus implements BaseCode {
     RECEIPT_UPLOAD_SUCCESS(HttpStatus.OK, "RECEIPT200", "영수증 저장 성공"),
     //MEMBER
     MEMBER_PUSH_SUCCESS(HttpStatus.OK, "MEMBER200", "앱 푸쉬 성공"),
+    MEMBER_DELETE_SUCCESS(HttpStatus.OK, "MEMBER2001", "회원 삭제 성공"),
 
     //POST
     POST_CREATE_SUCCESS(HttpStatus.OK, "POST200", "글 등록 성공"),
@@ -42,7 +43,8 @@ public enum SuccessStatus implements BaseCode {
     COMMENT_READ_SUCCESS(HttpStatus.OK, "COMMENT2003", "댓글 조회 성공"),
 
     //Refrigerator
-    SHARE_GET_SUCCESS(HttpStatus.OK, "REFRIGERATOR200", "공유된 사용자 정보 조회 성공");
+    SHARE_GET_SUCCESS(HttpStatus.OK, "REFRIGERATOR200", "공유된 사용자 정보 조회 성공"),
+    NAME_UPDATE_SUCCESS(HttpStatus.OK, "REFRIGERATOR2001", "냉장고 이름 변경 성공");
 
 
     private final HttpStatus httpStatus;

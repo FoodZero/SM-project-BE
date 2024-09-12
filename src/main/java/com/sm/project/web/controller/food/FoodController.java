@@ -114,6 +114,19 @@ public class FoodController {
         return ResponseDTO.onSuccess(FoodConverter.toGetRefrigeratorListResultDTO(refrigeratorList));
     }
 
+    @PutMapping("/refrigerator/{refrigeratorId}")
+    @Operation(summary = "냉장고 이름 수정 API", description = "냉장고 이름 수정 API")
+    public ResponseDTO<?> updateRefrigeratorName(Authentication authentication,
+                                                 @PathVariable(name = "refrigeratorId") Long refrigeratorId,
+                                                 @RequestBody FoodRequestDTO.UpdateRefrigeratorDTO request){
+        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString()))
+                .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        foodService.updateRefrigeratorName(request,refrigeratorId);
+
+        return ResponseDTO.of(SuccessStatus.NAME_UPDATE_SUCCESS,null);
+    }
+
     /**
      * 음식 조회 API
      * 
@@ -246,13 +259,14 @@ public class FoodController {
      *
      * @return 성공 메세지 반환
      */
-    @DeleteMapping("/share/{memberId}")
+    @DeleteMapping("/share/{refrigeratorId}/{memberId}")
     @Operation(summary = "냉장고에 등록된 사용자 삭제 API", description = "사용자 id를 입력하면 냉장고를 공유한 사용자가 삭제됩니다.")
     public ResponseDTO<?> deleteShareRefrigerator(Authentication authentication,
+                                                  @PathVariable(name = "refrigeratorId") Long refrigeratorId,
                                                   @PathVariable(name = "memberId") Long memberId){
 
         memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
-        foodService.deleteShare(memberId);
+        foodService.deleteShare(memberId,refrigeratorId);
 
         return ResponseDTO.onSuccess("공유된 사용자 삭제 성공");
     }

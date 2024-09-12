@@ -22,10 +22,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -67,6 +69,22 @@ public class MemberController {
     }
 
     /**
+     * 로그아웃 API
+     * @param authentication
+     * @param authorizationHeader
+     * @return 로그아웃 결과 응답
+     */
+    @Operation(summary = "로그아웃 API", description = "로그아웃 API 입니다.")
+    @PostMapping("/logout")
+    public ResponseDTO<?> logout(Authentication authentication,
+                                                                 HttpServletRequest authorizationHeader) {
+        String token = authorizationHeader.getHeader("Authorization").substring(7);
+        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        memberService.logout(token);
+        return ResponseDTO.of(SuccessStatus._OK,null);
+    }
+
+    /**
      * 카카오 계정 정보 조회 API
      * @param code 카카오 인증 코드
      * @return 카카오 계정 정보
@@ -95,6 +113,17 @@ public class MemberController {
         return ResponseDTO.of(SuccessStatus._OK, MemberConverter.toJoinResultDTO(newMember));
     }
 
+    @DeleteMapping("/delete")
+    @Operation(summary = "회원 탈퇴 API", description = "회원 탈퇴 API입니다.")
+    public ResponseDTO<?> deleteMember(Authentication authentication){
+
+        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        memberService.deleteMember(member);
+        return ResponseDTO.onSuccess(SuccessStatus.MEMBER_DELETE_SUCCESS);
+    }
+
+
     /**
      * 닉네임 중복 확인 API
      * @param request 닉네임 중복 확인 요청 데이터
@@ -107,12 +136,28 @@ public class MemberController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER4008", description = "이미 존재하는 닉네임입니다.",
                     content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class)))
     })
-    public ResponseDTO checkNickname(@RequestBody @Valid MemberRequestDTO.NicknameDTO request) {
+    public ResponseDTO<?> checkNickname(@RequestBody @Valid MemberRequestDTO.NicknameDTO request) {
         if (memberService.isDuplicate(request)) {
             throw new MemberHandler(ErrorStatus.MEMBER_NICKNAME_DUPLICATE);
         }
         return ResponseDTO.onSuccess("닉네임 중복이 아닙니다.");
     }
+
+
+    @PutMapping("/nickname/update")
+    @Operation(summary = "닉네임 변경 API", description = "토큰과 닉네임 넣어서 보내시면 됩니다.")
+    public ResponseDTO<?> updateNickname(Authentication authentication,
+                                         @RequestBody @Valid MemberRequestDTO.NicknameDTO request){
+        if (memberService.isDuplicate(request)) {
+            throw new MemberHandler(ErrorStatus.MEMBER_NICKNAME_DUPLICATE);
+        }
+        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        memberService.updateNickname(member, request);
+
+        return ResponseDTO.onSuccess("닉네임 변경 성공입니다.");
+    }
+
 
     /**
      * 이메일 찾기 API

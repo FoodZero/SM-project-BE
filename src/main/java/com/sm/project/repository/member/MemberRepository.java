@@ -3,6 +3,9 @@ package com.sm.project.repository.member;
 import com.sm.project.domain.food.Refrigerator;
 import com.sm.project.domain.member.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
@@ -44,5 +47,13 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
      * @return 조회된 회원 객체
      */
     Member findByMemberRefrigeratorListContaining(Refrigerator refrigerator);
+
+
+    /**
+     * 닉네임 변경 메서드
+     */
+    @Modifying
+    @Query("UPDATE Member m SET m.nickname = :newName WHERE m.id = :id")
+    int updateMemberName(@Param("id") Long id, @Param("newName") String newName);
 }
 
