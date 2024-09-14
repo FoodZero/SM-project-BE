@@ -65,11 +65,29 @@ public class RecipeController {
         return ResponseDTO.onSuccess(recipeService.searchByIngredient(ingredient, lastIndex, 5));
     }
 
+    /**
+     * 레시피 상세화면을 조회하는 api 입니다.
+     * @param auth 현재 인증된 사용자 정보
+     * @param recipeId 조회할 레시피의 식별자
+     * @return 레시피 상세화면 dto
+     */
     @GetMapping("/{recipeId}")
     @Operation(summary = "레시피 상세 조회 API", description = "레시피 목록에서 레시피를 눌렀을 때 레시피 상세를 조회하는 api입니다. 상세 조회할 레시피 아이디를 입력하세요.")
     public ResponseDTO<?> getRecipeDetail(Authentication auth, @PathVariable(name = "recipeId")Long recipeId) {
         Long memberId = Long.valueOf(auth.getName().toString());
         RecipeResponseDTO.RecipeDetailDto recipeDetailDto = recipeService.findRecipe(memberId, recipeId);
         return ResponseDTO.of(SuccessStatus._OK, recipeDetailDto);
+    }
+
+    /**
+     * 북마크된 레시피를 조회하는 api 입니다.
+     * @param auth 현재 인증된 사용자 정보
+     * @return 북마크된 레시피 목록을 담은 dto
+     */
+    @GetMapping("/bookmark")
+    @Operation(summary = "저장된 레시피 목록 조회 API", description = "저장된 레시피 목록을 조회하는 api입니다. 페이지 인덱스는 0부터 시작합니다.")
+    public ResponseDTO<?> getBookmarkedRecipe(Authentication auth, @RequestParam(value = "page") int page) {
+        RecipeResponseDTO.BookmarkedRecipeListDto result = recipeService.findBookmarkedRecipeList(auth, page);
+        return ResponseDTO.of(SuccessStatus._OK, result);
     }
 }

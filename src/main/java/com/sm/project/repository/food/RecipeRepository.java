@@ -4,6 +4,8 @@ import com.sm.project.domain.food.Recipe;
 import com.sm.project.domain.member.Member;
 import com.sm.project.repository.chatgpt.RecipeNameDto;
 import feign.Param;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -22,4 +24,9 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 
     @Query("select r from Recipe r where r.member = :member and r.isDeleted = false")
     List<Recipe> findByMemberIdAndIsDeleted(@Param("member")Member member);
+
+    @Query("select r from Recipe r " +
+            "join Bookmark b on b.recipe = r " +
+            "where b.member = :member")
+    Slice<Recipe> findByMemberIdAndBookmark(@Param("member")Member member, Pageable pageable);
 }
