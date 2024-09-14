@@ -146,7 +146,7 @@ public class PostController {
 
     @PostMapping(value = "/create")
     @Operation(summary = "커뮤니티 글 등록 API", description = "커뮤니티에서 게시글을 등록하는 API입니다. topic: 나눔, 레시피 중 선택, address: 위치 조회 결과의 주소 입력")
-    public ResponseDTO<?> createPost(Authentication auth, PostRequestDTO.CreateDTO request) {
+    public ResponseDTO<?> createPost(Authentication auth, @RequestBody PostRequestDTO.CreateDTO request) {
         Member member = memberQueryService.findMemberById(Long.valueOf(auth.getName().toString()))
                 .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
         postService.createPost2(request, member);
