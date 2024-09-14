@@ -1,20 +1,22 @@
 package com.sm.project.service.recipe;
 
 import com.sm.project.apiPayload.code.status.ErrorStatus;
+import com.sm.project.apiPayload.exception.handler.MemberHandler;
 import com.sm.project.apiPayload.exception.handler.RecipeHandler;
+import com.sm.project.converter.food.RecipeConverter;
 import com.sm.project.domain.food.Recipe;
+import com.sm.project.domain.member.Member;
 import com.sm.project.elasticsearch.RecipeDocument;
 import com.sm.project.elasticsearch.repository.RecipeElasticRepository;
 import com.sm.project.elasticsearch.repository.RecipeElasticRepositoryImpl;
 import com.sm.project.repository.food.BookmarkRepository;
 import com.sm.project.repository.food.RecipeRepository;
 import com.sm.project.repository.food.RecommendRepository;
+import com.sm.project.repository.member.MemberRepository;
 import com.sm.project.web.dto.recipe.RecipeResponseDTO;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +34,7 @@ public class RecipeService {
     private final RecipeRepository recipeRepository;
     private final BookmarkRepository bookmarkRepository;
     private final RecommendRepository recommendRepository;
+    private final MemberRepository memberRepository;
 
     /**
      * 추천 수가 높은 순으로 페이징된 레시피를 조회하는 메서드입니다.
@@ -76,5 +79,20 @@ public class RecipeService {
                 .isRecommend(recommendRepository.existsByMemberIdAndRecipeId(memberId,recipeId))
                 .recommendCount(recipe.getRecommendCount())
                 .build();
+    }
+
+
+    /**
+     * 저장된 레시피 목록을 슬라이스로 조회하는 메소드입니다.
+     * @param auth 현재 인증된 사용자 정보
+     * @param page 페이지 인덱스
+     * @return 저장된 레시피 목록을 담은 dto
+     */
+    public RecipeResponseDTO.BookmarkedRecipeListDto findBookmarkedRecipeList(Authentication auth, int page) {
+        Member member = memberRepository.findById(Long.valueOf(auth.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        PageRequest pageRequest = PageRequest.of(page, 10);
+        Slice<Recipe> recipeSlice = recipeRepository.findByMemberIdAndBookmark(member, pageRequest);
+        return RecipeConverter.toBookmarkedRecipeListDto(recipeSlice);
     }
 }
