@@ -16,7 +16,6 @@ import com.sm.project.service.community.CommentService;
 import com.sm.project.service.community.PostQueryService;
 import com.sm.project.service.member.MemberQueryService;
 import com.sm.project.web.dto.community.CommentRequestDTO;
-import com.sm.project.web.dto.community.CommentResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -25,12 +24,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Slice;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.io.IOException;
 
 @RestController
 @Slf4j
@@ -54,7 +52,7 @@ public class CommentController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "POST4001", description = "해당 포스트를 찾을 수 없습니다.",
                     content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
-    public ResponseDTO<?> createComment(Authentication auth, @PathVariable(name = "postId") Long postId, @RequestBody CommentRequestDTO.CreateCommentDTO request) {
+    public ResponseDTO<?> createComment(Authentication auth, @PathVariable(name = "postId") Long postId, @RequestBody CommentRequestDTO.CreateCommentDTO request) throws IOException {
         Member member = memberQueryService.findMemberById(Long.valueOf(auth.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
         Post post = postQueryService.findPostById(postId);
         commentService.createComment(member, post, request);
@@ -72,7 +70,7 @@ public class CommentController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMENT4001", description = "해당 댓글을 찾을 수 없습니다.",
                     content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
-    public ResponseDTO<?> createChildComment(Authentication auth, @PathVariable(name = "commentId") Long commentId, @RequestBody CommentRequestDTO.CreateCommentDTO request) {
+    public ResponseDTO<?> createChildComment(Authentication auth, @PathVariable(name = "commentId") Long commentId, @RequestBody CommentRequestDTO.CreateCommentDTO request) throws IOException{
         Member member = memberQueryService.findMemberById(Long.valueOf(auth.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
         Comment parent = commentQueryService.findCommentById(commentId);
         commentService.createChildComment(member, parent, request);
