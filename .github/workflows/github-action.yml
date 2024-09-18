@@ -22,7 +22,7 @@ jobs:
           distribution: 'adopt'
 
       - name: Add firebase configuration from secrets
-        run: echo ${{ secrets.FIREBASE_CONFIG }} > ./src/main/resources/firebase/sm-project-firebase.json
+        run: echo "${{ secrets.FIREBASE_CONFIG }}" | base64 -d > ./src/main/resources/firebase/sm-project-firebase.json
 
       - name: Set Environment
         uses: microsoft/variable-substitution@v1
