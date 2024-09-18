@@ -21,6 +21,9 @@ jobs:
           java-version: 17 # 자바 설치
           distribution: 'adopt'
 
+      - name: Add firebase configuration from secrets
+        run: echo ${{ secrets.FIREBASE_CONFIG }} > ./src/main/resources/firebase/sm-project-firebase.json
+
       - name: Set Environment
         uses: microsoft/variable-substitution@v1
         with:
