@@ -1,5 +1,6 @@
 package com.sm.project.repository.member;
 
+import com.sm.project.domain.food.Refrigerator;
 import com.sm.project.domain.mapping.MemberRefrigerator;
 import com.sm.project.domain.member.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -35,4 +36,6 @@ public interface MemberRefrigeratorRepository extends JpaRepository<MemberRefrig
     @Transactional
     @Query("DELETE FROM MemberRefrigerator mr WHERE mr.member.id = :memberId and mr.refrigerator.id = :refrigeratorId")
     void deleteByMemberId(Long memberId, Long refrigeratorId);
+
+    List<MemberRefrigerator> findByRefrigerator(Refrigerator refrigerator);
 }
