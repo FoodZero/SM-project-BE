@@ -1,6 +1,6 @@
 package com.sm.project.repository.member;
 
-import com.sm.project.domain.food.Refrigerator;
+import com.sm.project.domain.mapping.MemberRefrigerator;
 import com.sm.project.domain.member.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -42,11 +42,10 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     /**
      * 특정 냉장고를 소유한 회원을 조회하는 메서드입니다.
-     *
-     * @param refrigerator 냉장고 객체
-     * @return 조회된 회원 객체
+     * @param memberRefrigerator
+     * @return
      */
-    Member findByMemberRefrigeratorListContaining(Refrigerator refrigerator);
+    Member findByMemberRefrigeratorListContaining(MemberRefrigerator memberRefrigerator);
 
 
     /**

@@ -9,6 +9,7 @@ import com.sm.project.coolsms.RedisUtil;
 import com.sm.project.coolsms.SmsUtil;
 import com.sm.project.domain.enums.StatusType;
 import com.sm.project.domain.food.Refrigerator;
+import com.sm.project.domain.mapping.MemberRefrigerator;
 import com.sm.project.domain.member.FcmRepository;
 import com.sm.project.domain.member.FcmToken;
 import com.sm.project.domain.member.Member;
@@ -208,16 +209,34 @@ public class MemberService {
         Map<String, Integer> map = new HashMap<>();
         Date currentTime = new Date();
 
-        refrigeratorList.stream().forEach(refrigerator -> {
-            foodRepository.findTop5ByRefrigeratorOrderByExpireDesc(refrigerator).stream().forEach(food -> {
-                map.put(food.getName(), (int) (currentTime.getTime() - food.getExpire().getTime()));
+        refrigeratorList.forEach(refrigerator -> {
+            // foodRepository에서 음식 목록 가져오기
+            foodRepository.findTop5ByRefrigeratorOrderByExpireDesc(refrigerator).forEach(food -> {
+                // 식품 이름과 남은 유통기한을 map에 저장
+                int daysRemaining = (int) ((food.getExpire().getTime() - currentTime.getTime()) / (1000 * 60 * 60 * 24));
+                map.put(food.getName(), daysRemaining);
             });
+
             try {
+                // 유통기한 정보 메시지 생성
                 String result = map.entrySet().stream()
                         .map(entry -> entry.getKey() + "의 유통기한: " + entry.getValue() + "일 남음")
                         .collect(Collectors.joining("\n"));
-                Member member = memberRepository.findByMemberRefrigeratorListContaining(refrigerator);
-                fcmService.sendMessage(member.getFcmTokenList().get(0).getToken(), "유통기한이 곧 지나는 식품들입니다.", result);
+
+                // Refrigerator와 연관된 MemberRefrigerator 목록 조회
+                List<MemberRefrigerator> memberRefrigeratorList = memberRefrigeratorRepository.findByRefrigerator(refrigerator);
+
+                for (MemberRefrigerator memberRefrigerator : memberRefrigeratorList) {
+                    // MemberRefrigerator를 이용해 Member 조회
+                    Member member = memberRepository.findByMemberRefrigeratorListContaining(memberRefrigerator);
+                    if (member != null && !member.getFcmTokenList().isEmpty()) {
+                        fcmService.sendMessage(
+                                member.getFcmTokenList().get(0).getToken(),
+                                "유통기한이 곧 지나는 식품들입니다.",
+                                result
+                        );
+                    }
+                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
