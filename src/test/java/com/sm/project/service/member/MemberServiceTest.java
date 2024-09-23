@@ -265,8 +265,8 @@ class MemberServiceTest {
     @DisplayName("회원가입 테스트")
     void testJoinMemberSuccess() {
         //given
-        given(redisUtil.hasKey(joinRequest.getPhone())).willReturn(true);
-        given(redisUtil.getSmsCertification(joinRequest.getPhone())).willReturn(joinRequest.getCertificationCode());
+        //given(redisUtil.hasKey(joinRequest.getPhone())).willReturn(true);
+        //given(redisUtil.getSmsCertification(joinRequest.getPhone())).willReturn(joinRequest.getCertificationCode());
 
 
         Member newMember = MemberConverter.toMember(joinRequest);
@@ -294,8 +294,8 @@ class MemberServiceTest {
                 .id(1L)
                 .email(joinRequest.getEmail())
                 .build();
-        given(redisUtil.hasKey(joinRequest.getPhone())).willReturn(true);
-        given(redisUtil.getSmsCertification(joinRequest.getPhone())).willReturn(joinRequest.getCertificationCode());
+        //given(redisUtil.hasKey(joinRequest.getPhone())).willReturn(true);
+        //given(redisUtil.getSmsCertification(joinRequest.getPhone())).willReturn(joinRequest.getCertificationCode());
 
 
         when(memberRepository.findByEmail(joinRequest.getEmail())).thenReturn(Optional.of(existingMember));
