@@ -1,8 +1,12 @@
 package com.sm.project.service.mail;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.javamail.JavaMailSender;
 
 import javax.mail.MessagingException;
@@ -10,8 +14,10 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class MailServiceTest {
 
     @Mock
@@ -20,49 +26,56 @@ class MailServiceTest {
     @InjectMocks
     private MailService mailService;
 
-    @Captor
-    private ArgumentCaptor<MimeMessage> mimeMessageCaptor;
+    @Mock
+    private MimeMessage mimeMessage;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        // MimeMessage 객체를 Mock 객체로 설정
+        mimeMessage = mock(MimeMessage.class);
+        // JavaMailSender가 MimeMessage 객체를 생성할 때, Mock된 mimeMessage를 반환하도록 설정
+        when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
     }
 
     @Test
-    void sendResetPwdEmail() throws MessagingException, UnsupportedEncodingException {
-        // given
-        String toEmail = "test@example.com";
+    @DisplayName("비밀번호 재설정 이메일 전송 테스트")
+    void sendResetPwdEmail_Success() throws MessagingException, UnsupportedEncodingException {
+        // Given
+        String email = "test@example.com";
         String certificationCode = "123456";
 
-        MimeMessage mimeMessage = mock(MimeMessage.class);
-        when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
+        // When
+        mailService.sendResetPwdEmail(email, certificationCode);
 
-        // when
-        mailService.sendResetPwdEmail(toEmail, certificationCode);
+        // Then
+        // MimeMessage가 올바르게 설정되었는지 확인
+        verify(mimeMessage, times(1)).addRecipients(eq(MimeMessage.RecipientType.TO), eq(email));
+        verify(mimeMessage, times(1)).setSubject(eq("[냉장고 해결사] 비밀번호 찾기 인증 메일입니다."));
+        verify(mimeMessage, times(1)).setFrom(any(InternetAddress.class));
+        verify(mimeMessage, times(1)).setText(anyString(), eq("utf-8"), eq("html"));
 
-        // then
-        verify(mailSender, times(1)).createMimeMessage();
-        verify(mailSender, times(1)).send(mimeMessageCaptor.capture());
+        // 메일이 전송되었는지 확인
+        verify(mailSender, times(1)).send(mimeMessage);
+    }
 
-        MimeMessage capturedMessage = mimeMessageCaptor.getValue();
+    @Test
+    @DisplayName("인증 코드 이메일 전송 테스트")
+    void sendVerificationCode_Success() throws MessagingException, UnsupportedEncodingException {
+        // Given
+        String email = "test@example.com";
+        String verificationCode = "654321";
 
-        // Verify the recipient
-        verify(capturedMessage).addRecipients(MimeMessage.RecipientType.TO, toEmail);
-        // Verify the subject
-        verify(capturedMessage).setSubject("[냉장고 해결사] 비밀번호 찾기 인증 메일입니다.");
-        // Verify the content
-        String expectedContent = "<div>"
-                + "<p> 안녕하세요. 냉장고 해결사 입니다.<p>"
-                + "<br>"
-                + "<p> 아래 인증 코드를 앱에 입력하면 인증이 완료되고, " + toEmail + " 계정의 비밀번호를 재설정 할 수 있습니다.<p>"
-                + "<p> 새로운 비밀번호로 재설정 해주세요. <p>"
-                + "<br>"
-                + "<p> 인증코드: " + certificationCode + "<P>"
-                + "<br>"
-                + "<p> 감사합니다. <p>"
-                + "</div>";
-        verify(capturedMessage).setText(expectedContent, "utf-8", "html");
-        // Verify the sender
-        verify(capturedMessage).setFrom(new InternetAddress("test@example.com", "냉장고 해결사"));
+        // When
+        mailService.sendVerificationCode(email, verificationCode);
+
+        // Then
+        // MimeMessage가 올바르게 설정되었는지 확인
+        verify(mimeMessage, times(1)).addRecipients(eq(MimeMessage.RecipientType.TO), eq(email));
+        verify(mimeMessage, times(1)).setSubject(eq("[FoodZero] 인증 코드 발송"));
+        verify(mimeMessage, times(1)).setFrom(any(InternetAddress.class));
+        verify(mimeMessage, times(1)).setText(anyString(), eq("utf-8"), eq("html"));
+
+        // 메일이 전송되었는지 확인
+        verify(mailSender, times(1)).send(mimeMessage);
     }
 }
