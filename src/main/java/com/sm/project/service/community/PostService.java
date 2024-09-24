@@ -50,7 +50,7 @@ public class PostService {
      * @param imgList 이미지 파일 목록
      */
     public void createPost(PostRequestDTO.CreateDTO request, Member member, List<MultipartFile> imgList) {
-        Location location = locationRepository.findByAddress(request.getAddress())
+        Location location = locationRepository.findByAddress(request.getAddress(), member)
             .orElseThrow(() -> new PostHandler(ErrorStatus.LOCATION_NOT_FOUND));
         Post post = PostConverter.toPost(member, request, location);
         postRepository.save(post);
@@ -68,7 +68,7 @@ public class PostService {
     }
 
     public void createPost2(PostRequestDTO.CreateDTO request, Member member) {
-        Location location = locationRepository.findByAddress(request.getAddress())
+        Location location = locationRepository.findByAddress(request.getAddress(), member)
                 .orElseThrow(() -> new PostHandler(ErrorStatus.LOCATION_NOT_FOUND));
         Post post = PostConverter.toPost(member, request, location);
         postRepository.save(post);
@@ -108,7 +108,7 @@ public class PostService {
     public void createLocation(Member member, PostRequestDTO.LocationDTO request) {
         String coords = request.getLongitude() + "," + request.getLatitude();
         NaverGeoResponse naverGeoResponse = naverGeoFeignClient.generateLocation("coordsToaddr", coords, "epsg:4326", "json", "legalcode");
-        Optional<Location> location = locationRepository.findByAddress(naverGeoResponse.getResults().get(0).getRegion().getArea3().getName());
+        Optional<Location> location = locationRepository.findByAddress(naverGeoResponse.getResults().get(0).getRegion().getArea3().getName(), member);
 
         if (!location.isPresent()) {
             Location newLocation = Location.builder()
