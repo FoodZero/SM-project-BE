@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +47,11 @@ public class ChatGPTService {
     private final MemberRepository memberRepository;
     private final BookmarkRepository bookmarkRepository;
 
+    @PostConstruct
+    public void init() {
+        openAiService = new OpenAiService(gptKey, Duration.ofSeconds(60));  //타임아웃 시간 설정(60초)
+    }
+
     /**
      * ChatGPT의 응답을 생성하는 메서드입니다.
      *
@@ -53,8 +59,6 @@ public class ChatGPTService {
      * @return ChatGPT의 응답 객체
      */
     public String prompt(String userRequest, Long memberId) {
-        openAiService = new OpenAiService(gptKey, Duration.ofSeconds(60));  //타임아웃 시간 설정(60초)
-
         // 사용자 메시지를 생성하고 목록에 추가
         final List<ChatMessage> messages = new ArrayList<>();
 
