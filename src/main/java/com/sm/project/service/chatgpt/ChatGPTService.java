@@ -75,13 +75,13 @@ public class ChatGPTService {
 
         String existingRecipeList = "";
         List<RecipeNameDto> existingRecipeNameDtoList = recipeRepository.findRecipeName(memberId);
+
         for (RecipeNameDto recipeNameDto : existingRecipeNameDtoList) {
             existingRecipeList += recipeNameDto.getName() + ", ";  //지연로딩
         }
         if (!existingRecipeList.isEmpty()) {
             existingRecipeList = existingRecipeList.substring(0, existingRecipeList.length() - 2);
         }
-
         String systemRequest2 = "이미 있는 레시피는 또 말하지말고, 절대 레시피를 변형해서 대답하지마. 레시피 이름에 숫자 붙여서 변형하지마! 다른 재료를 선택해서 완전 다른 요리를 소개해. 다음은 이미 있는 레시피야: " + existingRecipeList;
         //System.out.println(systemRequest2);
 
@@ -238,5 +238,9 @@ public class ChatGPTService {
                 .filter(recipe -> recipeRepository.existsByNameAndIdNot(recipe.getName(), recipe.getId()) && !bookmarkRepository.existsByRecipe(recipe))  //북마크가 안되어있고, 동일한 이름의 레시피는 삭제 -> 중복되는 레시피가 많아지는 걸 방지하기 위함
                 .forEach(recipe -> recipeRepository.delete(recipe));  //실제 삭제
 
+    }
+
+    public void setOpenAiService(OpenAiService openAiService) {
+        this.openAiService = openAiService;
     }
 }
