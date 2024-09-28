@@ -354,6 +354,13 @@ public class MemberService {
     }
 
 
+    /**
+     * 프로필 조회 메서드
+     */
+    public MemberResponseDTO.ProfileDTO getEmailAndNickname(Member member){
+
+        return MemberConverter.toProfile(member);
+    }
 
 
 
