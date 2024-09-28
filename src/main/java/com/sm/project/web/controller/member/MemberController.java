@@ -294,5 +294,20 @@ public class MemberController {
         return ResponseDTO.onSuccess("패밀리 등록 성공");
     }
 
+    /**
+     * 이메일과 닉네임 프로필 조회 API 입니다.
+     *
+     * @param authentication
+     * @return
+     */
+
+    @GetMapping("/profile")
+    @Operation(summary = "이메일, 닉네임 조회 API", description = "이메일과 닉네임을 조회하는 API입니다")
+    public ResponseDTO<MemberResponseDTO.ProfileDTO> getEmailAndNickname(Authentication authentication){
+        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        return ResponseDTO.onSuccess(memberService.getEmailAndNickname(member));
+    }
+
 
 }
