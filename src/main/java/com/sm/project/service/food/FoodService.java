@@ -417,4 +417,8 @@ public class FoodService {
         memberRefrigeratorRepository.deleteByMemberId(memberId, refrigeratorId);
     }
 
+    public void deleteAllShare(Long refrigeratorId, Long memberId){
+        memberRefrigeratorRepository.deleteByRefrigeratorId(refrigeratorId, memberId);
+    }
+
 }

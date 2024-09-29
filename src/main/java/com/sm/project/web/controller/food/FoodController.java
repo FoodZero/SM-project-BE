@@ -271,4 +271,13 @@ public class FoodController {
         return ResponseDTO.onSuccess("공유된 사용자 삭제 성공");
     }
 
+    @DeleteMapping("share/{refrigeratorId}")
+    @Operation(summary = "냉장고에 등록된 모든 사용자 삭제 API", description = "냉장고에 공유된 사용자 삭제됩니다.")
+    public ResponseDTO<?> deleteAllShareRefrigerator(Authentication authentication,
+                                                     @PathVariable(name = "refrigeratorId") Long refrigeratorId){
+        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        foodService.deleteAllShare(refrigeratorId, member.getId());
+
+        return ResponseDTO.onSuccess("공유된 모든 사용자 삭제 성공");
+    }
 }
