@@ -52,6 +52,13 @@ class FoodServiceTest {
     @Mock
     private MemberRefrigeratorRepository memberRefrigeratorRepository;
 
+    @Mock
+    private MemberQueryService memberQueryService;
+
+    private final ReentrantLock lock = new ReentrantLock();
+    @Mock
+    private MemberRefrigeratorRepository memberRefrigeratorRepository;
+
     FoodService foodService;
     Member testMember;
     Refrigerator testRefrigerator;
