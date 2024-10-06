@@ -27,6 +27,6 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
      * @param address 주소
      * @return 조회된 위치 객체
      */
-    @Query("SELECT l FROM Location l WHERE l.address = :address")
-    Optional<Location> findByAddress(String address);
+    @Query("SELECT l FROM Location l WHERE l.address = :address and l.member = :member")
+    Optional<Location> findByAddress(String address, Member member);
 }

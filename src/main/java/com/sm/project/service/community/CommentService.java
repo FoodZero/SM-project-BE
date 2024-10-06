@@ -6,12 +6,15 @@ import com.sm.project.converter.community.CommentConverter;
 import com.sm.project.domain.community.Comment;
 import com.sm.project.domain.community.Post;
 import com.sm.project.domain.member.Member;
+import com.sm.project.firebase.FcmService;
 import com.sm.project.repository.community.CommentRepository;
 import com.sm.project.web.dto.community.CommentRequestDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.io.IOException;
 
 @Service
 @Slf4j
@@ -21,14 +24,14 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final PostQueryService postQueryService;
+    private final FcmService fcmService;
 
     public void createComment(Member member, Post post, CommentRequestDTO.CreateCommentDTO request) {
 
         commentRepository.save(CommentConverter.toParentComment(member, post, request));
     }
 
-    public void createChildComment(Member member, Comment parent, CommentRequestDTO.CreateCommentDTO request) {
-
+    public void createChildComment(Member member, Comment parent, CommentRequestDTO.CreateCommentDTO request) throws IOException{
         Post post = postQueryService.findPostById(parent.getPost().getId());
 
         commentRepository.save(CommentConverter.toChildComment(member, post, parent, request));
