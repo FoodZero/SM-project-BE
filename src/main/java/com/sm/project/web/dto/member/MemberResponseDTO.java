@@ -56,6 +56,15 @@ public class MemberResponseDTO {
         String nickname;
     }
 
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ProfileDTO{
+        String email;
+        String nickname;
+    }
+
 
 
 

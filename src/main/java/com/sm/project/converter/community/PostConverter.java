@@ -76,7 +76,7 @@ public class PostConverter {
                     .title(post.getTitle())
                     .status(post.getStatus())
                     .content(post.getContent())
-                    .nickname(member.getNickname())
+                    .nickname(post.getMember().getNickname())
                     .createdAt(post.getCreatedAt())
                     .itemImgUrlList(imgs)
                     .build();
@@ -101,7 +101,7 @@ public class PostConverter {
                 .title(post.getTitle())
                 .status(post.getStatus())
                 .content(post.getContent())
-                .nickname(member.getNickname())
+                .nickname(post.getMember().getNickname())
                 .createdAt(post.getCreatedAt())
                 .itemImgUrlList(imgs)
                 .build();

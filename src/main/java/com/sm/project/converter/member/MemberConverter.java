@@ -57,4 +57,11 @@ public class MemberConverter {
                 .map(member -> new MemberResponseDTO.ShareDTO(member.getId(), member.getNickname()))
                 .collect(Collectors.toList());
     }
+
+    public static MemberResponseDTO.ProfileDTO toProfile(Member member){
+        return MemberResponseDTO.ProfileDTO.builder()
+                .email(member.getEmail())
+                .nickname(member.getNickname())
+                .build();
+    }
 }

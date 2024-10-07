@@ -37,5 +37,16 @@ public interface MemberRefrigeratorRepository extends JpaRepository<MemberRefrig
     @Query("DELETE FROM MemberRefrigerator mr WHERE mr.member.id = :memberId and mr.refrigerator.id = :refrigeratorId")
     void deleteByMemberId(Long memberId, Long refrigeratorId);
 
+    /**
+     * 냉장고에 등록된 모든 사용자를 삭제한느 메서드입니다.
+     * @param refrigeratorId
+     */
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM MemberRefrigerator mr WHERE mr.refrigerator.id = :refrigeratorId and mr.member.id != :memberId")
+    void deleteByRefrigeratorId(Long refrigeratorId, Long memberId);
+
+
     List<MemberRefrigerator> findByRefrigerator(Refrigerator refrigerator);
+
 }
