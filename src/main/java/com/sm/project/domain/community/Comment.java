@@ -3,9 +3,7 @@ package com.sm.project.domain.community;
 import com.sm.project.domain.Common.BaseDateTimeEntity;
 import com.sm.project.domain.member.Member;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.util.ArrayList;

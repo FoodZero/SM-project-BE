@@ -48,4 +48,5 @@ public interface MemberRefrigeratorRepository extends JpaRepository<MemberRefrig
 
 
     List<MemberRefrigerator> findByRefrigerator(Refrigerator refrigerator);
+
 }
