@@ -9,13 +9,15 @@ import com.sm.project.repository.community.CommentRepository;
 import com.sm.project.web.dto.community.CommentRequestDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 
 import static org.mockito.Mockito.*;
+@ExtendWith(MockitoExtension.class)
 class CommentServiceTest {
 
     @Mock
@@ -40,8 +42,6 @@ class CommentServiceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this); // 모킹 객체를 초기화하는 부분만 남김
-
         // builder 패턴을 사용하여 실제 객체 생성
         member = Member.builder()
                 .id(1L)

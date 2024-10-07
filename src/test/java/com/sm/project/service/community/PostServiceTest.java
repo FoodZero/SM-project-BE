@@ -15,9 +15,10 @@ import com.sm.project.service.UtilService;
 import com.sm.project.web.dto.community.PostRequestDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -26,6 +27,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class PostServiceTest {
 
     @Mock
@@ -57,9 +59,13 @@ class PostServiceTest {
     private Post mockPost;
     private MultipartFile mockMultipartFile;
 
+    private NaverGeoResponse naverGeoResponse;
+    private NaverGeoResponse.Result result;
+    private NaverGeoResponse.Region region;
+    private NaverGeoResponse.Area area;
+
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
         mockMember = mock(Member.class);
         mockCreateRequest = mock(PostRequestDTO.CreateDTO.class);
         mockUpdateRequest = mock(PostRequestDTO.UpdateDTO.class);
@@ -67,22 +73,23 @@ class PostServiceTest {
         mockLocation = mock(Location.class);
         mockPost = mock(Post.class);
         mockMultipartFile = mock(MultipartFile.class);
+
+        naverGeoResponse = mock(NaverGeoResponse.class);
+        result = mock(NaverGeoResponse.Result.class);
+        region = mock(NaverGeoResponse.Region.class);
+        area = mock(NaverGeoResponse.Area.class);
+
     }
 
     @Test
     void createPost() {
         // Given
-        NaverGeoResponse naverGeoResponse = mock(NaverGeoResponse.class);
-        NaverGeoResponse.Result result = mock(NaverGeoResponse.Result.class);
-        NaverGeoResponse.Region region = mock(NaverGeoResponse.Region.class);
-        NaverGeoResponse.Area area3 = mock(NaverGeoResponse.Area.class);
-
         when(naverGeoFeignClient.generateLocation(anyString(), anyString(), anyString(), anyString(), anyString()))
                 .thenReturn(naverGeoResponse);
         when(naverGeoResponse.getResults()).thenReturn(List.of(result));
         when(result.getRegion()).thenReturn(region);
-        when(region.getArea3()).thenReturn(area3);
-        when(area3.getName()).thenReturn("Seoul");
+        when(region.getArea3()).thenReturn(area);
+        when(area.getName()).thenReturn("Seoul");
         when(locationRepository.findByAddress(anyString(), eq(mockMember)))
                 .thenReturn(Optional.of(mockLocation));
 
@@ -96,7 +103,7 @@ class PostServiceTest {
     @Test
     void createPostThrowException() {
         // Given
-        when(locationRepository.findByAddress(anyString(), eq(mockMember)))
+        when(locationRepository.findByAddress(null, mockMember))
                 .thenReturn(Optional.empty());
 
         // When, Then
@@ -135,17 +142,13 @@ class PostServiceTest {
     @Test
     void createLocation() {
         // Given
-        NaverGeoResponse naverGeoResponse = mock(NaverGeoResponse.class);
-        NaverGeoResponse.Result result = mock(NaverGeoResponse.Result.class);
-        NaverGeoResponse.Region region = mock(NaverGeoResponse.Region.class);
-
         when(result.getRegion()).thenReturn(region);
         when(region.getArea3()).thenReturn(mock(NaverGeoResponse.Area.class));
         when(naverGeoResponse.getResults()).thenReturn(List.of(result));
 
         when(naverGeoFeignClient.generateLocation(anyString(), anyString(), anyString(), anyString(), anyString()))
                 .thenReturn(naverGeoResponse);
-        when(locationRepository.findByAddress(anyString(), eq(mockMember)))
+        when(locationRepository.findByAddress(null, mockMember))
                 .thenReturn(Optional.empty());
 
         // When
@@ -158,18 +161,13 @@ class PostServiceTest {
     @Test
     void createLocationAlreadyExists() {
         // Given
-        NaverGeoResponse naverGeoResponse = mock(NaverGeoResponse.class);
-        NaverGeoResponse.Result result = mock(NaverGeoResponse.Result.class);
-        NaverGeoResponse.Region region = mock(NaverGeoResponse.Region.class);
-        NaverGeoResponse.Area area3 = mock(NaverGeoResponse.Area.class);
-
         when(naverGeoFeignClient.generateLocation(anyString(), anyString(), anyString(), anyString(), anyString()))
                 .thenReturn(naverGeoResponse);
 
         when(naverGeoResponse.getResults()).thenReturn(List.of(result));
         when(result.getRegion()).thenReturn(region);
-        when(region.getArea3()).thenReturn(area3);
-        when(area3.getName()).thenReturn("Seoul");
+        when(region.getArea3()).thenReturn(area);
+        when(area.getName()).thenReturn("Seoul");
 
         //Location이 이미 존재하는 경우
         when(locationRepository.findByAddress(anyString(), eq(mockMember)))

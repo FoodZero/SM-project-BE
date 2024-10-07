@@ -1,5 +1,6 @@
 package com.sm.project.service.mail;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,13 +25,19 @@ public class MailServiceTest {
     @InjectMocks
     private MailService mailService;
 
+    private String email;
+    private String certificationCode;
+
+    @BeforeEach
+    void setUp() {
+        email = "test@example.com";
+        certificationCode = "123456";
+    }
+
 
     @Test
     public void testSendResetPwdEmail() throws MessagingException, UnsupportedEncodingException {
         //given
-        String email = "test@example.com";
-        String certificationCode = "123456";
-
         MimeMessage mimeMessage = Mockito.mock(MimeMessage.class);
         Mockito.when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
 
@@ -45,14 +52,11 @@ public class MailServiceTest {
     @Test
     public void testSendVerificationCode() throws MessagingException, UnsupportedEncodingException {
         //given
-        String email = "test@example.com";
-        String verificationCode = "654321";
-
         MimeMessage mimeMessage = Mockito.mock(MimeMessage.class);
         Mockito.when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
 
         //when
-        mailService.sendVerificationCode(email, verificationCode);
+        mailService.sendVerificationCode(email, certificationCode);
 
         //then
         verify(mailSender, times(1)).send(mimeMessage);

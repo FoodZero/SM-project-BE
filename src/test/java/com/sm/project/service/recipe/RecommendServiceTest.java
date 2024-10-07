@@ -41,6 +41,8 @@ class RecommendServiceTest {
     private Member testMember;
     private Recipe testRecipe;
 
+    private Recommend recommend;
+
     @BeforeEach
     void setUp() {
         testMember = Member.builder()
@@ -53,6 +55,12 @@ class RecommendServiceTest {
                 .id(1L)
                 .name("Test Recipe")
                 .recommendCount(0L)
+                .build();
+
+        recommend = Recommend.builder()
+                .id(1L)
+                .member(testMember)
+                .recipe(testRecipe)
                 .build();
     }
 
@@ -109,12 +117,6 @@ class RecommendServiceTest {
     @DisplayName("레시피 추천 해제 성공 테스트")
     void deleteRecommend_Success() {
         // Given
-        Recommend recommend = Recommend.builder()
-                .id(1L)
-                .member(testMember)
-                .recipe(testRecipe)
-                .build();
-
         when(recommendRepository.findByMemberIdAndRecipeId(testMember.getId(), testRecipe.getId())).thenReturn(recommend);
         when(recipeRepository.findById(testRecipe.getId())).thenReturn(Optional.of(testRecipe));
 
@@ -140,12 +142,6 @@ class RecommendServiceTest {
     @DisplayName("레시피 추천 해제 실패 테스트 - 레시피 찾을 수 없음")
     void deleteRecommend_Failure_RecipeNotFound() {
         // Given
-        Recommend recommend = Recommend.builder()
-                .id(1L)
-                .member(testMember)
-                .recipe(testRecipe)
-                .build();
-
         when(recommendRepository.findByMemberIdAndRecipeId(testMember.getId(), testRecipe.getId())).thenReturn(recommend);
         when(recipeRepository.findById(testRecipe.getId())).thenReturn(Optional.empty());
 
