@@ -1,12 +1,11 @@
 package com.sm.project.web.controller.community;
 
 import com.sm.project.apiPayload.ResponseDTO;
-import com.sm.project.apiPayload.code.status.ErrorStatus;
 import com.sm.project.apiPayload.code.status.SuccessStatus;
-import com.sm.project.apiPayload.exception.handler.MemberHandler;
 import com.sm.project.converter.community.PostConverter;
 import com.sm.project.domain.enums.PostTopicType;
 import com.sm.project.domain.member.Member;
+import com.sm.project.service.UtilService;
 import com.sm.project.service.community.PostService;
 import com.sm.project.service.member.MemberQueryService;
 import com.sm.project.web.dto.community.PostRequestDTO;
@@ -38,6 +37,8 @@ public class PostController {
 
     private final MemberQueryService memberQueryService;
     private final PostService postService;
+    private final UtilService utilService;
+
 
     /**
      * 위치 저장 API
@@ -51,8 +52,7 @@ public class PostController {
     public ResponseDTO<?> postLocation(Authentication auth,
                                        @RequestBody PostRequestDTO.LocationDTO request) {
 
-        Member member = memberQueryService.findMemberById(Long.valueOf(auth.getName().toString()))
-                                          .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member member = utilService.getAuthenticatedMember(auth);
         postService.createLocation(member, request);
 
         return ResponseDTO.of(SuccessStatus.LOCATION_POST_SUCCESS, null);
@@ -68,8 +68,7 @@ public class PostController {
     @Operation(summary = "위치 조회 API", description = "사용자의 저장된 위치 조회 API입니다.")
     public ResponseDTO<PostResponseDTO.LocationListDTO> getLocation(Authentication auth) {
 
-        Member member = memberQueryService.findMemberById(Long.valueOf(auth.getName().toString()))
-                                          .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member member = utilService.getAuthenticatedMember(auth);
 
         return ResponseDTO.onSuccess(PostConverter.toLocationList(postService.getLocationList(member)));
     }
@@ -95,8 +94,8 @@ public class PostController {
                                                                 @RequestParam(value = "postType", required = false) PostTopicType postTopicType,
                                                                 @RequestParam(value = "locationId", required = false) Long locationId) {
 
-        Member member = memberQueryService.findMemberById(Long.valueOf(auth.getName().toString()))
-                                          .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member member = utilService.getAuthenticatedMember(auth);
+
         if (lastIndex == null) {
             lastIndex = 0L;
         }
@@ -116,8 +115,7 @@ public class PostController {
     public ResponseDTO<?> getPost(Authentication auth,
                                   @PathVariable(name = "postId") Long postId) {
 
-        Member member = memberQueryService.findMemberById(Long.valueOf(auth.getName().toString()))
-                                          .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member member = utilService.getAuthenticatedMember(auth);
 
         return ResponseDTO.onSuccess(PostConverter.toPostDTO(postService.getPost(postId), member));
     }
@@ -133,8 +131,8 @@ public class PostController {
     @PostMapping(value = "/create/image")
     @Operation(summary = "커뮤니티 글 등록 API", description = "커뮤니티에서 게시글을 등록하는 API입니다. topic: 나눔, 레시피 중 선택, address: 위치 조회 결과의 주소 입력")
     public ResponseDTO<?> createPost(Authentication auth, @RequestPart("request") PostRequestDTO.CreateDTO request, @RequestPart(value= "images", required = false) List<MultipartFile> imgList) {
-        Member member = memberQueryService.findMemberById(Long.valueOf(auth.getName().toString()))
-                                          .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        Member member = utilService.getAuthenticatedMember(auth);
 
         postService.createPost(request, member, imgList);
 
@@ -144,9 +142,10 @@ public class PostController {
     @PostMapping(value = "/create")
     @Operation(summary = "커뮤니티 글 등록 API", description = "커뮤니티에서 게시글을 등록하는 API입니다. topic: 나눔, 레시피 중 선택, address: 위치 조회 결과의 주소 입력")
     public ResponseDTO<?> createPost(Authentication auth, @RequestBody PostRequestDTO.CreateDTO request) {
-        Member member = memberQueryService.findMemberById(Long.valueOf(auth.getName().toString()))
-                .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        Member member = utilService.getAuthenticatedMember(auth);
         postService.createPost2(request, member);
+
         return ResponseDTO.of(SuccessStatus.POST_CREATE_SUCCESS, null);
     }
 
@@ -160,8 +159,9 @@ public class PostController {
      */
     @PatchMapping("/update/{postId}")
     @Operation(summary = "커뮤니티 글 수정 API", description = "커뮤니티에서 게시글을 수정하는 API입니다. status: 진행 중이면 true, 마감이면 false")
-    public ResponseDTO<?> updatePost(@PathVariable(name = "postId") Long postId, @RequestBody PostRequestDTO.UpdateDTO request) {
+    public ResponseDTO<?> updatePost(Authentication auth, @PathVariable(name = "postId") Long postId, @RequestBody PostRequestDTO.UpdateDTO request) {
 
+        utilService.getAuthenticatedMember(auth);
         postService.updatePost(postId, request);
 
         return ResponseDTO.of(SuccessStatus.POST_UPDATE_SUCCESS, null);
@@ -176,8 +176,9 @@ public class PostController {
      */
     @DeleteMapping("/delete/{postId}")
     @Operation(summary = "커뮤니티 글 삭제 API", description = "커뮤니티에서 게시글을 삭제하는 API입니다.")
-    public ResponseDTO<?> deletePost(@PathVariable(name = "postId") Long postId) {
+    public ResponseDTO<?> deletePost(Authentication auth, @PathVariable(name = "postId") Long postId) {
 
+        utilService.getAuthenticatedMember(auth);
         postService.deletePost(postId);
 
         return ResponseDTO.of(SuccessStatus.POST_DELETE_SUCCESS, null);

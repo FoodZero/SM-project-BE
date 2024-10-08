@@ -7,8 +7,8 @@ import com.sm.project.apiPayload.code.status.SuccessStatus;
 import com.sm.project.apiPayload.exception.handler.MemberHandler;
 import com.sm.project.converter.member.MemberConverter;
 import com.sm.project.domain.member.Member;
+import com.sm.project.service.UtilService;
 import com.sm.project.service.family.FamilyService;
-import com.sm.project.service.mail.MailService;
 import com.sm.project.service.member.MemberQueryService;
 import com.sm.project.service.member.MemberService;
 import com.sm.project.web.dto.family.FamilyRequestDTO;
@@ -46,7 +46,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final MemberQueryService memberQueryService;
-    private final MailService mailService;
+    private final UtilService utilService;
 
     /**
      * 테스트 엔드포인트
@@ -78,11 +78,11 @@ public class MemberController {
      */
     @Operation(summary = "로그아웃 API", description = "로그아웃 API 입니다.")
     @PostMapping("/logout")
-    public ResponseDTO<?> logout(Authentication authentication,
-                                                                 HttpServletRequest authorizationHeader) {
-        String token = authorizationHeader.getHeader("Authorization").substring(7);
-        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
-        memberService.logout(token);
+    public ResponseDTO<?> logout(Authentication authentication,HttpServletRequest authorizationHeader) {
+
+        utilService.getAuthenticatedMember(authentication);
+        memberService.logout(authorizationHeader);
+
         return ResponseDTO.of(SuccessStatus._OK,null);
     }
 
@@ -122,7 +122,7 @@ public class MemberController {
     @Operation(summary = "회원 탈퇴 API", description = "회원 탈퇴 API입니다.")
     public ResponseDTO<?> deleteMember(Authentication authentication){
 
-        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member member = utilService.getAuthenticatedMember(authentication);
 
         memberService.deleteMember(member);
         return ResponseDTO.onSuccess(SuccessStatus.MEMBER_DELETE_SUCCESS);
@@ -157,7 +157,7 @@ public class MemberController {
         if (memberService.isDuplicate(request)) {
             throw new MemberHandler(ErrorStatus.MEMBER_NICKNAME_DUPLICATE);
         }
-        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member member = utilService.getAuthenticatedMember(authentication);
 
         memberService.updateNickname(member, request);
 
@@ -300,7 +300,7 @@ public class MemberController {
     @PostMapping("/send-code")
     @Operation(summary = "인증 코드 발송 API", description = "이메일로 인증 코드를 발송하는 API입니다.")
     public ResponseDTO<?> sendVerificationCode(@RequestBody @Valid FamilyRequestDTO.EmailRequestDTO request) {
-        System.out.println("컨트롤러");
+
         familyService.sendVerificationCode(request.getEmail());
         return ResponseDTO.onSuccess("인증 코드 발송 성공");
     }
@@ -314,6 +314,7 @@ public class MemberController {
     @PostMapping("/verify")
     @Operation(summary = "인증 코드 검증 및 패밀리 등록 API", description = "이메일과 인증 코드를 검증하고 패밀리에 등록하는 API입니다.")
     public ResponseDTO<?> verifyAndRegisterFamily(@RequestBody @Valid FamilyRequestDTO.VerificationDTO request) {
+
         familyService.verifyAndRegisterFamily(request);
         return ResponseDTO.onSuccess("패밀리 등록 성공");
     }
@@ -328,7 +329,8 @@ public class MemberController {
     @GetMapping("/profile")
     @Operation(summary = "이메일, 닉네임 조회 API", description = "이메일과 닉네임을 조회하는 API입니다")
     public ResponseDTO<MemberResponseDTO.ProfileDTO> getEmailAndNickname(Authentication authentication){
-        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        Member member = utilService.getAuthenticatedMember(authentication);
 
         return ResponseDTO.onSuccess(memberService.getEmailAndNickname(member));
     }

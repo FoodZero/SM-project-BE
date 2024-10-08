@@ -38,6 +38,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
@@ -105,11 +106,11 @@ public class MemberService {
     /**
      * 로그 아웃 메서드
      * 로그인 상태 정보 삭제
-     * @param accessToken
      */
     @Transactional
-    public void logout(String accessToken) {
-        redisService.resolveLogout(accessToken);
+    public void logout(HttpServletRequest authorizationHeader) {
+
+        redisService.resolveLogout(authorizationHeader.getHeader("Authorization").substring(7));
     }
 
     /**

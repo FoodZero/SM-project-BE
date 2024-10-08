@@ -1,13 +1,12 @@
 package com.sm.project.web.controller.food;
 
 import com.sm.project.apiPayload.ResponseDTO;
-import com.sm.project.apiPayload.code.status.ErrorStatus;
 import com.sm.project.apiPayload.code.status.SuccessStatus;
-import com.sm.project.apiPayload.exception.handler.MemberHandler;
 import com.sm.project.converter.food.FoodConverter;
 import com.sm.project.converter.member.MemberConverter;
 import com.sm.project.domain.member.Member;
 import com.sm.project.feignClient.dto.NaverOCRResponse;
+import com.sm.project.service.UtilService;
 import com.sm.project.service.food.FoodService;
 import com.sm.project.service.member.MemberQueryService;
 import com.sm.project.web.dto.food.FoodRequestDTO;
@@ -39,6 +38,7 @@ public class FoodController {
 
     private final FoodService foodService;
     private final MemberQueryService memberQueryService;
+    private final UtilService utilService;
 
 
     /**
@@ -55,8 +55,7 @@ public class FoodController {
                                      @PathVariable(name = "refrigeratorId") Long refrigeratorId,
                                      Authentication authentication) {
 
-        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString()))
-                                          .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member member = utilService.getAuthenticatedMember(authentication);
         foodService.uploadFood(request, member, refrigeratorId);
 
         return ResponseDTO.of(SuccessStatus.FOOD_UPLOAD_SUCCESS, null);
@@ -73,8 +72,8 @@ public class FoodController {
     @Operation(summary = "냉장고 생성 API", description = "name에 냉장고 이름 적고 냉장고 추가할 때 사용하면 됩니다.")
     public ResponseDTO<?> postRefrigerator(Authentication authentication,
                                            @RequestBody FoodRequestDTO.UploadRefrigeratorDTO request) {
-        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString()))
-                                          .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        Member member = utilService.getAuthenticatedMember(authentication);
         foodService.uploadRefrigerator(request, member);
 
         return ResponseDTO.of(SuccessStatus.REFRIGERATOR_UPLOAD_SUCCESS, null);
@@ -89,9 +88,10 @@ public class FoodController {
     @Operation(summary = "냉장고 삭제 api", description = "냉장고 번호 request param으로 넘겨주면 됩니다.")
     public ResponseDTO<?> deleteRefrigerator(Authentication authentication,
                                              @PathVariable(name = "refrigeratorId") Long refrigeratorId){
-        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString()))
-                .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        Member member = utilService.getAuthenticatedMember(authentication);
         foodService.deleteRefrigerator(refrigeratorId, member);
+
         return ResponseDTO.of(SuccessStatus.REFRIGERATOR_DELETE_SUCCESS, null);
     }
 
@@ -105,8 +105,7 @@ public class FoodController {
     @Operation(summary = "냉장고 조회 API", description = "냉장고 조회 api")
     public ResponseDTO<FoodResponseDTO.RefrigeratorListDTO> getRefrigerator(Authentication authentication) {
 
-        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString()))
-                                          .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member member = utilService.getAuthenticatedMember(authentication);
 
         return ResponseDTO.onSuccess(FoodConverter.toGetRefrigeratorListResultDTO(foodService.getRefrigeratorList(member)));
     }
@@ -116,8 +115,8 @@ public class FoodController {
     public ResponseDTO<?> updateRefrigeratorName(Authentication authentication,
                                                  @PathVariable(name = "refrigeratorId") Long refrigeratorId,
                                                  @RequestBody FoodRequestDTO.UpdateRefrigeratorDTO request){
-        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString()))
-                .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        utilService.getAuthenticatedMember(authentication);
 
         foodService.updateRefrigeratorName(request,refrigeratorId);
 
@@ -136,8 +135,7 @@ public class FoodController {
     public ResponseDTO<FoodResponseDTO.FoodListDTO> getFood(@PathVariable(name = "refrigeratorId") Long refrigeratorId,
                                                             Authentication authentication) {
 
-        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString()))
-                                          .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member member = utilService.getAuthenticatedMember(authentication);
 
         return ResponseDTO.of(SuccessStatus.FOOD_GET_SUCCESS, FoodConverter.toGetFoodListResultDTO(foodService.getFoodList(member, refrigeratorId)));
     }
@@ -158,8 +156,7 @@ public class FoodController {
                                      @PathVariable(name = "foodId") Long foodId,
                                      Authentication authentication) {
 
-        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString()))
-                                          .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        utilService.getAuthenticatedMember(authentication);
 
         foodService.updateFood(request, foodId, refrigeratorId);
 
@@ -180,8 +177,7 @@ public class FoodController {
                                      @PathVariable(name = "refrigeratorId") Long refrigeratorId,
                                      Authentication authentication) {
 
-        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString()))
-                                          .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        utilService.getAuthenticatedMember(authentication);
         foodService.deleteFood(foodId, refrigeratorId);
 
         return ResponseDTO.of(SuccessStatus.FOOD_DELETE_SUCCESS, null);
@@ -199,8 +195,7 @@ public class FoodController {
     @Operation(summary = "영수증 사진 등록 API", description = "영수증 사진을 담아서 호출하면 사진이 저장됩니다.")
     public ResponseDTO<?> uploadReceipt(@RequestParam("receipt") MultipartFile receipt, Authentication authentication) throws Exception {
 
-        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString()))
-                                          .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member member = utilService.getAuthenticatedMember(authentication);
 
         // S3에 영수증 사진 업로드
         String receiptUrl = foodService.uploadReceipt(member, receipt);
@@ -228,8 +223,9 @@ public class FoodController {
     public ResponseDTO<?> shareRefrigerator(Authentication authentication,
                                             @RequestBody @Valid MemberRequestDTO.ShareDTO request){
 
-        memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        utilService.getAuthenticatedMember(authentication);
         foodService.shareRefrigerator(request);
+
         return ResponseDTO.onSuccess("냉장고 사용자 추가 성공입니다.");
     }
 
@@ -244,7 +240,7 @@ public class FoodController {
     public ResponseDTO<?> getShareRefrigerator(Authentication authentication,
                                                @PathVariable(name = "refrigeratorId") Long refrigeratorId){
 
-        memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        utilService.getAuthenticatedMember(authentication);
         List<Member> memberList = foodService.getShare(refrigeratorId);
 
         return ResponseDTO.of(SuccessStatus.SHARE_GET_SUCCESS, MemberConverter.toShare(memberList));
@@ -263,7 +259,7 @@ public class FoodController {
                                                   @PathVariable(name = "refrigeratorId") Long refrigeratorId,
                                                   @PathVariable(name = "memberId") Long memberId){
 
-        memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        utilService.getAuthenticatedMember(authentication);
         foodService.deleteShare(memberId,refrigeratorId);
 
         return ResponseDTO.onSuccess("공유된 사용자 삭제 성공");
@@ -273,7 +269,8 @@ public class FoodController {
     @Operation(summary = "냉장고에 등록된 모든 사용자 삭제 API", description = "냉장고에 공유된 사용자 삭제됩니다.")
     public ResponseDTO<?> deleteAllShareRefrigerator(Authentication authentication,
                                                      @PathVariable(name = "refrigeratorId") Long refrigeratorId){
-        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        Member member = utilService.getAuthenticatedMember(authentication);
         foodService.deleteAllShare(refrigeratorId, member.getId());
 
         return ResponseDTO.onSuccess("공유된 모든 사용자 삭제 성공");
