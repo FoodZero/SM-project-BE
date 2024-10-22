@@ -13,13 +13,13 @@ spring:
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
+    show_sql: true
     hibernate:
       ddl-auto: update
     properties:
       dialect: org.hibernate.dialect.MySQL8InnoDBDialect
       hibernate:
-      # show_sql: true
-      format_sql: true
+        format_sql: true
   servlet:
     multipart:
       max-file-size: 500MB
@@ -55,8 +55,18 @@ spring:
 
 logging:
   level:
-    org.hibernate.SQL: info
-    org.hibernate.type: trace
+    org:
+      hibernate:
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
+    com.sm.project.config.HttpInterceptor: OFF
+
+
+
+
 
 
 servlet:
