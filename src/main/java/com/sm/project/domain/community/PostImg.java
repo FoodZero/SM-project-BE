@@ -19,7 +19,7 @@ public class PostImg {
     private String name;
     private String url;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "post_id")
     private Post post;
 

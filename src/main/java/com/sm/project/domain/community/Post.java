@@ -6,6 +6,7 @@ import com.sm.project.domain.enums.PostTopicType;
 import com.sm.project.domain.member.Location;
 import com.sm.project.domain.member.Member;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -35,7 +36,8 @@ public class Post extends BaseDateTimeEntity {
     @Enumerated(EnumType.STRING)
     private PostStatusType status;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    @BatchSize(size = 5)
+    @OneToMany(mappedBy = "post", fetch = FetchType.EAGER)
     private List<PostImg> postImgs = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)

@@ -18,6 +18,8 @@ import com.sm.project.service.UtilService;
 import com.sm.project.web.dto.community.PostRequestDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -56,7 +58,7 @@ public class PostService {
 
         Post post = PostConverter.toPost(member, request, location);
 
-        postRepository.save(PostConverter.toPost(member, request, location));
+        postRepository.save(post);
 
         // 이미지 업로드
         for (MultipartFile multipartFile : imgList) {
@@ -147,7 +149,9 @@ public class PostService {
         Location location = (locationId == null) ? null : locationRepository.findById(locationId)
             .orElseThrow(() -> new PostHandler(ErrorStatus.LOCATION_NOT_FOUND));
 
-        return postRepository.findPostList(lastIndex, postTopicType, location);
+        Pageable pageable = PageRequest.of(0, 5);
+
+        return postRepository.findPostList(lastIndex, postTopicType, location, pageable);
     }
 
     /**
