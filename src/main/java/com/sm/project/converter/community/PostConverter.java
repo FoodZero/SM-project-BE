@@ -1,12 +1,15 @@
 package com.sm.project.converter.community;
 
 import com.sm.project.domain.community.Post;
+import com.sm.project.domain.community.PostImg;
 import com.sm.project.domain.enums.PostStatusType;
 import com.sm.project.domain.enums.PostTopicType;
 import com.sm.project.domain.member.Location;
 import com.sm.project.domain.member.Member;
+import com.sm.project.feignClient.dto.NaverGeoResponse;
 import com.sm.project.web.dto.community.PostRequestDTO;
 import com.sm.project.web.dto.community.PostResponseDTO;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,6 +106,24 @@ public class PostConverter {
                 .itemImgUrlList(imgs)
                 .build();
     }
+
+    public static PostImg toPostImg(String imgUrl, MultipartFile multipartFile){
+        return PostImg.builder()
+                .url(imgUrl)
+                .name(multipartFile.getOriginalFilename())
+                .build();
+    }
+
+    public static Location toLocation(PostRequestDTO.LocationDTO request, NaverGeoResponse naverGeoResponse, Member member){
+        return Location.builder()
+                .latitude(request.getLatitude())
+                .longitude(request.getLongitude())
+                .address(naverGeoResponse.getResults().get(0).getRegion().getArea3().getName())
+                .member(member)
+                .build();
+
+    }
+
 
 }
 

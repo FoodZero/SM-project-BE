@@ -19,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -198,7 +199,7 @@ class PostServiceTest {
     void getPostList() {
         // Given
         when(locationRepository.findById(anyLong())).thenReturn(Optional.of(mockLocation));
-        when(postRepository.findPostList(anyLong(), any(PostTopicType.class), any(Location.class)))
+        when(postRepository.findPostList(anyLong(), any(PostTopicType.class), any(Location.class), any(Pageable.class)))
                 .thenReturn(List.of(mockPost));
 
         // When
@@ -207,7 +208,7 @@ class PostServiceTest {
         // Then
         assertNotNull(posts);
         assertEquals(1, posts.size());
-        verify(postRepository, times(1)).findPostList(anyLong(), any(PostTopicType.class), any(Location.class));
+        verify(postRepository, times(1)).findPostList(anyLong(), any(PostTopicType.class), any(Location.class), any(Pageable.class));
     }
 
     @Test

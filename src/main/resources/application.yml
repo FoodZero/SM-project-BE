@@ -18,8 +18,7 @@ spring:
     properties:
       dialect: org.hibernate.dialect.MySQL8InnoDBDialect
       hibernate:
-      # show_sql: true
-      format_sql: true
+        format_sql: true
   servlet:
     multipart:
       max-file-size: 500MB
@@ -55,8 +54,18 @@ spring:
 
 logging:
   level:
-    org.hibernate.SQL: info
-    org.hibernate.type: trace
+    org:
+      hibernate:
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
+    com.sm.project.config.HttpInterceptor: OFF
+
+
+
+
 
 
 servlet:
@@ -97,8 +106,8 @@ feign:
   client:
     config:
       default:
-        connectTimeout: 900000
-        readTimeout: 900000
+        connectTimeout: 10000
+        readTimeout: 10000
 
 
 

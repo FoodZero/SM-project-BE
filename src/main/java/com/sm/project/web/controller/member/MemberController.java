@@ -7,8 +7,8 @@ import com.sm.project.apiPayload.code.status.SuccessStatus;
 import com.sm.project.apiPayload.exception.handler.MemberHandler;
 import com.sm.project.converter.member.MemberConverter;
 import com.sm.project.domain.member.Member;
+import com.sm.project.service.UtilService;
 import com.sm.project.service.family.FamilyService;
-import com.sm.project.service.mail.MailService;
 import com.sm.project.service.member.MemberQueryService;
 import com.sm.project.service.member.MemberService;
 import com.sm.project.web.dto.family.FamilyRequestDTO;
@@ -46,7 +46,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final MemberQueryService memberQueryService;
-    private final MailService mailService;
+    private final UtilService utilService;
 
     /**
      * 테스트 엔드포인트
@@ -65,7 +65,9 @@ public class MemberController {
     @PostMapping("/login")
     @Operation(summary = "로그인 API", description = "request 파라미터 : 이메일, 비밀번호(String)")
     public ResponseDTO<MemberResponseDTO.LoginDTO> login(@RequestBody MemberRequestDTO.LoginDTO request) {
+
         return ResponseDTO.onSuccess(memberService.login(request));
+
     }
 
     /**
@@ -76,11 +78,11 @@ public class MemberController {
      */
     @Operation(summary = "로그아웃 API", description = "로그아웃 API 입니다.")
     @PostMapping("/logout")
-    public ResponseDTO<?> logout(Authentication authentication,
-                                                                 HttpServletRequest authorizationHeader) {
-        String token = authorizationHeader.getHeader("Authorization").substring(7);
-        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
-        memberService.logout(token);
+    public ResponseDTO<?> logout(Authentication authentication,HttpServletRequest authorizationHeader) {
+
+        utilService.getAuthenticatedMember(authentication);
+        memberService.logout(authorizationHeader);
+
         return ResponseDTO.of(SuccessStatus._OK,null);
     }
 
@@ -91,7 +93,9 @@ public class MemberController {
      */
     @GetMapping("/callback/kakao")
     public ResponseDTO<?> getKakaoAccount(@RequestParam("code") String code) {
+
         return memberService.getKakaoInfo(code);
+
     }
 
     /**
@@ -109,15 +113,16 @@ public class MemberController {
                     content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
     public ResponseDTO<MemberResponseDTO.JoinResultDTO> join(@RequestBody @Valid MemberRequestDTO.JoinDTO request) {
-        Member newMember = memberService.joinMember(request);
-        return ResponseDTO.of(SuccessStatus._OK, MemberConverter.toJoinResultDTO(newMember));
+
+        return ResponseDTO.of(SuccessStatus._OK, MemberConverter.toJoinResultDTO(memberService.joinMember(request)));
+
     }
 
     @DeleteMapping("/delete")
     @Operation(summary = "회원 탈퇴 API", description = "회원 탈퇴 API입니다.")
     public ResponseDTO<?> deleteMember(Authentication authentication){
 
-        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member member = utilService.getAuthenticatedMember(authentication);
 
         memberService.deleteMember(member);
         return ResponseDTO.onSuccess(SuccessStatus.MEMBER_DELETE_SUCCESS);
@@ -140,6 +145,7 @@ public class MemberController {
         if (memberService.isDuplicate(request)) {
             throw new MemberHandler(ErrorStatus.MEMBER_NICKNAME_DUPLICATE);
         }
+
         return ResponseDTO.onSuccess("닉네임 중복이 아닙니다.");
     }
 
@@ -151,7 +157,7 @@ public class MemberController {
         if (memberService.isDuplicate(request)) {
             throw new MemberHandler(ErrorStatus.MEMBER_NICKNAME_DUPLICATE);
         }
-        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member member = utilService.getAuthenticatedMember(authentication);
 
         memberService.updateNickname(member, request);
 
@@ -174,9 +180,13 @@ public class MemberController {
                     content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
     public ResponseDTO<MemberResponseDTO.EmailResultDTO> findEmail(@RequestBody @Valid MemberRequestDTO.FindEmailDTO request) {
+
         memberService.verifySms(request.getPhone(), request.getCertificationCode());
+
         Member member = memberQueryService.findEmail(request.getPhone());
+
         return ResponseDTO.of(SuccessStatus._OK, MemberConverter.toEmailResultDTO(member.getEmail()));
+
     }
 
     /**
@@ -186,9 +196,12 @@ public class MemberController {
      */
     @PostMapping("/send")
     @Operation(summary = "본인인증 문자 전송 API", description = "본인인증을 위한 인증번호 문자를 보내는 API입니다.")
-    public ResponseDTO sendSMS(@RequestBody MemberRequestDTO.SmsDTO request) {
+    public ResponseDTO<?> sendSMS(@RequestBody MemberRequestDTO.SmsDTO request) {
+
         memberService.sendSms(request);
+
         return ResponseDTO.onSuccess("인증문자 전송 성공");
+
     }
 
     /**
@@ -204,8 +217,11 @@ public class MemberController {
                     content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
     public ResponseDTO<?> sendEmail(@RequestBody @Valid MemberRequestDTO.SendEmailDTO request) throws MessagingException, UnsupportedEncodingException {
+
         memberService.sendEmail(request);
+
         return ResponseDTO.of(SuccessStatus._OK, "메일 전송 성공");
+
     }
 
     /**
@@ -221,8 +237,11 @@ public class MemberController {
                     content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class)))
     })
     public ResponseDTO<MemberResponseDTO.EmailResultDTO> findPassword(@RequestBody @Valid MemberRequestDTO.FindPassword request) {
+
         memberService.verifyEmail(request.getEmail(), request.getCertificationCode()); //인증 코드 검사
+
         return ResponseDTO.of(SuccessStatus._OK, MemberConverter.toEmailResultDTO(request.getEmail()));
+
     }
 
 
@@ -242,8 +261,11 @@ public class MemberController {
                     content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
     public ResponseDTO<?> resetPassword(@RequestBody @Valid MemberRequestDTO.PasswordDTO request) {
+
         memberService.resetPassword(request);
+
         return ResponseDTO.of(SuccessStatus._OK, "비밀번호 재설정 성공");
+
     }
 
     /**
@@ -257,9 +279,11 @@ public class MemberController {
     @PostMapping("/fcm/send")
     @Operation(summary = "앱 푸쉬 전송 api", description = "")
     public ResponseDTO<?> pushMessage() throws IOException {
-        //Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
         memberService.sendPushAlarm();
+
         return ResponseDTO.of(SuccessStatus.MEMBER_PUSH_SUCCESS, null);
+
     }
 
     /**
@@ -276,7 +300,7 @@ public class MemberController {
     @PostMapping("/send-code")
     @Operation(summary = "인증 코드 발송 API", description = "이메일로 인증 코드를 발송하는 API입니다.")
     public ResponseDTO<?> sendVerificationCode(@RequestBody @Valid FamilyRequestDTO.EmailRequestDTO request) {
-        System.out.println("컨트롤러");
+
         familyService.sendVerificationCode(request.getEmail());
         return ResponseDTO.onSuccess("인증 코드 발송 성공");
     }
@@ -290,6 +314,7 @@ public class MemberController {
     @PostMapping("/verify")
     @Operation(summary = "인증 코드 검증 및 패밀리 등록 API", description = "이메일과 인증 코드를 검증하고 패밀리에 등록하는 API입니다.")
     public ResponseDTO<?> verifyAndRegisterFamily(@RequestBody @Valid FamilyRequestDTO.VerificationDTO request) {
+
         familyService.verifyAndRegisterFamily(request);
         return ResponseDTO.onSuccess("패밀리 등록 성공");
     }
@@ -304,7 +329,8 @@ public class MemberController {
     @GetMapping("/profile")
     @Operation(summary = "이메일, 닉네임 조회 API", description = "이메일과 닉네임을 조회하는 API입니다")
     public ResponseDTO<MemberResponseDTO.ProfileDTO> getEmailAndNickname(Authentication authentication){
-        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        Member member = utilService.getAuthenticatedMember(authentication);
 
         return ResponseDTO.onSuccess(memberService.getEmailAndNickname(member));
     }

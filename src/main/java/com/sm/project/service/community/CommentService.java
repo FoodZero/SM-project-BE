@@ -26,17 +26,15 @@ public class CommentService {
     private final PostQueryService postQueryService;
     private final FcmService fcmService;
 
-    public void createComment(Member member, Post post, CommentRequestDTO.CreateCommentDTO request) throws IOException {
-        Comment comment = CommentConverter.toParentComment(member, post, request);
-        //fcmService.sendMessage(post.getMember().getFcmTokenList().get(0).getToken(), member.getNickname() +"님의 댓글", request.getContent());
-        commentRepository.save(comment);
+    public void createComment(Member member, Post post, CommentRequestDTO.CreateCommentDTO request) {
+
+        commentRepository.save(CommentConverter.toParentComment(member, post, request));
     }
 
     public void createChildComment(Member member, Comment parent, CommentRequestDTO.CreateCommentDTO request) throws IOException{
         Post post = postQueryService.findPostById(parent.getPost().getId());
-        Comment childComment = CommentConverter.toChildComment(member, post, parent, request);
-        //fcmService.sendMessage(parent.getMember().getFcmTokenList().get(0).getToken(), member.getNickname() +"님의 댓글", request.getContent());
-        commentRepository.save(childComment);
+
+        commentRepository.save(CommentConverter.toChildComment(member, post, parent, request));
     }
 
     public void updateComment(Member member, Comment comment, CommentRequestDTO.UpdateCommentDTO request) {

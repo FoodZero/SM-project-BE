@@ -6,11 +6,10 @@ import com.sm.project.apiPayload.code.ErrorReasonDTO;
 import com.sm.project.apiPayload.code.status.ErrorStatus;
 import com.sm.project.apiPayload.code.status.SuccessStatus;
 import com.sm.project.apiPayload.exception.handler.CommentHandler;
-import com.sm.project.apiPayload.exception.handler.MemberHandler;
 import com.sm.project.converter.community.CommentConverter;
 import com.sm.project.domain.community.Comment;
-import com.sm.project.domain.community.Post;
 import com.sm.project.domain.member.Member;
+import com.sm.project.service.UtilService;
 import com.sm.project.service.community.CommentQueryService;
 import com.sm.project.service.community.CommentService;
 import com.sm.project.service.community.PostQueryService;
@@ -42,6 +41,7 @@ public class CommentController {
     private final PostQueryService postQueryService;
     private final CommentService commentService;
     private final CommentQueryService commentQueryService;
+    private final UtilService utilService;
 
     @PostMapping("/{postId}")
     @Operation(summary = "커뮤니티 댓글 등록 API", description = "커뮤니티에서 댓글을 등록하는 api입니다. postId는 댓글을 등록할 포스트의 식별자입니다.")
@@ -52,10 +52,12 @@ public class CommentController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "POST4001", description = "해당 포스트를 찾을 수 없습니다.",
                     content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
-    public ResponseDTO<?> createComment(Authentication auth, @PathVariable(name = "postId") Long postId, @RequestBody CommentRequestDTO.CreateCommentDTO request) throws IOException {
-        Member member = memberQueryService.findMemberById(Long.valueOf(auth.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
-        Post post = postQueryService.findPostById(postId);
-        commentService.createComment(member, post, request);
+    public ResponseDTO<?> createComment(Authentication auth, @PathVariable(name = "postId") Long postId, @RequestBody CommentRequestDTO.CreateCommentDTO request) {
+
+        Member member = utilService.getAuthenticatedMember(auth);
+
+        commentService.createComment(member, postQueryService.findPostById(postId), request);
+
         return ResponseDTO.of(SuccessStatus.COMMENT_CREATE_SUCCESS, null);
     }
 
@@ -70,10 +72,12 @@ public class CommentController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMENT4001", description = "해당 댓글을 찾을 수 없습니다.",
                     content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
-    public ResponseDTO<?> createChildComment(Authentication auth, @PathVariable(name = "commentId") Long commentId, @RequestBody CommentRequestDTO.CreateCommentDTO request) throws IOException{
-        Member member = memberQueryService.findMemberById(Long.valueOf(auth.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
-        Comment parent = commentQueryService.findCommentById(commentId);
-        commentService.createChildComment(member, parent, request);
+    public ResponseDTO<?> createChildComment(Authentication auth, @PathVariable(name = "commentId") Long commentId, @RequestBody CommentRequestDTO.CreateCommentDTO request) throws IOException {
+
+        Member member = utilService.getAuthenticatedMember(auth);
+
+        commentService.createChildComment(member, commentQueryService.findCommentById(commentId), request);
+
         return ResponseDTO.of(SuccessStatus.COMMENT_CREATE_SUCCESS, null);
     }
 
@@ -89,9 +93,11 @@ public class CommentController {
                     content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
     public ResponseDTO<?> updateComment(Authentication auth, @PathVariable(name = "commentId") Long commentId, @RequestBody CommentRequestDTO.UpdateCommentDTO request) {
-        Member member = memberQueryService.findMemberById(Long.valueOf(auth.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
-        Comment comment = commentQueryService.findCommentById(commentId);
-        commentService.updateComment(member, comment, request);
+
+        Member member = utilService.getAuthenticatedMember(auth);
+
+        commentService.updateComment(member, commentQueryService.findCommentById(commentId), request);
+
         return ResponseDTO.of(SuccessStatus.COMMENT_UPDATE_SUCCESS, null);
     }
 
@@ -109,11 +115,17 @@ public class CommentController {
                     content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class)))
     })
     public ResponseDTO<?> deleteComment(Authentication auth, @PathVariable(name = "commentId") Long commentId) {
-        Member member = memberQueryService.findMemberById(Long.valueOf(auth.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        Member member = utilService.getAuthenticatedMember(auth);
+
         Comment comment = commentQueryService.findCommentById(commentId);
+
         if (comment.getChildComments().isEmpty()) {
+
             commentService.deleteComment(member, comment);
+
         } else throw new CommentHandler(ErrorStatus.COMMENT_CHILD_EXIST);
+
         return ResponseDTO.of(SuccessStatus.COMMENT_DELETE_SUCCESS, null);
     }
 
@@ -131,20 +143,29 @@ public class CommentController {
                     content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class)))
     })
     public ResponseDTO<?> deleteParentComment(Authentication auth, @PathVariable(name = "commentId") Long commentId) {
-        Member member = memberQueryService.findMemberById(Long.valueOf(auth.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        Member member = utilService.getAuthenticatedMember(auth);
+
         Comment comment = commentQueryService.findCommentById(commentId);
+
         if (comment.getChildComments().isEmpty()) {
             throw new CommentHandler(ErrorStatus.COMMENT_NOT_PARENT);
         }
+
         commentService.deleteParentComment(member, comment);
+
         return ResponseDTO.of(SuccessStatus.COMMENT_DELETE_SUCCESS, null);
     }
 
     @GetMapping("/{postId}")
     @Operation(summary = "커뮤니티 댓글 조회 API", description = "조회할 댓글 목록의 post 식별자를 입력하고, page의 인덱스를 입력하세요. page의 인덱스는 0부터 시작합니다. 응답에서 last는 마지막 페이지인지의 여부입니다.")
     @ApiResponses()
-    public ResponseDTO<?> readCommentList(@PathVariable(name = "postId") Long postId, @RequestParam(name = "page") int page) {
+    public ResponseDTO<?> readCommentList(Authentication auth, @PathVariable(name = "postId") Long postId, @RequestParam(name = "page") int page) {
+
+        utilService.getAuthenticatedMember(auth);
         Slice<Comment> commentList = commentQueryService.findCommentListByPostId(postId, page);
+
         return ResponseDTO.of(SuccessStatus.COMMENT_READ_SUCCESS, CommentConverter.toCommentListDTO(commentList));
+
     }
 }

@@ -2,6 +2,8 @@ package com.sm.project.web.controller.recipe;
 
 import com.sm.project.apiPayload.ResponseDTO;
 import com.sm.project.apiPayload.code.status.SuccessStatus;
+import com.sm.project.domain.member.Member;
+import com.sm.project.service.UtilService;
 import com.sm.project.service.recipe.RecommendService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class RecommendController {
 
     private final RecommendService recommendService;
+    private final UtilService utilService;
 
     /**
      * 레시피에 추천을 누르는 api입니다.
@@ -30,8 +33,10 @@ public class RecommendController {
     @PostMapping("/recipe/{recipeId}")
     @Operation(summary = "레시피 추천 API", description = "레시피 상세 화면에서 추천을 눌렀을 때 저장하는 API입니다.(gpt레시피 화면도 사용) 추천할 레시피의 아이디를 입력하세요.")
     public ResponseDTO<?> recommendRecipe(Authentication auth, @PathVariable(name = "recipeId") Long recipeId) {
-        Long memberId = Long.valueOf(auth.getName().toString());
-        recommendService.saveRecommend(memberId, recipeId);
+
+        Member member = utilService.getAuthenticatedMember(auth);
+        recommendService.saveRecommend(member.getId(), recipeId);
+
         return ResponseDTO.of(SuccessStatus._OK, "레시피 추천 저장 성공");
     }
 
@@ -44,8 +49,10 @@ public class RecommendController {
     @DeleteMapping("/recipe/{recipeId}")
     @Operation(summary = "레시피 추천 해제 API", description = "레시피 상세 화면에서 추천을 다시 눌렀을 때 해제하는 API입니다.(gpt레시피 화면도 사용) 추천 해제할 레시피의 아이디를 입력하세요. ")
     public ResponseDTO<?> unrecommendRecipe(Authentication auth, @PathVariable(name = "recipeId") Long recipeId) {
-        Long memberId = Long.valueOf(auth.getName().toString());
-        recommendService.deleteRecommend(memberId, recipeId);
+
+        Member member = utilService.getAuthenticatedMember(auth);
+        recommendService.deleteRecommend(member.getId(), recipeId);
+
         return ResponseDTO.of(SuccessStatus._OK, "레시피 추천 해제 성공");
     }
 }

@@ -1,17 +1,18 @@
 package com.sm.project.web.controller.recipe;
 
-import com.sm.project.apiPayload.code.status.SuccessStatus;
-import com.sm.project.service.recipe.BookmarkService;
-import com.sm.project.web.dto.recipe.RecipeResponseDTO;
-import org.springframework.data.domain.Page;
 import com.sm.project.apiPayload.ResponseDTO;
+import com.sm.project.apiPayload.code.status.SuccessStatus;
+import com.sm.project.domain.member.Member;
 import com.sm.project.elasticsearch.RecipeDocument;
+import com.sm.project.service.UtilService;
 import com.sm.project.service.recipe.RecipeService;
+import com.sm.project.web.dto.recipe.RecipeResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 public class RecipeController {
 
     private final RecipeService recipeService;
+    private final UtilService utilService;
 
     /**
      * 레시피를 추천순으로 5개씩 조회하는 API입니다.
@@ -42,6 +44,8 @@ public class RecipeController {
     @Parameter(name = "lastIndex", description = "lastIndex 첫 조회는 0이고 스크롤 내릴때마다 마지막 index 입력하시면 됩니다. 맨 처음인 경우 Null")
     public ResponseDTO<Page<RecipeDocument>> getRecipe(Authentication auth,
                                                        @RequestParam(value = "lastIndex", required = false, defaultValue = "0") int lastIndex){
+
+        utilService.getAuthenticatedMember(auth);
 
         return ResponseDTO.onSuccess(recipeService.findTopRecipes(lastIndex,5));
     }
@@ -62,6 +66,8 @@ public class RecipeController {
                                                                      @RequestParam(value= "ingredient") String ingredient,
                                                        @RequestParam(value = "lastIndex", required = false, defaultValue = "0") int lastIndex){
 
+        utilService.getAuthenticatedMember(auth);
+
         return ResponseDTO.onSuccess(recipeService.searchByIngredient(ingredient, lastIndex, 5));
     }
 
@@ -74,8 +80,10 @@ public class RecipeController {
     @GetMapping("/{recipeId}")
     @Operation(summary = "레시피 상세 조회 API", description = "레시피 목록에서 레시피를 눌렀을 때 레시피 상세를 조회하는 api입니다. 상세 조회할 레시피 아이디를 입력하세요.")
     public ResponseDTO<?> getRecipeDetail(Authentication auth, @PathVariable(name = "recipeId")Long recipeId) {
-        Long memberId = Long.valueOf(auth.getName().toString());
-        RecipeResponseDTO.RecipeDetailDto recipeDetailDto = recipeService.findRecipe(memberId, recipeId);
+
+        Member member = utilService.getAuthenticatedMember(auth);
+        RecipeResponseDTO.RecipeDetailDto recipeDetailDto = recipeService.findRecipe(member.getId(), recipeId);
+
         return ResponseDTO.of(SuccessStatus._OK, recipeDetailDto);
     }
 
@@ -87,7 +95,10 @@ public class RecipeController {
     @GetMapping("/bookmark")
     @Operation(summary = "저장된 레시피 목록 조회 API", description = "저장된 레시피 목록을 조회하는 api입니다. 페이지 인덱스는 0부터 시작합니다.")
     public ResponseDTO<?> getBookmarkedRecipe(Authentication auth, @RequestParam(value = "page") int page) {
+
+        utilService.getAuthenticatedMember(auth);
         RecipeResponseDTO.BookmarkedRecipeListDto result = recipeService.findBookmarkedRecipeList(auth, page);
+
         return ResponseDTO.of(SuccessStatus._OK, result);
     }
 }
