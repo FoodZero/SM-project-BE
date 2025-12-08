@@ -1,5 +1,6 @@
 package com.sm.project.service.member;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sm.project.apiPayload.ResponseDTO;
 import com.sm.project.apiPayload.code.status.ErrorStatus;
 import com.sm.project.apiPayload.exception.handler.MemberHandler;
@@ -19,6 +20,8 @@ import com.sm.project.feignClient.dto.KakaoTokenResponse;
 import com.sm.project.feignClient.kakao.KakaoTokenFeignClient;
 import com.sm.project.feignClient.service.KakaoOauthService;
 import com.sm.project.firebase.FcmService;
+import com.sm.project.redis.pub_sub.MessageDto;
+import com.sm.project.redis.pub_sub.RedisPublisherUtil;
 import com.sm.project.redis.service.RedisService;
 import com.sm.project.repository.food.FoodRepository;
 import com.sm.project.repository.food.RefrigeratorRepository;
@@ -31,6 +34,7 @@ import com.sm.project.web.dto.member.MemberResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -71,12 +75,16 @@ public class MemberService {
     private final FcmRepository fcmRepository;
     private final RefrigeratorRepository refrigeratorRepository;
     private final MemberRefrigeratorRepository memberRefrigeratorRepository;
+    private final RedisPublisherUtil redisPublisherUtil;
 
     @Value("${oauth2.kakao.client-id}")
     private String kakaoClientId;
 
     @Value("${oauth2.kakao.redirect-uri}")
     private String kakaoRedirectUri;
+
+    @Value("${spring.redis.channel}")
+    private String channel;  //redis pub/sub 메일 전송 채널
 
     /**
      * 로그인 메서드
@@ -319,20 +327,19 @@ public class MemberService {
      * @throws MessagingException 예외 발생 시
      * @throws UnsupportedEncodingException 예외 발생 시
      */
-    @Transactional
-    public void sendEmail(MemberRequestDTO.SendEmailDTO request) throws MessagingException, UnsupportedEncodingException {
-
+    public void sendEmail(MemberRequestDTO.SendEmailDTO request) throws MessagingException, UnsupportedEncodingException, JsonProcessingException {
         Member member = memberQueryService.findByEmail(request.getEmail()); // 가입된 메일인지 검사. null이면 에러 발생
 
         // 랜덤 수 생성
         int randomNum = (int) (Math.random() * 9000) + 1000;
+        String verificationCode = String.valueOf(randomNum);
+        redisUtil.createEmailCertification(request.getEmail(), verificationCode); // redis에 key:이메일, value:인증코드 저장
 
-        String vertificationCode = String.valueOf(randomNum);
-
-        redisUtil.createEmailCertification(request.getEmail(), vertificationCode); // redis에 key:이메일, value:인증코드 저장
-
-        mailService.sendResetPwdEmail(member.getEmail(), vertificationCode);
+        //메시지 발행
+        MessageDto messageDto = new MessageDto(member.getEmail(), verificationCode);
+        redisPublisherUtil.publish(new ChannelTopic(channel), messageDto);
     }
+
 
     /**
      * 이메일 인증 코드 검증 후 삭제 메서드

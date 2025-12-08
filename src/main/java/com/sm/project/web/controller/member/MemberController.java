@@ -1,5 +1,6 @@
 package com.sm.project.web.controller.member;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sm.project.apiPayload.ResponseDTO;
 import com.sm.project.apiPayload.code.ErrorReasonDTO;
 import com.sm.project.apiPayload.code.status.ErrorStatus;
@@ -216,10 +217,8 @@ public class MemberController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER4001", description = "해당 회원을 찾을 수 없습니다.",
                     content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
-    public ResponseDTO<?> sendEmail(@RequestBody @Valid MemberRequestDTO.SendEmailDTO request) throws MessagingException, UnsupportedEncodingException {
-
+    public ResponseDTO<?> sendEmail(@RequestBody @Valid MemberRequestDTO.SendEmailDTO request) throws MessagingException, UnsupportedEncodingException, JsonProcessingException {
         memberService.sendEmail(request);
-
         return ResponseDTO.of(SuccessStatus._OK, "메일 전송 성공");
 
     }
