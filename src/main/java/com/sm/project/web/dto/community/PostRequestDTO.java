@@ -3,6 +3,7 @@ package com.sm.project.web.dto.community;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 public class PostRequestDTO {
 

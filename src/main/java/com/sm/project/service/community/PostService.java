@@ -11,11 +11,14 @@ import com.sm.project.domain.member.Location;
 import com.sm.project.domain.member.Member;
 import com.sm.project.feignClient.dto.NaverGeoResponse;
 import com.sm.project.feignClient.naver.NaverGeoFeignClient;
+import com.sm.project.repository.community.CommentRepository;
 import com.sm.project.repository.community.PostImgRepository;
 import com.sm.project.repository.community.PostRepository;
+import com.sm.project.repository.community.dto.CommentCountDto;
 import com.sm.project.repository.member.LocationRepository;
 import com.sm.project.service.UtilService;
 import com.sm.project.web.dto.community.PostRequestDTO;
+import com.sm.project.web.dto.community.PostResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -25,7 +28,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * PostService는 게시글 관련 기능을 제공하는 서비스 클래스입니다.
@@ -43,6 +48,7 @@ public class PostService {
     private final NaverGeoFeignClient naverGeoFeignClient;
     private final UtilService utilService;
     private final PostImgRepository postImgRepository;
+    private final CommentRepository commentRepository;
 
     /**
      * 새로운 게시글을 생성하는 메서드입니다.
@@ -144,14 +150,23 @@ public class PostService {
      * @param locationId 위치 ID
      * @return 게시글 목록
      */
-    public List<Post> getPostList(Long lastIndex, PostTopicType postTopicType, Long locationId) {
+    public List<PostResponseDTO.PostDTO> getPostList(Long lastIndex, PostTopicType postTopicType, Long locationId) {
 
         Location location = (locationId == null) ? null : locationRepository.findById(locationId)
-            .orElseThrow(() -> new PostHandler(ErrorStatus.LOCATION_NOT_FOUND));
+                .orElseThrow(() -> new PostHandler(ErrorStatus.LOCATION_NOT_FOUND));
 
-        Pageable pageable = PageRequest.of(0, 5);
+        Pageable pageable = PageRequest.of(0, 20);
 
-        return postRepository.findPostList(lastIndex, postTopicType, location, pageable);
+        //게시글 목록 조회
+        List<Post> postList = postRepository.findPostList(lastIndex, postTopicType, location, pageable);
+
+        //댓글 수 조회
+        List<CommentCountDto> commentCount = commentRepository.countCommentByPostId(postList.stream().map(Post::getId).toList());
+        Map<Long, Long> commentCountMap = commentCount.stream().collect(Collectors.toMap(
+                CommentCountDto::getPostId,
+                CommentCountDto::getCommentCount
+        ));
+        return PostConverter.getCommentCountAndDto(postList, commentCountMap);
     }
 
     /**

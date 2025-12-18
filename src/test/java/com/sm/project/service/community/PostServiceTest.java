@@ -13,6 +13,7 @@ import com.sm.project.repository.community.PostRepository;
 import com.sm.project.repository.member.LocationRepository;
 import com.sm.project.service.UtilService;
 import com.sm.project.web.dto.community.PostRequestDTO;
+import com.sm.project.web.dto.community.PostResponseDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -203,7 +204,7 @@ class PostServiceTest {
                 .thenReturn(List.of(mockPost));
 
         // When
-        List<Post> posts = postService.getPostList(1L, PostTopicType.SHARE, 1L);
+        List<PostResponseDTO.PostDTO> posts = postService.getPostList(1L, PostTopicType.SHARE, 1L);
 
         // Then
         assertNotNull(posts);

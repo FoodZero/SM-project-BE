@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -62,14 +63,13 @@ public class PostConverter {
                 .build();
     }
 
-    public static PostResponseDTO.PostListDTO toPostList(List<Post> postList, Member member) {
-        List<PostResponseDTO.PostDTO> postDTOS = postList.stream().map(post -> {
+    public static List<PostResponseDTO.PostDTO> getCommentCountAndDto(List<Post> postList, Map<Long, Long> commentCountMap) {
+        List<PostResponseDTO.PostDTO> postDTOS = postList.stream().map(post ->  {
             List<PostResponseDTO.PostImgResponseDTO> imgs = post.getPostImgs().stream().map(img ->
                             PostResponseDTO.PostImgResponseDTO.builder()
                                     .itemImgUrl(img.getUrl())
                                     .build())
                     .collect(Collectors.toList());
-
             return PostResponseDTO.PostDTO.builder()
                     .id(post.getId())
                     .address(post.getLocation().getAddress())
@@ -79,8 +79,13 @@ public class PostConverter {
                     .nickname(post.getMember().getNickname())
                     .createdAt(post.getCreatedAt())
                     .itemImgUrlList(imgs)
+                    .commentCount(commentCountMap.getOrDefault(post.getId(), 0L).intValue())  //댓글 수 조회 -> 기본값 = 0
                     .build();
         }).collect(Collectors.toList());
+        return postDTOS;
+    }
+
+    public static PostResponseDTO.PostListDTO toPostListDto(List<PostResponseDTO.PostDTO> postDTOS) {
 
         return PostResponseDTO.PostListDTO.builder()
                 .postDTOList(postDTOS)

@@ -63,3 +63,5 @@ out/
 
 ### VS Code ###
 .vscode/
+docker-compose.yml
+k6/

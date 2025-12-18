@@ -6,6 +6,8 @@ import com.sm.project.converter.community.PostConverter;
 import com.sm.project.domain.enums.PostTopicType;
 import com.sm.project.domain.member.Member;
 import com.sm.project.service.UtilService;
+import com.sm.project.service.community.CommentQueryService;
+import com.sm.project.service.community.CommentService;
 import com.sm.project.service.community.PostService;
 import com.sm.project.service.member.MemberQueryService;
 import com.sm.project.web.dto.community.PostRequestDTO;
@@ -38,6 +40,7 @@ public class PostController {
     private final MemberQueryService memberQueryService;
     private final PostService postService;
     private final UtilService utilService;
+    private final CommentQueryService commentQueryService;
 
 
     /**
@@ -49,7 +52,7 @@ public class PostController {
      */
     @PostMapping("/location")
     @Operation(summary = "위치 저장 API", description = "사용자의 위치를 저장하는 API입니다.")
-    public ResponseDTO<?> postLocation(Authentication auth,
+    public ResponseDTO<String> postLocation(Authentication auth,
                                        @RequestBody PostRequestDTO.LocationDTO request) {
 
         Member member = utilService.getAuthenticatedMember(auth);
@@ -99,8 +102,7 @@ public class PostController {
         if (lastIndex == null) {
             lastIndex = 0L;
         }
-
-        return ResponseDTO.onSuccess(PostConverter.toPostList(postService.getPostList(lastIndex, postTopicType, locationId), member));
+        return ResponseDTO.onSuccess(PostConverter.toPostListDto(postService.getPostList(lastIndex, postTopicType, locationId)));
     }
 
     /**
