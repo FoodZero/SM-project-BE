@@ -1,17 +1,12 @@
 package com.sm.project.web.controller.community;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sm.project.apiPayload.ResponseDTO;
 import com.sm.project.apiPayload.code.status.SuccessStatus;
 import com.sm.project.converter.community.PostConverter;
 import com.sm.project.domain.enums.PostTopicType;
 import com.sm.project.domain.member.Member;
-import com.sm.project.service.CommentCacheService;
 import com.sm.project.service.UtilService;
-import com.sm.project.service.community.CommentQueryService;
 import com.sm.project.service.community.PostService;
-import com.sm.project.service.member.MemberQueryService;
 import com.sm.project.web.dto.community.PostRequestDTO;
 import com.sm.project.web.dto.community.PostResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,13 +34,8 @@ import java.util.List;
 @RequestMapping("/api/post")
 public class PostController {
 
-    private final MemberQueryService memberQueryService;
     private final PostService postService;
     private final UtilService utilService;
-    private final CommentQueryService commentQueryService;
-    private final CommentCacheService commentCacheService;
-    private final ObjectMapper objectMapper;
-
 
     /**
      * 위치 저장 API
@@ -99,7 +89,7 @@ public class PostController {
     public ResponseDTO<?> getPostList(Authentication auth,
                                          @RequestParam(value = "lastIndex", required = false) Long lastIndex,
                                          @RequestParam(value = "postType", required = false) PostTopicType postTopicType,
-                                         @RequestParam(value = "locationId", required = false) Long locationId) throws JsonProcessingException {
+                                         @RequestParam(value = "locationId", required = false) Long locationId) {
 
         Member member = utilService.getAuthenticatedMember(auth);
 

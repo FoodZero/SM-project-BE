@@ -19,7 +19,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableJpaRepositories(excludeFilters = @ComponentScan.Filter(
 		type = FilterType.ASSIGNABLE_TYPE,
 		classes = RecipeElasticRepository.class))
-@EnableCaching
 public class ProjectApplication {
 
 	public static void main(String[] args) {
