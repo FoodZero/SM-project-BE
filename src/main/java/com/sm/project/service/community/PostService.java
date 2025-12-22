@@ -16,6 +16,7 @@ import com.sm.project.repository.community.PostImgRepository;
 import com.sm.project.repository.community.PostRepository;
 import com.sm.project.repository.community.dto.CommentCountDto;
 import com.sm.project.repository.member.LocationRepository;
+import com.sm.project.service.CommentCacheService;
 import com.sm.project.service.UtilService;
 import com.sm.project.web.dto.community.PostRequestDTO;
 import com.sm.project.web.dto.community.PostResponseDTO;
@@ -23,6 +24,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,6 +52,8 @@ public class PostService {
     private final UtilService utilService;
     private final PostImgRepository postImgRepository;
     private final CommentRepository commentRepository;
+    private final CommentCacheService commentCacheService;
+    private final StringRedisTemplate redisTemplate;
 
     /**
      * 새로운 게시글을 생성하는 메서드입니다.
@@ -157,17 +162,44 @@ public class PostService {
 
         Pageable pageable = PageRequest.of(0, 20);
 
+        log.info("게시글 목록 조회");
         //게시글 목록 조회
         List<Post> postList = postRepository.findPostList(lastIndex, postTopicType, location, pageable);
 
         //댓글 수 조회
-        List<CommentCountDto> commentCount = commentRepository.countCommentByPostId(postList.stream().map(Post::getId).toList());
-        Map<Long, Long> commentCountMap = commentCount.stream().collect(Collectors.toMap(
+        //방안1 집계쿼리
+        /*Map<Long, Long> commentCountMap = commentRepository.countCommentByPostId(postList).stream().collect(Collectors.toMap(
                 CommentCountDto::getPostId,
                 CommentCountDto::getCommentCount
-        ));
-        return PostConverter.getCommentCountAndDto(postList, commentCountMap);
+        ));;*/
+
+        //return PostConverter.getCommentCountAndDto(postList, commentCountMap);
+        return getCommentCountAndDto(postList);
     }
+
+    private List<PostResponseDTO.PostDTO> getCommentCountAndDto(List<Post> postList) {
+        List<PostResponseDTO.PostDTO> postDTOS = postList.stream().map(post ->  {
+            List<PostResponseDTO.PostImgResponseDTO> imgs = post.getPostImgs().stream().map(img ->
+                            PostResponseDTO.PostImgResponseDTO.builder()
+                                    .itemImgUrl(img.getUrl())
+                                    .build())
+                    .collect(Collectors.toList());
+            return PostResponseDTO.PostDTO.builder()
+                    .id(post.getId())
+                    .address(post.getLocation().getAddress())
+                    .title(post.getTitle())
+                    .status(post.getStatus())
+                    .content(post.getContent())
+                    .nickname(post.getMember().getNickname())
+                    .createdAt(post.getCreatedAt())
+                    .itemImgUrlList(imgs)
+                    //.commentCount(commentRepository.countByPost(post.getId()))  //댓글 수 조회 -> 기본값 = 0
+                    .commentCount(commentCacheService.getCommentCount(post.getId()))  //댓글 수 캐싱
+                    .build();
+        }).collect(Collectors.toList());
+        return postDTOS;
+    }
+
 
     /**
      * 특정 게시글을 조회하는 메서드입니다.

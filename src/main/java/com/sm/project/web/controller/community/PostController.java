@@ -1,13 +1,15 @@
 package com.sm.project.web.controller.community;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sm.project.apiPayload.ResponseDTO;
 import com.sm.project.apiPayload.code.status.SuccessStatus;
 import com.sm.project.converter.community.PostConverter;
 import com.sm.project.domain.enums.PostTopicType;
 import com.sm.project.domain.member.Member;
+import com.sm.project.service.CommentCacheService;
 import com.sm.project.service.UtilService;
 import com.sm.project.service.community.CommentQueryService;
-import com.sm.project.service.community.CommentService;
 import com.sm.project.service.community.PostService;
 import com.sm.project.service.member.MemberQueryService;
 import com.sm.project.web.dto.community.PostRequestDTO;
@@ -41,6 +43,8 @@ public class PostController {
     private final PostService postService;
     private final UtilService utilService;
     private final CommentQueryService commentQueryService;
+    private final CommentCacheService commentCacheService;
+    private final ObjectMapper objectMapper;
 
 
     /**
@@ -92,10 +96,10 @@ public class PostController {
             @Parameter(name = "postType", description = "나눔, 레시피, 선택하지 않으면 전체 조회"),
             @Parameter(name = "locationId", description = "위치 조회 결과에서 나온 현재 위치 ID (Null인 경우 전체 조회)")
     })
-    public ResponseDTO<PostResponseDTO.PostListDTO> getPostList(Authentication auth,
-                                                                @RequestParam(value = "lastIndex", required = false) Long lastIndex,
-                                                                @RequestParam(value = "postType", required = false) PostTopicType postTopicType,
-                                                                @RequestParam(value = "locationId", required = false) Long locationId) {
+    public ResponseDTO<?> getPostList(Authentication auth,
+                                         @RequestParam(value = "lastIndex", required = false) Long lastIndex,
+                                         @RequestParam(value = "postType", required = false) PostTopicType postTopicType,
+                                         @RequestParam(value = "locationId", required = false) Long locationId) throws JsonProcessingException {
 
         Member member = utilService.getAuthenticatedMember(auth);
 

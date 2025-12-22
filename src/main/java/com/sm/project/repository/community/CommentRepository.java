@@ -1,6 +1,7 @@
 package com.sm.project.repository.community;
 
 import com.sm.project.domain.community.Comment;
+import com.sm.project.domain.community.Post;
 import com.sm.project.repository.community.dto.CommentCountDto;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -18,7 +19,10 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     //댓글 수 조회
     @Query("select new com.sm.project.repository.community.dto.CommentCountDto(c.post.id, count(c)) " +
             "from Comment c " +
-            "where c.post.id in :postIds " +
+            "where c.post in :postList " +
             "group by c.post.id")
-    List<CommentCountDto> countCommentByPostId(@Param("postIds") List<Long> postIds);
+    List<CommentCountDto> countCommentByPostId(@Param("postList") List<Post> postList);
+
+    @Query("select count(c) from Comment c where c.post.id = :postId")
+    Long countByPost(@Param("postId") Long postId);
 }

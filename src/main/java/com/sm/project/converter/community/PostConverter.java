@@ -79,7 +79,7 @@ public class PostConverter {
                     .nickname(post.getMember().getNickname())
                     .createdAt(post.getCreatedAt())
                     .itemImgUrlList(imgs)
-                    .commentCount(commentCountMap.getOrDefault(post.getId(), 0L).intValue())  //댓글 수 조회 -> 기본값 = 0
+                    .commentCount(commentCountMap.getOrDefault(post.getId(), 0L))  //댓글 수 조회 -> 기본값 = 0
                     .build();
         }).collect(Collectors.toList());
         return postDTOS;

@@ -38,7 +38,7 @@ public class PostResponseDTO {
         PostStatusType status;
         LocalDateTime createdAt;
         List<PostImgResponseDTO> itemImgUrlList;
-        Integer commentCount;
+        Long commentCount;
 
     }
 
